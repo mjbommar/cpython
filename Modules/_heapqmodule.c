@@ -22,6 +22,85 @@ module _heapq
 [clinic start generated code]*/
 /*[clinic end generated code: output=da39a3ee5e6b4b0d input=d7cca0a2e4c0ceb3]*/
 
+static inline int
+heap_lt_tuple3_exact_firstfloat(PyObject *lhs, PyObject *rhs)
+{
+    Py_ssize_t size;
+    long long lhs_value;
+    long long rhs_value;
+    PyObject *lhs0;
+    PyObject *rhs0;
+    PyObject *lhs1;
+    PyObject *rhs1;
+    PyObject *lhs2;
+    PyObject *rhs2;
+
+    if (PyTuple_Check(lhs) &&
+        PyTuple_Check(rhs) &&
+        Py_TYPE(lhs)->tp_richcompare == PyTuple_Type.tp_richcompare &&
+        Py_TYPE(rhs)->tp_richcompare == PyTuple_Type.tp_richcompare)
+    {
+        size = PyTuple_GET_SIZE(lhs);
+        if (size == PyTuple_GET_SIZE(rhs) && (size == 3 || size == 6)) {
+            lhs0 = PyTuple_GET_ITEM(lhs, 0);
+            rhs0 = PyTuple_GET_ITEM(rhs, 0);
+            if (PyFloat_CheckExact(lhs0) && PyFloat_CheckExact(rhs0)) {
+                double lhs_when = PyFloat_AS_DOUBLE(lhs0);
+                double rhs_when = PyFloat_AS_DOUBLE(rhs0);
+                if (lhs_when < rhs_when) {
+                    return 1;
+                }
+                if (lhs_when > rhs_when) {
+                    return 0;
+                }
+
+                lhs1 = PyTuple_GET_ITEM(lhs, 1);
+                rhs1 = PyTuple_GET_ITEM(rhs, 1);
+                if (PyLong_CheckExact(lhs1) && PyLong_CheckExact(rhs1)) {
+                    lhs_value = PyLong_AsLongLong(lhs1);
+                    if (lhs_value == -1 && PyErr_Occurred()) {
+                        PyErr_Clear();
+                        return PyObject_RichCompareBool(lhs, rhs, Py_LT);
+                    }
+                    rhs_value = PyLong_AsLongLong(rhs1);
+                    if (rhs_value == -1 && PyErr_Occurred()) {
+                        PyErr_Clear();
+                        return PyObject_RichCompareBool(lhs, rhs, Py_LT);
+                    }
+                    if (lhs_value < rhs_value) {
+                        return 1;
+                    }
+                    if (lhs_value > rhs_value) {
+                        return 0;
+                    }
+
+                    lhs2 = PyTuple_GET_ITEM(lhs, 2);
+                    rhs2 = PyTuple_GET_ITEM(rhs, 2);
+                    if (PyLong_CheckExact(lhs2) && PyLong_CheckExact(rhs2)) {
+                        lhs_value = PyLong_AsLongLong(lhs2);
+                        if (lhs_value == -1 && PyErr_Occurred()) {
+                            PyErr_Clear();
+                            return PyObject_RichCompareBool(lhs, rhs, Py_LT);
+                        }
+                        rhs_value = PyLong_AsLongLong(rhs2);
+                        if (rhs_value == -1 && PyErr_Occurred()) {
+                            PyErr_Clear();
+                            return PyObject_RichCompareBool(lhs, rhs, Py_LT);
+                        }
+                        if (lhs_value < rhs_value) {
+                            return 1;
+                        }
+                        if (lhs_value > rhs_value) {
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return PyObject_RichCompareBool(lhs, rhs, Py_LT);
+}
+
 static int
 siftdown(PyListObject *heap, Py_ssize_t startpos, Py_ssize_t pos)
 {
@@ -45,7 +124,7 @@ siftdown(PyListObject *heap, Py_ssize_t startpos, Py_ssize_t pos)
         parent = arr[parentpos];
         Py_INCREF(newitem);
         Py_INCREF(parent);
-        cmp = PyObject_RichCompareBool(newitem, parent, Py_LT);
+        cmp = heap_lt_tuple3_exact_firstfloat(newitem, parent);
         Py_DECREF(parent);
         Py_DECREF(newitem);
         if (cmp < 0)
@@ -93,7 +172,7 @@ siftup(PyListObject *heap, Py_ssize_t pos)
             PyObject* b = arr[childpos + 1];
             Py_INCREF(a);
             Py_INCREF(b);
-            cmp = PyObject_RichCompareBool(a, b, Py_LT);
+            cmp = heap_lt_tuple3_exact_firstfloat(a, b);
             Py_DECREF(a);
             Py_DECREF(b);
             if (cmp < 0)

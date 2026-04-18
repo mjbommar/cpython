@@ -1,0 +1,1225 @@
+{
+  "roots": {
+    "Lib": 24,
+    "Lib/test": 45,
+    "site-packages": 31
+  },
+  "pattern_totals": {
+    "import_heapq": 8,
+    "call_at": 12,
+    "heapq_heappush": 7,
+    "heapq_heapify": 7,
+    "heapq_heappop": 7,
+    "call_later": 45,
+    "import_from_heapq": 7,
+    "heapq__nlargest": 1,
+    "PriorityQueue": 1,
+    "heapq_heappushpop": 1,
+    "heapq_heapreplace": 3,
+    "heapq_nsmallest": 1
+  },
+  "heappush_shapes": {
+    "name": 9,
+    "int": 1,
+    "tuple_len_4": 1
+  },
+  "top_packages": [
+    [
+      "test_asyncio",
+      35
+    ],
+    [
+      "asyncio",
+      15
+    ],
+    [
+      "celery",
+      11
+    ],
+    [
+      "test_free_threading",
+      8
+    ],
+    [
+      "dateutil",
+      7
+    ],
+    [
+      "queue.py",
+      4
+    ],
+    [
+      "uvicorn",
+      4
+    ],
+    [
+      "sched.py",
+      3
+    ],
+    [
+      "kombu",
+      3
+    ],
+    [
+      "difflib.py",
+      2
+    ],
+    [
+      "test_asyncgen.py",
+      2
+    ],
+    [
+      "gunicorn",
+      2
+    ],
+    [
+      "jsonschema",
+      2
+    ],
+    [
+      "anyio",
+      1
+    ],
+    [
+      "asgiref",
+      1
+    ]
+  ],
+  "top_files": [
+    {
+      "path": "Lib/test/test_asyncio/test_base_events.py",
+      "total": 18,
+      "counts": {
+        "call_later": 13,
+        "call_at": 5
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_free_threading/test_heapq.py",
+      "total": 8,
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappush": 2,
+        "heapq_heappop": 2,
+        "heapq_heappushpop": 1,
+        "heapq_heapreplace": 1,
+        "heapq_heapify": 1
+      },
+      "heappush_shapes": {
+        "name": 3,
+        "int": 1
+      }
+    },
+    {
+      "path": "Lib/test/test_asyncio/test_events.py",
+      "total": 7,
+      "counts": {
+        "call_later": 6,
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/dateutil/rrule.py",
+      "total": 7,
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappop": 1,
+        "heapq_heapify": 3,
+        "heapq_heapreplace": 2
+      },
+      "heappush_shapes": {
+        "name": 2
+      }
+    },
+    {
+      "path": "Lib/asyncio/base_events.py",
+      "total": 6,
+      "counts": {
+        "import_heapq": 1,
+        "call_at": 1,
+        "heapq_heappush": 1,
+        "heapq_heapify": 1,
+        "heapq_heappop": 2
+      },
+      "heappush_shapes": {
+        "name": 1
+      }
+    },
+    {
+      "path": "site-packages/celery/utils/collections.py",
+      "total": 6,
+      "counts": {
+        "import_from_heapq": 3,
+        "heapq_heapify": 1,
+        "heapq_heappush": 1,
+        "heapq_heappop": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      }
+    },
+    {
+      "path": "Lib/queue.py",
+      "total": 4,
+      "counts": {
+        "import_from_heapq": 2,
+        "heapq_heappush": 1,
+        "heapq_heappop": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      }
+    },
+    {
+      "path": "Lib/asyncio/tasks.py",
+      "total": 3,
+      "counts": {
+        "call_later": 3
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/sched.py",
+      "total": 3,
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappush": 1,
+        "heapq_heapify": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      }
+    },
+    {
+      "path": "Lib/test/test_asyncio/test_queues.py",
+      "total": 3,
+      "counts": {
+        "call_later": 2,
+        "PriorityQueue": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_asyncio/test_tasks.py",
+      "total": 3,
+      "counts": {
+        "call_later": 3
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/asyncio/sslproto.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/difflib.py",
+      "total": 2,
+      "counts": {
+        "import_from_heapq": 1,
+        "heapq__nlargest": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_asyncgen.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_asyncio/test_runners.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/celery/concurrency/asynpool.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/celery/worker/consumer/gossip.py",
+      "total": 2,
+      "counts": {
+        "import_from_heapq": 1,
+        "heapq_heappush": 1
+      },
+      "heappush_shapes": {
+        "tuple_len_4": 1
+      }
+    },
+    {
+      "path": "site-packages/gunicorn/asgi/protocol.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/jsonschema/exceptions.py",
+      "total": 2,
+      "counts": {
+        "import_heapq": 1,
+        "heapq_nsmallest": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/uvicorn/protocols/websockets/websockets_sansio_impl.py",
+      "total": 2,
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/asyncio/events.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/asyncio/queues.py",
+      "total": 1,
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/asyncio/selector_events.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/asyncio/timeouts.py",
+      "total": 1,
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_asyncio/test_streams.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "Lib/test/test_asyncio/utils.py",
+      "total": 1,
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/anyio/_backends/_asyncio.py",
+      "total": 1,
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/asgiref/timeout.py",
+      "total": 1,
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/celery/beat.py",
+      "total": 1,
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/kombu/asynchronous/http/curl.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/kombu/asynchronous/hub.py",
+      "total": 1,
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/kombu/asynchronous/timer.py",
+      "total": 1,
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/uvicorn/protocols/http/h11_impl.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    },
+    {
+      "path": "site-packages/uvicorn/protocols/http/httptools_impl.py",
+      "total": 1,
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {}
+    }
+  ],
+  "files": [
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/base_events.py",
+      "counts": {
+        "import_heapq": 1,
+        "call_at": 1,
+        "heapq_heappush": 1,
+        "heapq_heapify": 1,
+        "heapq_heappop": 2
+      },
+      "heappush_shapes": {
+        "name": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 21
+        },
+        {
+          "kind": "call_at",
+          "lineno": 798
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 818
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 2005
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 2012
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 2040
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/events.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 312
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/queues.py",
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 11
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/selector_events.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 204
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/sslproto.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 547
+        },
+        {
+          "kind": "call_later",
+          "lineno": 627
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/tasks.py",
+      "counts": {
+        "call_later": 3
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 499
+        },
+        {
+          "kind": "call_later",
+          "lineno": 571
+        },
+        {
+          "kind": "call_later",
+          "lineno": 698
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "asyncio",
+      "path": "asyncio/timeouts.py",
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_at",
+          "lineno": 69
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "difflib.py",
+      "path": "difflib.py",
+      "counts": {
+        "import_from_heapq": 1,
+        "heapq__nlargest": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "import_from_heapq",
+          "lineno": 34,
+          "detail": "nlargest"
+        },
+        {
+          "kind": "heapq__nlargest",
+          "lineno": 713
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "queue.py",
+      "path": "queue.py",
+      "counts": {
+        "import_from_heapq": 2,
+        "heapq_heappush": 1,
+        "heapq_heappop": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_from_heapq",
+          "lineno": 6,
+          "detail": "heappush"
+        },
+        {
+          "kind": "import_from_heapq",
+          "lineno": 6,
+          "detail": "heappop"
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 293
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 296
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "package": "sched.py",
+      "path": "sched.py",
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappush": 1,
+        "heapq_heapify": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 27
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 75
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 96
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncgen.py",
+      "path": "test_asyncgen.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 1493
+        },
+        {
+          "kind": "call_later",
+          "lineno": 1583
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_base_events.py",
+      "counts": {
+        "call_later": 13,
+        "call_at": 5
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 301
+        },
+        {
+          "kind": "call_later",
+          "lineno": 306
+        },
+        {
+          "kind": "call_later",
+          "lineno": 315
+        },
+        {
+          "kind": "call_later",
+          "lineno": 316
+        },
+        {
+          "kind": "call_at",
+          "lineno": 328
+        },
+        {
+          "kind": "call_at",
+          "lineno": 336
+        },
+        {
+          "kind": "call_later",
+          "lineno": 349
+        },
+        {
+          "kind": "call_at",
+          "lineno": 351
+        },
+        {
+          "kind": "call_later",
+          "lineno": 354
+        },
+        {
+          "kind": "call_at",
+          "lineno": 355
+        },
+        {
+          "kind": "call_later",
+          "lineno": 460
+        },
+        {
+          "kind": "call_later",
+          "lineno": 467
+        },
+        {
+          "kind": "call_later",
+          "lineno": 473
+        },
+        {
+          "kind": "call_later",
+          "lineno": 503
+        },
+        {
+          "kind": "call_later",
+          "lineno": 508
+        },
+        {
+          "kind": "call_later",
+          "lineno": 622
+        },
+        {
+          "kind": "call_later",
+          "lineno": 2126
+        },
+        {
+          "kind": "call_at",
+          "lineno": 2128
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_events.py",
+      "counts": {
+        "call_later": 6,
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 317
+        },
+        {
+          "kind": "call_later",
+          "lineno": 621
+        },
+        {
+          "kind": "call_later",
+          "lineno": 641
+        },
+        {
+          "kind": "call_later",
+          "lineno": 1981
+        },
+        {
+          "kind": "call_at",
+          "lineno": 1983
+        },
+        {
+          "kind": "call_later",
+          "lineno": 2537
+        },
+        {
+          "kind": "call_later",
+          "lineno": 2541
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_queues.py",
+      "counts": {
+        "call_later": 2,
+        "PriorityQueue": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 157
+        },
+        {
+          "kind": "call_later",
+          "lineno": 239
+        },
+        {
+          "kind": "PriorityQueue",
+          "lineno": 449
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_runners.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 437
+        },
+        {
+          "kind": "call_later",
+          "lineno": 452
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_streams.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 924
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/test_tasks.py",
+      "counts": {
+        "call_later": 3
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 613
+        },
+        {
+          "kind": "call_later",
+          "lineno": 1835
+        },
+        {
+          "kind": "call_later",
+          "lineno": 3009
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_asyncio",
+      "path": "test_asyncio/utils.py",
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_at",
+          "lineno": 487
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "package": "test_free_threading",
+      "path": "test_free_threading/test_heapq.py",
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappush": 2,
+        "heapq_heappop": 2,
+        "heapq_heappushpop": 1,
+        "heapq_heapreplace": 1,
+        "heapq_heapify": 1
+      },
+      "heappush_shapes": {
+        "name": 3,
+        "int": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 3
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 42
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 59
+        },
+        {
+          "kind": "heapq_heappushpop",
+          "lineno": 78
+        },
+        {
+          "kind": "heapq_heapreplace",
+          "lineno": 95
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 199
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 200
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 232
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "anyio",
+      "path": "anyio/_backends/_asyncio.py",
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_at",
+          "lineno": 570
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "asgiref",
+      "path": "asgiref/timeout.py",
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_at",
+          "lineno": 101
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "celery",
+      "path": "celery/beat.py",
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 6
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "celery",
+      "path": "celery/concurrency/asynpool.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 581
+        },
+        {
+          "kind": "call_later",
+          "lineno": 659
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "celery",
+      "path": "celery/utils/collections.py",
+      "counts": {
+        "import_from_heapq": 3,
+        "heapq_heapify": 1,
+        "heapq_heappush": 1,
+        "heapq_heappop": 1
+      },
+      "heappush_shapes": {
+        "name": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_from_heapq",
+          "lineno": 6,
+          "detail": "heapify"
+        },
+        {
+          "kind": "import_from_heapq",
+          "lineno": 6,
+          "detail": "heappop"
+        },
+        {
+          "kind": "import_from_heapq",
+          "lineno": 6,
+          "detail": "heappush"
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 519
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 540
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 601
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "celery",
+      "path": "celery/worker/consumer/gossip.py",
+      "counts": {
+        "import_from_heapq": 1,
+        "heapq_heappush": 1
+      },
+      "heappush_shapes": {
+        "tuple_len_4": 1
+      },
+      "call_sites": [
+        {
+          "kind": "import_from_heapq",
+          "lineno": 4,
+          "detail": "heappush"
+        },
+        {
+          "kind": "heapq_heappush",
+          "lineno": 100
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "dateutil",
+      "path": "dateutil/rrule.py",
+      "counts": {
+        "import_heapq": 1,
+        "heapq_heappop": 1,
+        "heapq_heapify": 3,
+        "heapq_heapreplace": 2
+      },
+      "heappush_shapes": {
+        "name": 2
+      },
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 10
+        },
+        {
+          "kind": "heapq_heappop",
+          "lineno": 1330
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 1333
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 1396
+        },
+        {
+          "kind": "heapq_heapify",
+          "lineno": 1397
+        },
+        {
+          "kind": "heapq_heapreplace",
+          "lineno": 1405
+        },
+        {
+          "kind": "heapq_heapreplace",
+          "lineno": 1412
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "gunicorn",
+      "path": "gunicorn/asgi/protocol.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 540
+        },
+        {
+          "kind": "call_later",
+          "lineno": 589
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "jsonschema",
+      "path": "jsonschema/exceptions.py",
+      "counts": {
+        "import_heapq": 1,
+        "heapq_nsmallest": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 10
+        },
+        {
+          "kind": "heapq_nsmallest",
+          "lineno": 486
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "kombu",
+      "path": "kombu/asynchronous/http/curl.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 105
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "kombu",
+      "path": "kombu/asynchronous/hub.py",
+      "counts": {
+        "call_at": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_at",
+          "lineno": 215
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "kombu",
+      "path": "kombu/asynchronous/timer.py",
+      "counts": {
+        "import_heapq": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "import_heapq",
+          "lineno": 5
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "uvicorn",
+      "path": "uvicorn/protocols/http/h11_impl.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 327
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "uvicorn",
+      "path": "uvicorn/protocols/http/httptools_impl.py",
+      "counts": {
+        "call_later": 1
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 340
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "package": "uvicorn",
+      "path": "uvicorn/protocols/websockets/websockets_sansio_impl.py",
+      "counts": {
+        "call_later": 2
+      },
+      "heappush_shapes": {},
+      "call_sites": [
+        {
+          "kind": "call_later",
+          "lineno": 286
+        },
+        {
+          "kind": "call_later",
+          "lineno": 299
+        }
+      ]
+    }
+  ]
+}
