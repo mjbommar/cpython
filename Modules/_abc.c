@@ -629,13 +629,24 @@ _abc__abc_instancecheck_impl(PyObject *module, PyObject *self,
         return NULL;
     }
 
+    subtype = (PyObject *)Py_TYPE(instance);
+    int incache = _in_weak_set(impl, &impl->_abc_cache, subtype);
+    if (incache < 0) {
+        Py_DECREF(impl);
+        return NULL;
+    }
+    if (incache > 0) {
+        Py_DECREF(impl);
+        return Py_NewRef(Py_True);
+    }
+
     subclass = PyObject_GetAttr(instance, &_Py_ID(__class__));
     if (subclass == NULL) {
         Py_DECREF(impl);
         return NULL;
     }
     /* Inline the cache checking. */
-    int incache = _in_weak_set(impl, &impl->_abc_cache, subclass);
+    incache = _in_weak_set(impl, &impl->_abc_cache, subclass);
     if (incache < 0) {
         goto end;
     }
@@ -643,7 +654,6 @@ _abc__abc_instancecheck_impl(PyObject *module, PyObject *self,
         result = Py_NewRef(Py_True);
         goto end;
     }
-    subtype = (PyObject *)Py_TYPE(instance);
     if (subtype == subclass) {
         if (get_cache_version(impl) == get_invalidation_counter(get_abc_state(module))) {
             incache = _in_weak_set(impl, &impl->_abc_negative_cache, subclass);

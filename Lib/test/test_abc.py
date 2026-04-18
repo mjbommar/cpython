@@ -196,6 +196,26 @@ def test_factory(abc_ABCMeta, abc_get_cache_token):
                 self.assertRaises(TypeError, F)  # because bar is abstract now
                 self.assertTrue(isabstract(F))
 
+        def test_instancecheck_respects_dynamic___class__(self):
+            class RegisteredABC(metaclass=abc_ABCMeta):
+                pass
+
+            RegisteredABC.register(dict)
+
+            class PropertyProxy:
+                @property
+                def __class__(self):
+                    return dict
+
+            class GetattributeProxy:
+                def __getattribute__(self, name):
+                    if name == "__class__":
+                        return dict
+                    return object.__getattribute__(self, name)
+
+            self.assertIsInstance(PropertyProxy(), RegisteredABC)
+            self.assertIsInstance(GetattributeProxy(), RegisteredABC)
+
         def test_descriptors_with_abstractmethod(self):
             class C(metaclass=abc_ABCMeta):
                 @property
