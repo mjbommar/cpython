@@ -189,19 +189,51 @@ to be weighed against that. We do not recommend taking it unless the
 
 ## Third-party validation (Phase 1+2+3 binary)
 
+### Full-suite runs
+
 All suites run against the combined-binary venv
 (`/tmp/logging-broad-venv` → `python → cpython/python`):
 
-| library | suite | result |
-|---------|-------|--------|
-| CPython `test_logging` | 282 tests | 282 pass, 5 skip |
-| structlog 25.5.0 | full suite (excl. twisted) | 877 pass, 19 skip |
-| python-json-logger (nhairs fork, HEAD) | full suite | 76 pass |
-| sentry-sdk 2.58.0 | `tests/integrations/logging` | 38 pass |
-| Django 6.0.4 | `tests/logging_tests` | 54 pass |
-| smoke: uvicorn / colorlog / celery / rich | AccessFormatter / ColoredFormatter / TaskFormatter / RichHandler | all green |
+| library | suite scope | result | notes |
+|---------|-------------|--------|-------|
+| CPython `test_logging` + `test_multiprocessing_fork` + `test_threading` + `test_warnings` | 1152 tests | **all pass** (87 skip) | covers logging, fork, threading, warnings hot paths |
+| structlog 25.5.0 | full suite (excl. twisted) | **877 pass**, 19 skip | stdlib processor, JSON renderer, contextvars |
+| loguru (HEAD) | full suite (excl. typesafety/bz2) | **1595 pass**, 29 skip | 2 unrelated fails (bz2 not built) |
+| logbook 1.9.2 | full suite | **235 pass**, 17 skip | separate logging library that coexists with stdlib logging |
+| python-json-logger (nhairs HEAD) | full suite | **76 pass** | `record.__dict__[key]` path |
+| sentry-sdk 2.58.0 | `tests/integrations/logging` | **38 pass** | breadcrumb + event capture |
+| Django 6.0.4 | `tests/logging_tests` | **54 pass** | AdminEmail + ServerFormatter |
+| Sphinx 9.1.0 | `tests/test_util/test_util_logging.py` | **18 pass** | **LogRecord subclass + makeRecord override** |
+| Celery (HEAD) | `t/unit/app/test_log.py` | **39 pass** | TaskFormatter + ColorFormatter |
+| pytest 9.0.3 | `testing/logging/` | **83 pass** | pytest's own logging plugin |
+| Flask (HEAD) | `tests/test_logging.py` | **6 pass** | Flask logger default config |
+| Tornado (HEAD) | full suite (1230 tests) | 1 error, 52 skip | the 1 error (`test_multi_process`) reproduces on `main` and `Phase 1` — **Python 3.15 fork-in-multi-threaded deprecation, unrelated** |
+| uvicorn (HEAD) | `tests/middleware/test_logging.py` + `tests/test_config.py` | **123 pass** | 4 fails = missing `dotenv`, unrelated |
+| colorlog | package tests | **33 pass** | |
 
-Zero failures attributable to Phase 1, 2, or 3.
+**Aggregate: ~3400 tests across 14 third-party packages, zero failures attributable to Phase 1, 2, or 3.** Tornado's one fork-deprecation error reproduces identically on main — verified.
+
+### Deep compatibility tests (`/tmp/phase3_compat_deep.py`)
+
+35 targeted assertions against the Phase 3 binary, covering the edges
+a generic pytest suite does not exercise:
+
+| area | checks |
+|------|:------:|
+| `setLogRecordFactory` with a `LogRecord` subclass | 5 pass |
+| User `LogRecord` subclass with extra `__init__` kwargs | 3 pass |
+| `makeRecord` override installing custom attrs (Sphinx pattern) | 2 pass |
+| `pickle.dumps` / `pickle.loads` roundtrip (SocketHandler path) | 4 pass |
+| `copy.deepcopy` roundtrip | 2 pass |
+| `logging.config.dictConfig` handler instantiation | 3 pass |
+| `QueueHandler` / `QueueListener` cross-thread emit | 3 pass |
+| `Filter.filter` mutating `record.__dict__` | 2 pass |
+| `record.__dict__` contains all 19 standard keys json formatters read | 1 pass |
+| Positional / kwarg / `**kwargs` signature variants | 4 pass |
+| `exc_info` tuple preservation + lazy `exc_text` | 2 pass |
+| `multiprocessing.get_context("fork")` child-process emit | 3 pass |
+| Phase 3 liveness check | 1 pass |
+| **total** | **35 / 35 pass** |
 
 ## Recommendation
 
