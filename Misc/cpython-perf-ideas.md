@@ -45,6 +45,12 @@ done in `exp-json/research` 2026-04-18: see
 and is ready to split into filing candidates**), `_csv.c` bulk scan
 (on our radar).
 
+Reusable service-style profiling harnesses for framework-heavy paths now
+live in `Misc/service-profile-data/` on this branch. They are not
+optimization ideas by themselves; they exist to make FastAPI and Celery
+profiling repeatable across future experiments and to expose which
+stdlib and builtins / C-backed paths dominate under service-ish loads.
+
 ## Convergence — ideas that surfaced on multiple lists
 
 These are the strongest signals. When a compiler theorist, a graph
