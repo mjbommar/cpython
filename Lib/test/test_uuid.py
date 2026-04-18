@@ -708,6 +708,21 @@ class BaseTestUUID:
         self.assertEqual(u, expected)
         generate_random_int.assert_called_once_with()
 
+    def test_uuid4_helper_fallback(self):
+        random_data = bytes.fromhex('00112233445566778899aabbccddeeff')
+        expected_int = int.from_bytes(random_data)
+        expected_int &= self.uuid._RFC_4122_CLEARFLAGS_MASK
+        expected_int |= self.uuid._RFC_4122_VERSION_4_FLAGS
+
+        with (
+            mock.patch.object(self.uuid, '_generate_random_int', None),
+            mock.patch('os.urandom', return_value=random_data) as urandom,
+        ):
+            u = self.uuid.uuid4()
+
+        self.assertEqual(u, self.uuid.UUID(int=expected_int))
+        urandom.assert_called_once_with(16)
+
     def test_uuid5(self):
         equal = self.assertEqual
 
