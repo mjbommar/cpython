@@ -1,0 +1,297 @@
+{
+  "files": {
+    "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages": [
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "Parentage",
+            "line": 599
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "_OldSchoolNamespacePackageVis",
+            "line": 767
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pydoctor/astutils.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "CellMagicFinder",
+            "line": 379
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "MagicFinder",
+            "line": 421
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/black/handle_ipynb_magics.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "_NameExtractor",
+            "line": 197
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "_LiteralEvalVisitor",
+            "line": 457
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/typeshed_client/parser.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "_Visitor",
+            "line": 979
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyanalyze/annotations.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "BaseNodeVisitor",
+            "line": 168
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "NodeTransformer",
+            "line": 1042
+          },
+          {
+            "bases": [
+              "NodeTransformer"
+            ],
+            "class": "ReplaceNodeTransformer",
+            "line": 1074
+          },
+          {
+            "bases": [
+              "BaseNodeVisitor"
+            ],
+            "class": "ReplacingNodeVisitor",
+            "line": 1086
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyanalyze/node_visitor.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "ConditionEvaluator",
+            "line": 347
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "EvaluateVisitor",
+            "line": 620
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyanalyze/type_evaluation.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "IsGeneratorVisitor",
+            "line": 387
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyanalyze/functions.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "PatmaVisitor",
+            "line": 190
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyanalyze/patma.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "Vulture",
+            "line": 190
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/vulture/core.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "Decompiler",
+            "line": 149
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/ast_decompiler/decompiler.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "Visitor",
+            "line": 87
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pyupgrade/_plugins/legacy.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "SourceAnalyzer",
+            "line": 133
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "ImportablesAnalyzer",
+            "line": 526
+          },
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "SideEffectsAnalyzer",
+            "line": 732
+          }
+        ],
+        "path": "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages/pycln/utils/scan.py"
+      }
+    ],
+    "/tmp/cpython-ast-nodevisitor/Lib": [
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "_ModuleBrowser",
+            "line": 185
+          }
+        ],
+        "path": "/tmp/cpython-ast-nodevisitor/Lib/pyclbr.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "NodeVisitor"
+            ],
+            "class": "Unparser",
+            "line": 49
+          }
+        ],
+        "path": "/tmp/cpython-ast-nodevisitor/Lib/_ast_unparse.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "SourceOffsetVisitor",
+            "line": 1904
+          }
+        ],
+        "path": "/tmp/cpython-ast-nodevisitor/Lib/test/test_compile.py"
+      }
+    ],
+    "/tmp/cpython-ast-nodevisitor/Tools": [
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "GettextVisitor",
+            "line": 455
+          }
+        ],
+        "path": "/tmp/cpython-ast-nodevisitor/Tools/i18n/pygettext.py"
+      },
+      {
+        "classes": [
+          {
+            "bases": [
+              "ast.NodeVisitor"
+            ],
+            "class": "DetectBadNodes",
+            "line": 973
+          }
+        ],
+        "path": "/tmp/cpython-ast-nodevisitor/Tools/clinic/libclinic/dsl_parser.py"
+      }
+    ]
+  },
+  "package_counts": {
+    "_ast_unparse": 1,
+    "ast_decompiler": 1,
+    "black": 2,
+    "clinic": 1,
+    "i18n": 1,
+    "pyanalyze": 9,
+    "pyclbr": 1,
+    "pycln": 3,
+    "pydoctor": 2,
+    "pyupgrade": 1,
+    "test": 1,
+    "typeshed_client": 2,
+    "vulture": 1
+  },
+  "roots": [
+    "/tmp/cpython-ast-nodevisitor/Lib",
+    "/tmp/cpython-ast-nodevisitor/Tools",
+    "/tmp/ast-nodevisitor-venv/lib/python3.14/site-packages"
+  ]
+}
