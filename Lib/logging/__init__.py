@@ -211,6 +211,32 @@ _pathname_to_fields_cache = {}
 _main_thread_ident = threading.main_thread().ident
 _main_thread_name = threading.main_thread().name
 
+# Optional C accelerator. When available, LogRecord.__init__ is
+# replaced by a C implementation that skips 21 STORE_ATTR opcodes.
+# Import failure is not an error — the module is strictly additive.
+#
+# Note: a C `_find_caller` helper was evaluated and measured to be
+# slightly slower end-to-end than the pure-Python cached findCaller
+# (Phase 1) due to Python↔C boundary + tuple-construction overhead
+# offsetting the internal speedup. Kept available but not wired in
+# as a default.
+try:
+    import _logging as _c_accel
+except ImportError:
+    _c_accel = None
+
+# Runtime toggles for A/B benchmarking. Removed before upstream PR.
+#   LOGGING_C_FINDCALLER=1   enables Phase 2 (C _find_caller).
+#   LOGGING_DISABLE_C_INIT=1 disables Phase 3 (C LogRecord.__init__).
+#   LOGGING_DISABLE_PHASE1=1 disables the pure-Python Phase 1 caches.
+import os as _os_env
+if _c_accel is not None and _os_env.environ.get("LOGGING_C_FINDCALLER") == "1":
+    _find_caller_c = _c_accel._find_caller
+else:
+    _find_caller_c = None
+_ENABLE_PHASE3 = _os_env.environ.get("LOGGING_DISABLE_C_INIT") != "1"
+_ENABLE_PHASE1 = _os_env.environ.get("LOGGING_DISABLE_PHASE1") != "1"
+
 
 def _is_internal_frame(frame):
     """Signal whether the frame is a CPython or logging module internal."""
@@ -437,6 +463,41 @@ class LogRecord(object):
         if self.args:
             msg = msg % self.args
         return msg
+
+#
+#   Optional C accelerator: install a fast __init__ for LogRecord.
+#   This must happen AFTER LogRecord is defined and BEFORE any records
+#   are created. When _logging is unavailable the pure-Python __init__
+#   above is used unchanged.
+#
+if _c_accel is not None and _ENABLE_PHASE3:
+    _c_accel._install_state(
+        sys.modules[__name__],
+        _pathname_to_fields_cache,
+        getLevelName,
+        os.path.basename,
+        os.path.splitext,
+        threading.get_ident,
+        threading.current_thread,
+        _main_thread_ident,
+        _main_thread_name,
+        _startTime,
+        time,
+        os.getpid,
+    )
+    # A one-line Python wrapper is unavoidable because PyCFunction is
+    # not a descriptor; assigning it to a class attribute would not
+    # auto-bind `self`. This wrapper costs ~100 ns per call but the
+    # C body of _log_record_init saves much more on the 20+ attribute
+    # stores it would otherwise take.
+    _c_log_record_init = _c_accel._log_record_init
+    def _LogRecord_init_c(self, name, level, pathname, lineno,
+                          msg, args, exc_info, func=None, sinfo=None,
+                          **kwargs):
+        _c_log_record_init(self, name, level, pathname, lineno,
+                           msg, args, exc_info, func, sinfo)
+    LogRecord.__init__ = _LogRecord_init_c
+
 
 #
 #   Determine which class to use when instantiating log records.
@@ -1644,6 +1705,16 @@ class Logger(Filterer):
         Find the stack frame of the caller so that we can note the source
         file name, line number and function name.
         """
+        if _find_caller_c is not None and not stack_info:
+            # The C helper walks the frame chain directly, skipping
+            # internal-logging-module frames via a PyCodeObject pointer
+            # cache. Matches the pure-Python semantics below. The
+            # stack_info=True branch (rare; only when the caller
+            # explicitly requests a stack trace) falls through to the
+            # Python path so that test_logging's traceback.print_stack
+            # monkey-patches and any user-level traceback hooks still
+            # apply unchanged.
+            return _find_caller_c(False, stacklevel)
         f = currentframe()
         #On some versions of IronPython, currentframe() returns None if
         #IronPython isn't run with -X:Frames.
