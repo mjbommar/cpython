@@ -9984,7 +9984,7 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
     Py_UCS4 item_maxchar;
     int use_memcpy;
     unsigned char *res_data = NULL, *sep_data = NULL;
-    PyObject *last_obj;
+    int last_kind = -1;
     int kind = 0;
 
     /* If empty sequence, return u"". */
@@ -9993,7 +9993,6 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
     }
 
     /* If singleton sequence with an exact Unicode, return that. */
-    last_obj = NULL;
     if (seqlen == 1) {
         if (PyUnicode_CheckExact(items[0])) {
             res = items[0];
@@ -10027,7 +10026,9 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
                above case of a blank separator */
             Py_INCREF(sep);
         }
-        last_obj = sep;
+        if (seplen != 0) {
+            last_kind = PyUnicode_KIND(sep);
+        }
     }
 
     /* There are at least two things to join, or else we have a subclass
@@ -10063,11 +10064,11 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
             goto onError;
         }
         sz += add_sz;
-        if (use_memcpy && last_obj != NULL) {
-            if (PyUnicode_KIND(last_obj) != PyUnicode_KIND(item))
+        if (use_memcpy && last_kind != -1) {
+            if (last_kind != PyUnicode_KIND(item))
                 use_memcpy = 0;
         }
-        last_obj = item;
+        last_kind = PyUnicode_KIND(item);
     }
 
     res = PyUnicode_New(sz, maxchar);
@@ -10086,12 +10087,22 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
     }
 #endif
     if (use_memcpy) {
-        for (i = 0; i < seqlen; ++i) {
-            Py_ssize_t itemlen;
+        Py_ssize_t itemlen;
+
+        item = items[0];
+        itemlen = PyUnicode_GET_LENGTH(item);
+        if (itemlen != 0) {
+            memcpy(res_data,
+                   PyUnicode_DATA(item),
+                   kind * itemlen);
+            res_data += kind * itemlen;
+        }
+
+        for (i = 1; i < seqlen; ++i) {
             item = items[i];
 
             /* Copy item, and maybe the separator. */
-            if (i && seplen != 0) {
+            if (seplen != 0) {
                 memcpy(res_data,
                           sep_data,
                           kind * seplen);
@@ -10110,12 +10121,23 @@ _PyUnicode_JoinArray(PyObject *separator, PyObject *const *items, Py_ssize_t seq
                            + kind * PyUnicode_GET_LENGTH(res));
     }
     else {
-        for (i = 0, res_offset = 0; i < seqlen; ++i) {
-            Py_ssize_t itemlen;
+        Py_ssize_t itemlen;
+
+        item = items[0];
+        itemlen = PyUnicode_GET_LENGTH(item);
+        if (itemlen != 0) {
+            _PyUnicode_FastCopyCharacters(res, 0, item, 0, itemlen);
+            res_offset = itemlen;
+        }
+        else {
+            res_offset = 0;
+        }
+
+        for (i = 1; i < seqlen; ++i) {
             item = items[i];
 
             /* Copy item, and maybe the separator. */
-            if (i && seplen != 0) {
+            if (seplen != 0) {
                 _PyUnicode_FastCopyCharacters(res, res_offset, sep, 0, seplen);
                 res_offset += seplen;
             }
