@@ -1,0 +1,456 @@
+{
+  "pattern_totals": {
+    "__getattr__": 570,
+    "__getattribute__": 217,
+    "cached_property": 767,
+    "getattr_call": 4041,
+    "hasattr_call": 3830,
+    "property": 2958
+  },
+  "roots": {
+    "Lib": 675,
+    "Lib/test": 390,
+    "Tools": 50,
+    "site-packages": 909
+  },
+  "top_files": [
+    [
+      "Lib/test/test_os/test_os.py",
+      {
+        "getattr_call": 17,
+        "hasattr_call": 111
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/typing_extensions.py",
+      {
+        "__getattr__": 3,
+        "getattr_call": 50,
+        "hasattr_call": 61,
+        "property": 5
+      }
+    ],
+    [
+      "Lib/test/test_os/test_posix.py",
+      {
+        "getattr_call": 9,
+        "hasattr_call": 103
+      }
+    ],
+    [
+      "Lib/test/test_descr.py",
+      {
+        "__getattr__": 22,
+        "__getattribute__": 22,
+        "getattr_call": 33,
+        "hasattr_call": 10,
+        "property": 16
+      }
+    ],
+    [
+      "Lib/test/test_socket.py",
+      {
+        "getattr_call": 9,
+        "hasattr_call": 70,
+        "property": 7
+      }
+    ],
+    [
+      "Lib/inspect.py",
+      {
+        "__getattr__": 3,
+        "__getattribute__": 4,
+        "cached_property": 1,
+        "getattr_call": 42,
+        "hasattr_call": 23,
+        "property": 10
+      }
+    ],
+    [
+      "Lib/email/_header_value_parser.py",
+      {
+        "hasattr_call": 3,
+        "property": 64
+      }
+    ],
+    [
+      "Lib/pydoc_data/topics.py",
+      {
+        "__getattr__": 34,
+        "__getattribute__": 22,
+        "getattr_call": 2,
+        "hasattr_call": 3,
+        "property": 3
+      }
+    ],
+    [
+      "Lib/typing.py",
+      {
+        "__getattr__": 6,
+        "getattr_call": 38,
+        "hasattr_call": 8,
+        "property": 10
+      }
+    ],
+    [
+      "Lib/ipaddress.py",
+      {
+        "__getattr__": 1,
+        "cached_property": 4,
+        "getattr_call": 1,
+        "property": 51
+      }
+    ],
+    [
+      "Lib/test/test_inspect/test_inspect.py",
+      {
+        "__getattr__": 18,
+        "__getattribute__": 1,
+        "getattr_call": 9,
+        "hasattr_call": 11,
+        "property": 14
+      }
+    ],
+    [
+      "Lib/pydoc.py",
+      {
+        "getattr_call": 29,
+        "hasattr_call": 20,
+        "property": 2
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/base.py",
+      {
+        "getattr_call": 30,
+        "hasattr_call": 18,
+        "property": 3
+      }
+    ],
+    [
+      "Lib/test/test_shutil.py",
+      {
+        "getattr_call": 10,
+        "hasattr_call": 40
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/fields/__init__.py",
+      {
+        "cached_property": 11,
+        "getattr_call": 12,
+        "hasattr_call": 15,
+        "property": 7
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/attr/_make.py",
+      {
+        "__getattr__": 8,
+        "__getattribute__": 1,
+        "cached_property": 2,
+        "getattr_call": 26,
+        "hasattr_call": 4,
+        "property": 3
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/contrib/gis/gdal/geometries.py",
+      {
+        "property": 44
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/fields/related.py",
+      {
+        "cached_property": 11,
+        "getattr_call": 22,
+        "hasattr_call": 8,
+        "property": 3
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/forms/models.py",
+      {
+        "getattr_call": 28,
+        "hasattr_call": 13,
+        "property": 2
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/celery/worker/request.py",
+      {
+        "cached_property": 7,
+        "hasattr_call": 1,
+        "property": 34
+      }
+    ],
+    [
+      "Lib/enum.py",
+      {
+        "getattr_call": 27,
+        "hasattr_call": 7,
+        "property": 7
+      }
+    ],
+    [
+      "Lib/unittest/mock.py",
+      {
+        "__getattr__": 4,
+        "__getattribute__": 2,
+        "getattr_call": 20,
+        "hasattr_call": 9,
+        "property": 6
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/options.py",
+      {
+        "cached_property": 23,
+        "getattr_call": 8,
+        "hasattr_call": 6,
+        "property": 4
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/pydantic/main.py",
+      {
+        "__getattr__": 4,
+        "__getattribute__": 4,
+        "cached_property": 9,
+        "getattr_call": 11,
+        "hasattr_call": 8,
+        "property": 4
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/kombu/utils/eventio.py",
+      {
+        "getattr_call": 40
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/expressions.py",
+      {
+        "cached_property": 12,
+        "getattr_call": 14,
+        "hasattr_call": 7,
+        "property": 6
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/contrib/gis/geos/geometry.py",
+      {
+        "property": 38
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/sql/query.py",
+      {
+        "cached_property": 3,
+        "getattr_call": 10,
+        "hasattr_call": 18,
+        "property": 7
+      }
+    ],
+    [
+      "Lib/test/_test_multiprocessing.py",
+      {
+        "getattr_call": 9,
+        "hasattr_call": 13,
+        "property": 15
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/httpx/_models.py",
+      {
+        "hasattr_call": 15,
+        "property": 22
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/pydantic/fields.py",
+      {
+        "__getattr__": 2,
+        "cached_property": 10,
+        "getattr_call": 12,
+        "hasattr_call": 2,
+        "property": 11
+      }
+    ],
+    [
+      "Lib/test/test_signal.py",
+      {
+        "getattr_call": 4,
+        "hasattr_call": 32
+      }
+    ],
+    [
+      "Lib/pathlib/__init__.py",
+      {
+        "hasattr_call": 21,
+        "property": 15
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/db/models/query.py",
+      {
+        "cached_property": 5,
+        "getattr_call": 14,
+        "hasattr_call": 13,
+        "property": 4
+      }
+    ],
+    [
+      "Lib/_pyio.py",
+      {
+        "getattr_call": 7,
+        "hasattr_call": 5,
+        "property": 23
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/jsonpath_ng/_ply/yacc.py",
+      {
+        "__getattribute__": 1,
+        "getattr_call": 21,
+        "hasattr_call": 13
+      }
+    ],
+    [
+      "Lib/importlib/_bootstrap.py",
+      {
+        "getattr_call": 17,
+        "hasattr_call": 14,
+        "property": 3
+      }
+    ],
+    [
+      "Lib/test/test_asyncio/test_tasks.py",
+      {
+        "getattr_call": 17,
+        "hasattr_call": 14,
+        "property": 2
+      }
+    ],
+    [
+      "Tools/c-analyzer/c_parser/info.py",
+      {
+        "__getattr__": 1,
+        "getattr_call": 5,
+        "hasattr_call": 1,
+        "property": 26
+      }
+    ],
+    [
+      "/tmp/perf-extra-pkgs/_pytest/_code/code.py",
+      {
+        "getattr_call": 3,
+        "hasattr_call": 1,
+        "property": 28
+      }
+    ]
+  ],
+  "top_packages": [
+    [
+      "test",
+      2375
+    ],
+    [
+      "django",
+      2079
+    ],
+    [
+      "celery",
+      470
+    ],
+    [
+      "pydantic",
+      397
+    ],
+    [
+      "_pytest",
+      365
+    ],
+    [
+      "kombu",
+      258
+    ],
+    [
+      "test_os",
+      240
+    ],
+    [
+      "werkzeug",
+      185
+    ],
+    [
+      "prompt_toolkit",
+      155
+    ],
+    [
+      "gunicorn",
+      127
+    ],
+    [
+      "typing_extensions.py",
+      119
+    ],
+    [
+      "anyio",
+      112
+    ],
+    [
+      "billiard",
+      112
+    ],
+    [
+      "test_asyncio",
+      110
+    ],
+    [
+      "email",
+      108
+    ],
+    [
+      "unittest",
+      107
+    ],
+    [
+      "support",
+      104
+    ],
+    [
+      "test_descr.py",
+      103
+    ],
+    [
+      "importlib",
+      101
+    ],
+    [
+      "multiprocessing",
+      100
+    ],
+    [
+      "c-analyzer",
+      88
+    ],
+    [
+      "test_socket.py",
+      86
+    ],
+    [
+      "inspect.py",
+      83
+    ],
+    [
+      "jinja2",
+      82
+    ],
+    [
+      "httpx",
+      80
+    ]
+  ]
+}
