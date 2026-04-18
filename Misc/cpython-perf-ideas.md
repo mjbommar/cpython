@@ -162,9 +162,44 @@ at the same code, that's a load-bearing observation.
        it was performance-unstable and could return false positives for
        later instances of the same type when protocol satisfaction came
        from instance attributes.
-     - Validation on the final branch state included `test_abc`,
-       `test_typing`, `test_inspect`, `test_context`,
-       `test_collections`, and `test_pathlib`.
+   - Validation on the final branch state included `test_abc`,
+     `test_typing`, `test_inspect`, `test_context`,
+     `test_collections`, and `test_pathlib`.
+   - **2026-04-18 deeper follow-up**:
+     - Re-opened on `exp-isinstance/type-lookup` with a broader search
+       over `_abc.c` plus `typeobject.c`, and a workload corpus covering
+       `inspect`, `httpx`, `typeguard`, `jsonschema`, Django, and
+       Celery.
+     - Best aggregate result was a combined patch:
+       - `_abc.c`: subtype-cache check against `_abc_cache`
+       - `PyType_IsSubtype()`: exact/base/object direct-edge shortcut
+       - `find_name_in_mro()`: own-dict-first before the full MRO walk
+     - Representative deltas vs rebuilt baseline:
+       `inspect.isawaitable -10.3%`, `httpx` request-data encoding
+       `-10.9%`, `typeguard` mapping checks `-4.8%`,
+       `jsonschema._utils.equal -3.8%`, direct
+       `jsonschema.protocols.Validator -6.2%`,
+       `jsonschema.validate -0.6%`, minimal Django request `-2.4%`,
+       Celery eager dispatch `-2.4%`.
+     - Tradeoff: semantics stayed correct, but the fake-`__class__`
+       proxy micro regressed by about `+70%`. The new `test_abc`
+       regression confirms proxy behavior is still correct.
+     - Safer runner-up: the standalone `PyType_IsSubtype` direct-edge
+       fast path. It is smaller, keeps the proxy micro healthy, and
+       still wins on `httpx`, Django, and Celery, but it gives back some
+       ground on `jsonschema` protocol-heavy cases.
+     - Guarding the `_abc` subtype-cache behind a default-`__class__`
+       descriptor check avoided the proxy slowdown, but cost too much on
+       the negative ABC miss path to be the preferred direction.
+     - Validation on the combined branch state:
+       - stdlib: `test_abc test_typing test_inspect test_context
+         test_collections test_pathlib`
+       - third-party: `691` local `jsonschema` / `referencing` tests
+         passed (excluding the two suite-checkout-dependent files)
+     - Updated recommendation: prefer the broader
+       `exp-isinstance/type-lookup` result if we want the strongest
+       service-workload win; keep the standalone `PyType_IsSubtype`
+       patch in reserve as the lower-risk fallback.
 
 ## Single-lens standouts worth building
 
@@ -473,7 +508,7 @@ reach)**. Each target stands alone as a PR; none depends on another.
 |---|---|---|---|---|
 | **1** | Logging hot path — pure-function caches in `LogRecord` / `findCaller`; optional C-helper follow-up | Medium | High (3×) | Pure Python first; C helper separate |
 | **2** | AST `NodeVisitor.visit` method-name cache | Tiny | High | Pure Python, validated branch |
-| **3** | ABC `__instancecheck__` subtype-cache fast path | Small | High | One C file, validated branch |
+| **3** | `isinstance` / ABC / type-lookup fast paths (`_abc.c` + small `typeobject.c` helpers) | Small-Medium | Medium-high | Validated branch; lower-risk `PyType_IsSubtype` subset exists |
 | **4** | `datetime.fromisoformat` ASCII / separator entry fast path | Small | Medium-high | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
 | **6** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
