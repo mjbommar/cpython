@@ -632,11 +632,13 @@ def _netstat_getnode():
 # Import optional C extension at toplevel, to help disabling it when testing
 try:
     import _uuid
+    _generate_random_int = getattr(_uuid, "generate_random_int", None)
     _generate_time_safe = getattr(_uuid, "generate_time_safe", None)
     _has_stable_extractable_node = _uuid.has_stable_extractable_node
     _UuidCreate = getattr(_uuid, "UuidCreate", None)
 except ImportError:
     _uuid = None
+    _generate_random_int = None
     _generate_time_safe = None
     _has_stable_extractable_node = False
     _UuidCreate = None
@@ -774,6 +776,8 @@ def uuid3(namespace, name):
 
 def uuid4():
     """Generate a random UUID."""
+    if _generate_random_int is not None:
+        return UUID._from_int(_generate_random_int())
     int_uuid_4 = int.from_bytes(os.urandom(16))
     int_uuid_4 &= _RFC_4122_CLEARFLAGS_MASK
     int_uuid_4 |= _RFC_4122_VERSION_4_FLAGS

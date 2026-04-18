@@ -3,10 +3,8 @@
  * DCE compatible Universally Unique Identifier library.
  */
 
-// Need limited C API version 3.13 for Py_mod_gil
-#include "pyconfig.h"   // Py_GIL_DISABLED
-#ifndef Py_GIL_DISABLED
-#  define Py_LIMITED_API 0x030d0000
+#ifndef Py_BUILD_CORE_BUILTIN
+#  define Py_BUILD_CORE_MODULE 1
 #endif
 
 #include "Python.h"
@@ -17,12 +15,18 @@
   // libuuid without pkgconf
   #include <uuid/uuid.h>
 #endif
+#ifdef HAVE_ERRNO_H
+#  include <errno.h>
+#endif
+#if defined(HAVE_SYS_RANDOM_H) && (defined(HAVE_GETRANDOM) || defined(HAVE_GETENTROPY))
+#  include <sys/random.h>
+#endif
 
 #ifdef MS_WINDOWS
 #include <rpc.h>
 #endif
 
-#ifndef MS_WINDOWS
+#if !defined(MS_WINDOWS) && (defined(HAVE_UUID_H) || defined(HAVE_UUID_UUID_H))
 
 static PyObject *
 py_uuid_generate_time_safe(PyObject *Py_UNUSED(context),
@@ -50,7 +54,7 @@ py_uuid_generate_time_safe(PyObject *Py_UNUSED(context),
 #endif /* HAVE_UUID_GENERATE_TIME_SAFE */
 }
 
-#else /* MS_WINDOWS */
+#elif defined(MS_WINDOWS)
 
 static PyObject *
 py_UuidCreate(PyObject *Py_UNUSED(context),
@@ -88,7 +92,64 @@ py_windows_has_stable_node(void)
     Py_END_ALLOW_THREADS
     return res == RPC_S_OK;
 }
-#endif /* MS_WINDOWS */
+#endif
+
+#if defined(HAVE_GETRANDOM)
+static int
+uuid_fill_random_bytes(unsigned char *buffer, Py_ssize_t size)
+{
+    while (size > 0) {
+        ssize_t n = getrandom(buffer, (size_t)size, 0);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            PyErr_SetFromErrno(PyExc_OSError);
+            return -1;
+        }
+        buffer += n;
+        size -= n;
+    }
+    return 0;
+}
+#elif defined(HAVE_GETENTROPY)
+static int
+uuid_fill_random_bytes(unsigned char *buffer, Py_ssize_t size)
+{
+    while (size > 0) {
+        size_t len = (size_t)Py_MIN(size, 256);
+        if (getentropy(buffer, len) < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            PyErr_SetFromErrno(PyExc_OSError);
+            return -1;
+        }
+        buffer += len;
+        size -= (Py_ssize_t)len;
+    }
+    return 0;
+}
+#endif
+
+#if defined(HAVE_GETRANDOM) || defined(HAVE_GETENTROPY)
+static PyObject *
+py_uuid_generate_random_int(PyObject *Py_UNUSED(context),
+                            PyObject *Py_UNUSED(ignored))
+{
+    unsigned char uuid[16];
+
+    if (uuid_fill_random_bytes(uuid, sizeof(uuid)) < 0) {
+        return NULL;
+    }
+
+    // RFC 4122/9562 version and variant bits in big-endian byte order.
+    uuid[6] = (uuid[6] & 0x0f) | 0x40;
+    uuid[8] = (uuid[8] & 0x3f) | 0x80;
+
+    return _PyLong_FromByteArray(uuid, sizeof(uuid), 0, 0);
+}
+#endif
 
 
 static int
@@ -101,7 +162,9 @@ uuid_exec(PyObject *module)
         }                                                           \
     } while (0)
 
+#if defined(HAVE_UUID_H) || defined(HAVE_UUID_UUID_H)
     assert(sizeof(uuid_t) == 16);
+#endif
 #if defined(MS_WINDOWS)
     ADD_INT("has_uuid_generate_time_safe", 0);
 #elif defined(HAVE_UUID_GENERATE_TIME_SAFE)
@@ -123,6 +186,9 @@ uuid_exec(PyObject *module)
 }
 
 static PyMethodDef uuid_methods[] = {
+#if defined(HAVE_GETRANDOM) || defined(HAVE_GETENTROPY)
+    {"generate_random_int", py_uuid_generate_random_int, METH_NOARGS, NULL},
+#endif
 #if defined(HAVE_UUID_UUID_H) || defined(HAVE_UUID_H)
     {"generate_time_safe", py_uuid_generate_time_safe, METH_NOARGS, NULL},
 #endif
