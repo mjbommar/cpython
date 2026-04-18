@@ -646,6 +646,63 @@ Ideas that only one lens surfaced but with high individual ROI.
       - Recommendation: keep this as a plausible small C PR after the
         higher-priority logging / AST / ABC / datetime work.
 
+25. **`Python/ceval.c:1674` `initialize_locals` / call-setup
+    specialization**
+    - The service-profile follow-ups exposed a narrower interpreter-core
+      target than “optimize ceval”: the helpers that turn vectorcall
+      arguments into frame locals. The hot pieces are
+      `initialize_locals`, `_PyEvalFramePushAndInit`, and
+      `_PyEval_Vector`.
+    - Plan: specialize the dominant no-keyword path and the common
+      `0-4` positional-argument case, rather than trying to optimize the
+      opcode loop itself.
+    - Payoff: medium. Broad enough to matter in Jinja2 / `jsonschema` /
+      Celery / general Python-call-heavy code, but still below the
+      logging / AST / ABC work in confidence.
+    - Scope: medium, but tightly localized to call setup in one file
+      plus a small `_PyEval_Vector` tweak.
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-ceval/initialize-locals-fastpath`; full
+        notes live in `Misc/initialize-locals-perf-diary.md` on that
+        branch.
+      - The branch started from a call-shape inventory over `Lib/` and
+        the local third-party sample environment. In both corpora, the
+        dominant case was simple positional calls with no keywords, and
+        the dominant positional buckets were `1`, `2`, and `0`.
+      - The combined wrapper perf probe showed the family was real:
+        `_PyEval_Vector` about `2.3%`, `initialize_locals` about `1.5%`,
+        `_PyEvalFramePushAndInit` about `1.0%`, and
+        `PyObject_Vectorcall` about `1.1%` of sampled user-space time.
+      - Eight variants were tested. The recommended patch was `C7`:
+        - split the no-keyword path into a dedicated helper
+        - use a `0-4` positional small-copy switch in that helper
+        - mirror the same `0-4` small-copy switch in `_PyEval_Vector`
+          for no-keyword calls
+      - Representative confirmatory deltas vs rebuilt baseline:
+        `M1_exact_positional -6.6%`,
+        `M2_defaults_fill -4.7%`,
+        `M3_keyword_call -9.6%`,
+        `R1_jinja2_render -6.5%`,
+        `R3_jsonschema_validate -2.2%`,
+        `R4_celery_eager -2.1%`,
+        while `R2_django_template` stayed effectively flat
+        (`+0.5%` in the confirm run).
+      - A broader runner-up (`C8`) extended the small-copy strategy into
+        the generic keyword-capable path, but it lost ground on
+        closure-heavy and `jsonschema`-like traffic and is not the
+        recommended shape.
+      - Validation on the final branch state:
+        - stdlib: `test_call test_extcall test_positional_only_arg
+          test_keywordonlyarg test_inspect test_functools
+          test_generators test_decorators test_compile`
+        - third-party: import smoke for `jinja2`, `django`,
+          `jsonschema`, `celery`, `fastapi`, `httpx`, `anyio`, `flask`,
+          `werkzeug`, `uvicorn`; plus `484` local `jsonschema` tests
+          with only the external-suite checkout file excluded
+      - Recommendation: keep this as the best remaining unfiled
+        interpreter-core experiment, but frame it strictly as targeted
+        call-setup work rather than a generic `ceval` optimization.
+
 ## Recommended implementation order
 
 Ranked by **(triple-convergence) × (concrete first-diff) × (ecosystem
@@ -659,15 +716,18 @@ reach)**. Each target stands alone as a PR; none depends on another.
 | **4** | `datetime.fromisoformat` ASCII / separator entry fast path | Small | Medium-high | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
 | **6** | `_PyUnicode_JoinArray` control-flow fast path | Small | Medium-high | Single C file, validated branch |
-| **7** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
-| **8** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
-| **9** | `copy.deepcopy` SCC prepass | Small | Medium | Pure Python |
-| **10** | `re.compile` id-keyed cache fast path | Tiny | Medium | Pure Python |
+| **7** | `initialize_locals` / call-setup no-keyword fast path | Medium | Medium | Validated branch, but interpreter-core risk |
+| **8** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
+| **9** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
+| **10** | `copy.deepcopy` SCC prepass | Small | Medium | Pure Python |
 
 ## Non-goals / explicitly not recommended
 
-- **The interpreter loop (`Python/ceval.c`)** — the Faster CPython team
-  actively specializes it. Do not duplicate work there.
+- **The opcode-dispatch interpreter loop (`Python/ceval.c`)** — the
+  Faster CPython team actively specializes it. Do not duplicate work
+  there. Narrow call-entry helpers such as `initialize_locals` are a
+  separate category and can still be fair game when the patch is tightly
+  scoped.
 - **Introducing new C extension modules from scratch.** All picks above
   either extend an existing module or stay in pure Python.
 - **Wire-format changes** (marshal, pickle protocol). The shipped work
