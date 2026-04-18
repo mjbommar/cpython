@@ -1,0 +1,1202 @@
+{
+  "pattern_totals": {
+    "add_reader": 55,
+    "add_writer": 38,
+    "asyncio_import": 182,
+    "asyncio_sleep": 514,
+    "call_at": 26,
+    "call_later": 63,
+    "call_soon": 254,
+    "create_server": 89,
+    "create_task": 426,
+    "get_running_loop": 195,
+    "start_server": 40
+  },
+  "roots": {
+    "Lib/asyncio": 172,
+    "Lib/test": 1349,
+    "site-packages": 361
+  },
+  "sample_hits": [
+    {
+      "hits": {
+        "call_soon": 4
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/windows_events.py"
+    },
+    {
+      "hits": {
+        "add_reader": 1,
+        "add_writer": 2,
+        "call_soon": 13,
+        "get_running_loop": 3
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/unix_events.py"
+    },
+    {
+      "hits": {
+        "create_server": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/transports.py"
+    },
+    {
+      "hits": {
+        "call_at": 1,
+        "call_soon": 1,
+        "get_running_loop": 2
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/timeouts.py"
+    },
+    {
+      "hits": {
+        "get_running_loop": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/threads.py"
+    },
+    {
+      "hits": {
+        "asyncio_sleep": 1,
+        "call_later": 3,
+        "call_soon": 8,
+        "create_task": 10,
+        "get_running_loop": 6
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/tasks.py"
+    },
+    {
+      "hits": {
+        "create_task": 10,
+        "get_running_loop": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/taskgroups.py"
+    },
+    {
+      "hits": {
+        "get_running_loop": 2
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/subprocess.py"
+    },
+    {
+      "hits": {
+        "create_server": 5,
+        "create_task": 1,
+        "get_running_loop": 4,
+        "start_server": 3
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/streams.py"
+    },
+    {
+      "hits": {
+        "create_task": 2,
+        "get_running_loop": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/staggered.py"
+    },
+    {
+      "hits": {
+        "call_later": 2,
+        "call_soon": 4
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/sslproto.py"
+    },
+    {
+      "hits": {
+        "add_reader": 1,
+        "add_writer": 1,
+        "call_later": 1,
+        "call_soon": 1,
+        "create_task": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/selector_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_sleep": 1,
+        "call_soon": 1,
+        "create_task": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/runners.py"
+    },
+    {
+      "hits": {
+        "call_soon": 1,
+        "create_server": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/protocols.py"
+    },
+    {
+      "hits": {
+        "call_soon": 12
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/proactor_events.py"
+    },
+    {
+      "hits": {
+        "call_soon": 6
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/futures.py"
+    },
+    {
+      "hits": {
+        "add_reader": 1,
+        "add_writer": 1,
+        "call_at": 1,
+        "call_later": 2,
+        "call_soon": 4,
+        "create_server": 2,
+        "create_task": 1,
+        "get_running_loop": 5
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/events.py"
+    },
+    {
+      "hits": {
+        "call_soon": 3,
+        "create_task": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/base_subprocess.py"
+    },
+    {
+      "hits": {
+        "add_reader": 2,
+        "call_at": 3,
+        "call_later": 3,
+        "call_soon": 11,
+        "create_server": 2,
+        "create_task": 4
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/base_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 3,
+        "call_soon": 2,
+        "create_task": 1
+      },
+      "package": "Lib/asyncio",
+      "path": "Lib/asyncio/__main__.py"
+    },
+    {
+      "hits": {
+        "start_server": 14
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_urllib2_localnet.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_syntax.py"
+    },
+    {
+      "hits": {
+        "create_server": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_support.py"
+    },
+    {
+      "hits": {
+        "create_server": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_ssl.py"
+    },
+    {
+      "hits": {
+        "create_server": 13
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_socket.py"
+    },
+    {
+      "hits": {
+        "asyncio_sleep": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_repl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 5,
+        "asyncio_sleep": 3,
+        "create_task": 6
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_pdb.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_logging.py"
+    },
+    {
+      "hits": {
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_kqueue.py"
+    },
+    {
+      "hits": {
+        "create_server": 3
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_httplib.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_gc.py"
+    },
+    {
+      "hits": {
+        "create_server": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_ftplib.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 6,
+        "asyncio_sleep": 9,
+        "create_server": 1,
+        "create_task": 6,
+        "get_running_loop": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_external_inspection.py"
+    },
+    {
+      "hits": {
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_epoll.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 3
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_coroutines.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_code.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_cmd_line.py"
+    },
+    {
+      "hits": {
+        "asyncio_sleep": 45,
+        "call_later": 2,
+        "create_task": 4,
+        "get_running_loop": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncgen.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/datetimetester.py"
+    },
+    {
+      "hits": {
+        "create_server": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/_test_multiprocessing.py"
+    },
+    {
+      "hits": {
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/_test_eintr.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_warnings/__init__.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 2,
+        "create_task": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_unittest/test_async_case.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "get_running_loop": 1,
+        "start_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_os/test_os.py"
+    },
+    {
+      "hits": {
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_io/test_largefile.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_inspect/test_inspect.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_soon": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_concurrent_futures/test_interpreter_pool.py"
+    },
+    {
+      "hits": {
+        "add_reader": 1,
+        "add_writer": 1,
+        "asyncio_import": 5,
+        "asyncio_sleep": 1,
+        "call_at": 2,
+        "call_soon": 2,
+        "create_task": 1,
+        "get_running_loop": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/utils.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_windows_utils.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 1,
+        "call_soon": 3,
+        "create_task": 2,
+        "get_running_loop": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_windows_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 18,
+        "call_soon": 2,
+        "create_task": 13,
+        "get_running_loop": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_waitfor.py"
+    },
+    {
+      "hits": {
+        "add_reader": 5,
+        "add_writer": 11,
+        "asyncio_import": 2,
+        "asyncio_sleep": 2,
+        "create_server": 1,
+        "create_task": 1,
+        "get_running_loop": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_unix_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_transports.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_tools.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 31,
+        "create_task": 3,
+        "get_running_loop": 8
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_timeouts.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_threads.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 4,
+        "asyncio_sleep": 79,
+        "call_later": 7,
+        "call_soon": 10,
+        "create_task": 16,
+        "get_running_loop": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_tasks.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 85,
+        "create_task": 83
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_taskgroups.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 4,
+        "asyncio_sleep": 4,
+        "call_soon": 3,
+        "create_task": 4,
+        "get_running_loop": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_subprocess.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 1,
+        "call_later": 1,
+        "call_soon": 10,
+        "create_server": 4,
+        "create_task": 16,
+        "get_running_loop": 1,
+        "start_server": 6
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_streams.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 5
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_staggered.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 4,
+        "asyncio_sleep": 4,
+        "call_soon": 1,
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_sslproto.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 5,
+        "call_soon": 15,
+        "create_server": 2,
+        "create_task": 2,
+        "start_server": 5
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_ssl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 8,
+        "call_soon": 1,
+        "create_task": 14
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_sock_lowlevel.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 2,
+        "create_server": 4,
+        "create_task": 2,
+        "get_running_loop": 3,
+        "start_server": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_server_context.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 13,
+        "call_soon": 2,
+        "create_server": 1,
+        "create_task": 9,
+        "get_running_loop": 2,
+        "start_server": 5
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_server.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 3,
+        "create_server": 2,
+        "create_task": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_sendfile.py"
+    },
+    {
+      "hits": {
+        "add_reader": 6,
+        "add_writer": 4,
+        "asyncio_import": 2,
+        "asyncio_sleep": 6,
+        "create_task": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_selector_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 11,
+        "call_later": 2,
+        "create_task": 4,
+        "get_running_loop": 5
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_runners.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 26,
+        "call_later": 2,
+        "create_task": 36,
+        "get_running_loop": 7
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_queues.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_protocols.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_soon": 7,
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_proactor_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 5,
+        "create_task": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_pep492.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 77,
+        "call_soon": 7,
+        "create_task": 78,
+        "get_running_loop": 9
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_locks.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 13,
+        "create_task": 8
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_graph.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 2,
+        "call_soon": 1,
+        "get_running_loop": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_futures2.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "call_soon": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_futures.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 2,
+        "create_task": 4,
+        "get_running_loop": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_free_threading.py"
+    },
+    {
+      "hits": {
+        "add_reader": 7,
+        "add_writer": 6,
+        "asyncio_import": 4,
+        "asyncio_sleep": 9,
+        "call_at": 3,
+        "call_later": 8,
+        "call_soon": 30,
+        "create_server": 16,
+        "create_task": 5,
+        "get_running_loop": 12
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 8,
+        "create_task": 15,
+        "get_running_loop": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_eager_task_factory.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_context.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "start_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_buffered_proto.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 4,
+        "asyncio_sleep": 5,
+        "call_at": 5,
+        "call_later": 16,
+        "call_soon": 25,
+        "create_server": 11,
+        "create_task": 16,
+        "get_running_loop": 3,
+        "start_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/test_base_events.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "asyncio_sleep": 1,
+        "create_server": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_asyncio/functional.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/support/__init__.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 3,
+        "create_task": 4
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_profiling/test_sampling_profiler/test_integration.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2
+      },
+      "package": "Lib/test",
+      "path": "Lib/test/test_unittest/testmock/testasync.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "starlette",
+      "path": "/tmp/perf-extra-pkgs/starlette/_utils.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_at": 1,
+        "call_soon": 1,
+        "get_running_loop": 1
+      },
+      "package": "asgiref",
+      "path": "/tmp/perf-extra-pkgs/asgiref/timeout.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 1,
+        "create_task": 2
+      },
+      "package": "asgiref",
+      "path": "/tmp/perf-extra-pkgs/asgiref/testing.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 3,
+        "asyncio_sleep": 1,
+        "call_soon": 2,
+        "create_task": 2,
+        "get_running_loop": 4
+      },
+      "package": "asgiref",
+      "path": "/tmp/perf-extra-pkgs/asgiref/sync.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 1
+      },
+      "package": "asgiref",
+      "path": "/tmp/perf-extra-pkgs/asgiref/server.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "create_task": 1,
+        "get_running_loop": 1
+      },
+      "package": "asgiref",
+      "path": "/tmp/perf-extra-pkgs/asgiref/local.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "get_running_loop": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/workers.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "asyncio_sleep": 4,
+        "create_server": 3,
+        "get_running_loop": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/server.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/main.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/config.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "get_running_loop": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/_compat.py"
+    },
+    {
+      "hits": {
+        "call_at": 4
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/worker/strategy.py"
+    },
+    {
+      "hits": {
+        "call_soon": 1
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/worker/loops.py"
+    },
+    {
+      "hits": {
+        "call_soon": 2
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/worker/control.py"
+    },
+    {
+      "hits": {
+        "call_at": 2
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/utils/timer2.py"
+    },
+    {
+      "hits": {
+        "add_reader": 12,
+        "add_writer": 4,
+        "call_later": 6
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/concurrency/asynpool.py"
+    },
+    {
+      "hits": {
+        "call_soon": 6
+      },
+      "package": "celery",
+      "path": "/tmp/perf-extra-pkgs/celery/worker/consumer/consumer.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "get_running_loop": 2
+      },
+      "package": "django",
+      "path": "/tmp/perf-extra-pkgs/django/utils/asyncio.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "django",
+      "path": "/tmp/perf-extra-pkgs/django/dispatch/dispatcher.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "django",
+      "path": "/tmp/perf-extra-pkgs/django/core/handlers/base.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "create_task": 2
+      },
+      "package": "django",
+      "path": "/tmp/perf-extra-pkgs/django/core/handlers/asgi.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "django",
+      "path": "/tmp/perf-extra-pkgs/django/db/backends/postgresql/base.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/utils.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_soon": 3,
+        "create_task": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/middleware/wsgi.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/loops/uvloop.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/loops/auto.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/loops/asyncio.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "create_task": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/lifespan/on.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "create_task": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/websockets/wsproto_impl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2,
+        "call_later": 2,
+        "create_task": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/websockets/websockets_sansio_impl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "create_task": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/websockets/websockets_impl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/websockets/auto.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_later": 1,
+        "create_task": 3
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/http/httptools_impl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "call_later": 1,
+        "create_task": 2
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/http/h11_impl.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/http/flow_control.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "uvicorn",
+      "path": "/tmp/perf-extra-pkgs/uvicorn/protocols/http/auto.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1
+      },
+      "package": "fastapi",
+      "path": "/tmp/perf-extra-pkgs/fastapi/dependencies/models.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 1,
+        "get_running_loop": 1
+      },
+      "package": "anyio",
+      "path": "/tmp/perf-extra-pkgs/anyio/_core/_eventloop.py"
+    },
+    {
+      "hits": {
+        "add_reader": 1,
+        "add_writer": 1,
+        "asyncio_import": 1,
+        "call_soon": 2,
+        "get_running_loop": 2
+      },
+      "package": "anyio",
+      "path": "/tmp/perf-extra-pkgs/anyio/_core/_asyncio_selector_thread.py"
+    },
+    {
+      "hits": {
+        "add_reader": 4,
+        "add_writer": 5,
+        "asyncio_import": 4,
+        "call_at": 1,
+        "call_soon": 6,
+        "create_task": 5,
+        "get_running_loop": 30
+      },
+      "package": "anyio",
+      "path": "/tmp/perf-extra-pkgs/anyio/_backends/_asyncio.py"
+    },
+    {
+      "hits": {
+        "asyncio_import": 2
+      },
+      "package": "httpx",
+      "path": "/tmp/perf-extra-pkgs/httpx/_transports/asgi.py"
+    }
+  ],
+  "top_packages": [
+    [
+      "Lib/test",
+      1349
+    ],
+    [
+      "Lib/asyncio",
+      172
+    ],
+    [
+      "prompt_toolkit",
+      93
+    ],
+    [
+      "anyio",
+      64
+    ],
+    [
+      "gunicorn",
+      49
+    ],
+    [
+      "uvicorn",
+      49
+    ],
+    [
+      "celery",
+      37
+    ],
+    [
+      "asgiref",
+      25
+    ],
+    [
+      "kombu",
+      20
+    ],
+    [
+      "django",
+      9
+    ],
+    [
+      "structlog",
+      8
+    ],
+    [
+      "httpx",
+      2
+    ],
+    [
+      "jinja2",
+      2
+    ],
+    [
+      "fastapi",
+      1
+    ],
+    [
+      "starlette",
+      1
+    ],
+    [
+      "typing_extensions.py",
+      1
+    ]
+  ]
+}
