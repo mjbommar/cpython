@@ -1671,10 +1671,149 @@ fail:
 }
 
 static int
+initialize_locals_no_keywords(PyThreadState *tstate, PyFunctionObject *func,
+    _PyStackRef *localsplus, _PyStackRef const *args, Py_ssize_t argcount)
+{
+    PyCodeObject *co = (PyCodeObject *)func->func_code;
+    const Py_ssize_t total_args = co->co_argcount + co->co_kwonlyargcount;
+    Py_ssize_t i, j, n;
+    PyObject *kwdict = NULL;
+
+    if (co->co_flags & CO_VARKEYWORDS) {
+        kwdict = PyDict_New();
+        if (kwdict == NULL) {
+            goto fail_pre_positional;
+        }
+        i = total_args;
+        if (co->co_flags & CO_VARARGS) {
+            i++;
+        }
+        assert(PyStackRef_IsNull(localsplus[i]));
+        localsplus[i] = PyStackRef_FromPyObjectSteal(kwdict);
+    }
+
+    n = argcount > co->co_argcount ? co->co_argcount : argcount;
+    for (j = 0; j < n; j++) {
+        assert(PyStackRef_IsNull(localsplus[j]));
+    }
+    switch (n) {
+    case 4:
+        localsplus[3] = args[3];
+        /* fall through */
+    case 3:
+        localsplus[2] = args[2];
+        /* fall through */
+    case 2:
+        localsplus[1] = args[1];
+        /* fall through */
+    case 1:
+        localsplus[0] = args[0];
+        break;
+    default:
+        memcpy(localsplus, args, n * sizeof(_PyStackRef));
+        break;
+    }
+
+    if (co->co_flags & CO_VARARGS) {
+        PyObject *u = NULL;
+        if (argcount == n) {
+            u = (PyObject *)&_Py_SINGLETON(tuple_empty);
+        }
+        else {
+            u = _PyTuple_FromStackRefStealOnSuccess(args + n, argcount - n);
+            if (u == NULL) {
+                for (i = n; i < argcount; i++) {
+                    PyStackRef_CLOSE(args[i]);
+                }
+            }
+        }
+        if (u == NULL) {
+            goto fail_post_positional;
+        }
+        assert(PyStackRef_AsPyObjectBorrow(localsplus[total_args]) == NULL);
+        localsplus[total_args] = PyStackRef_FromPyObjectSteal(u);
+    }
+    else if (argcount > n) {
+        for (j = n; j < argcount; j++) {
+            PyStackRef_CLOSE(args[j]);
+        }
+    }
+
+    if ((argcount > co->co_argcount) && !(co->co_flags & CO_VARARGS)) {
+        too_many_positional(tstate, co, argcount, func->func_defaults, localsplus,
+                            func->func_qualname);
+        goto fail_post_positional;
+    }
+
+    if (argcount < co->co_argcount) {
+        Py_ssize_t defcount = func->func_defaults == NULL ? 0 : PyTuple_GET_SIZE(func->func_defaults);
+        Py_ssize_t m = co->co_argcount - defcount;
+        Py_ssize_t missing = 0;
+        for (i = argcount; i < m; i++) {
+            if (PyStackRef_IsNull(localsplus[i])) {
+                missing++;
+            }
+        }
+        if (missing) {
+            missing_arguments(tstate, co, missing, defcount, localsplus,
+                              func->func_qualname);
+            goto fail_post_positional;
+        }
+        i = n > m ? n - m : 0;
+        if (defcount) {
+            PyObject **defs = &PyTuple_GET_ITEM(func->func_defaults, 0);
+            for (; i < defcount; i++) {
+                if (PyStackRef_AsPyObjectBorrow(localsplus[m+i]) == NULL) {
+                    localsplus[m+i] = PyStackRef_FromPyObjectNew(defs[i]);
+                }
+            }
+        }
+    }
+
+    if (co->co_kwonlyargcount > 0) {
+        Py_ssize_t missing = 0;
+        for (i = co->co_argcount; i < total_args; i++) {
+            if (PyStackRef_AsPyObjectBorrow(localsplus[i]) != NULL) {
+                continue;
+            }
+            PyObject *varname = PyTuple_GET_ITEM(co->co_localsplusnames, i);
+            if (func->func_kwdefaults != NULL) {
+                PyObject *def;
+                if (PyDict_GetItemRef(func->func_kwdefaults, varname, &def) < 0) {
+                    goto fail_post_positional;
+                }
+                if (def) {
+                    localsplus[i] = PyStackRef_FromPyObjectSteal(def);
+                    continue;
+                }
+            }
+            missing++;
+        }
+        if (missing) {
+            missing_arguments(tstate, co, missing, -1, localsplus,
+                              func->func_qualname);
+            goto fail_post_positional;
+        }
+    }
+    return 0;
+
+fail_pre_positional:
+    for (j = 0; j < argcount; j++) {
+        PyStackRef_CLOSE(args[j]);
+    }
+fail_post_positional:
+    return -1;
+}
+
+static int
 initialize_locals(PyThreadState *tstate, PyFunctionObject *func,
     _PyStackRef *localsplus, _PyStackRef const *args,
     Py_ssize_t argcount, PyObject *kwnames)
 {
+    if (kwnames == NULL) {
+        return initialize_locals_no_keywords(tstate, func, localsplus, args, argcount);
+    }
+
     PyCodeObject *co = (PyCodeObject*)func->func_code;
     const Py_ssize_t total_args = co->co_argcount + co->co_kwonlyargcount;
     /* Create a dictionary for keyword parameters (**kwags) */
@@ -2102,10 +2241,31 @@ _PyEval_Vector(PyThreadState *tstate, PyFunctionObject *func,
     /* _PyEvalFramePushAndInit consumes the references
      * to func, locals and all its arguments */
     Py_XINCREF(locals);
-    for (size_t i = 0; i < argcount; i++) {
-        arguments[i] = PyStackRef_FromPyObjectNew(args[i]);
+    if (kwnames == NULL) {
+        switch (argcount) {
+        case 4:
+            arguments[3] = PyStackRef_FromPyObjectNew(args[3]);
+            /* fall through */
+        case 3:
+            arguments[2] = PyStackRef_FromPyObjectNew(args[2]);
+            /* fall through */
+        case 2:
+            arguments[1] = PyStackRef_FromPyObjectNew(args[1]);
+            /* fall through */
+        case 1:
+            arguments[0] = PyStackRef_FromPyObjectNew(args[0]);
+            break;
+        default:
+            for (size_t i = 0; i < argcount; i++) {
+                arguments[i] = PyStackRef_FromPyObjectNew(args[i]);
+            }
+            break;
+        }
     }
-    if (kwnames) {
+    else {
+        for (size_t i = 0; i < argcount; i++) {
+            arguments[i] = PyStackRef_FromPyObjectNew(args[i]);
+        }
         Py_ssize_t kwcount = PyTuple_GET_SIZE(kwnames);
         for (Py_ssize_t i = 0; i < kwcount; i++) {
             arguments[i+argcount] = PyStackRef_FromPyObjectNew(args[i+argcount]);
