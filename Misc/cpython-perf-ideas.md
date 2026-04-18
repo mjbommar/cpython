@@ -53,6 +53,28 @@ stdlib and builtins / C-backed paths dominate under service-ish loads.
 The current harness set includes `fastapi`, `celery`, `django`,
 `jinja2`, and `jsonschema`.
 
+One service-profile follow-up was explicitly investigated and rejected:
+generic `getattr` / dict / type-lookup fast paths in
+`Objects/object.c` + `Objects/typeobject.c`. Full notes live in
+`exp-attr/generic-getattr-fastpaths` (`Misc/attr-getattr-perf-diary.md`)
+on that branch. Short version:
+
+- stackref-native generic-`getattr` (`_PyObject_GetAttrStackRef`)
+  produced nice micro wins but broke Django import (`Field.remote_field`
+  lookup failure)
+- `find_name_in_mro()` own-dict-first looked like the smallest safe
+  patch, but failed `test_descr` and hit an MRO / re-entrant-lookup
+  regression including a subprocess segfault in
+  `test_type_lookup_mro_reference`
+- exact-dict-only known-hash instance-dict lookup was the only clearly
+  safe variant, and it was too close to noise on the real workloads to
+  justify a PR
+
+Conclusion: this family is still hot, but the obvious C fast paths sit
+too close to descriptor / MRO correctness boundaries. Keep it off the
+recommended queue unless we come back with a deeper interpreter-level
+specialization plan.
+
 ## Convergence — ideas that surfaced on multiple lists
 
 These are the strongest signals. When a compiler theorist, a graph
