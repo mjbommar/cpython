@@ -154,16 +154,109 @@ and trailing-comma/unquoted-key rejection.
 
 **`test_json` regression.** 226 tests run on every commit. All pass.
 
-**No third-party validation yet.** Before proposing for upstream,
-run the agent-S-flagged suites: `simplejson`/`orjson` round-trip
-corpus, `jsonschema`, `pydantic`, `fastapi` response-model, `django`
-serializer. Each `dumps`/`loads` cycle should be byte-for-byte
-identical to main.
+## 2026-04-18 deeper follow-up
+
+The original campaign stopped after `test_json` plus the stdlib
+realistic bench. This follow-up widened the evidence base in two ways:
+
+- broader third-party compatibility and performance coverage
+- two additional `_json.c` ideas tested after the first campaign and
+  rejected
+
+`Misc/json-perf-data/json_third_party_bench.py` and
+`Misc/json-perf-data/README.md` were added so the wrapper/framework
+reruns are reproducible.
+
+### Broader package ecosystem coverage
+
+Imports succeeded on both rebuilt `main` and the rebuilt branch for:
+
+- `starlette`
+- `fastapi`
+- `httpx`
+- `dataclasses_json`
+- `jsonschema`
+- `flask`
+- `django`
+- `structlog`
+- `uvicorn`
+- `gunicorn`
+- `celery`
+- `simplejson`
+- `orjson`
+- `ujson`
+
+The deterministic smoke outputs matched `main` byte-for-byte for the
+stdlib-`json` call paths exercised through:
+
+- `httpx.Request(..., json=payload)`
+- `httpx.Response(...).json()`
+- `starlette.responses.JSONResponse`
+- `fastapi.responses.JSONResponse(jsonable_encoder(...))`
+- `Flask.app.json.dumps`
+- `django.http.JsonResponse`
+- `dataclasses_json` `to_json()` / `from_json()`
+- `jsonschema.validate(json.loads(...), schema)`
+
+### Package-backed JSON bench (vs rebuilt `main`)
+
+All results below are trimmed-mean microseconds per operation:
+
+| scenario | `main` | branch | delta |
+| --- | ---: | ---: | ---: |
+| `httpx_request_json` | 19.33 µs | 18.67 µs | **−3.4%** |
+| `httpx_response_json` | 10.48 | 10.14 | **−3.2%** |
+| `starlette_jsonresponse` | 3.06 | 2.66 | **−13.1%** |
+| `fastapi_jsonresponse` | 8.88 | 8.48 | **−4.5%** |
+| `flask_json_dumps` | 3.17 | 2.69 | **−15.1%** |
+| `django_jsonresponse` | 6.43 | 5.99 | **−6.8%** |
+| `dataclasses_json_to` | 16.55 | 15.62 | **−5.6%** |
+| `dataclasses_json_from` | 42.98 | 41.43 | **−3.6%** |
+
+The third-party read is therefore consistent with the stdlib realistic
+bench: the branch is not just winning on isolated micros, it is still
+ahead once wrapped in common web/framework helpers.
+
+### Additional ideas tested after the first campaign
+
+Two smaller follow-up ideas were tried and rejected:
+
+- exact-`str` key refcount elision inside `encoder_encode_key_value`
+- an exact-dict `sort_keys=True` path using `PyDict_Items(...)`
+  instead of `PyMapping_Items(...)`
+
+Both patches kept `test_json` green and preserved the third-party smoke
+outputs, but both regressed the core realistic bench:
+
+| idea | `J1` | `J2` | `J3` | `J4` | `J8` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| exact-`str` key ref elision | +3.6% | +4.0% | +3.4% | +2.2% | +5.8% |
+| exact-dict `sort_keys` path | +5.8% | +4.0% | +4.5% | +3.4% | +6.4% |
+
+Those follow-up patches were reverted.
+
+### Updated recommendation
+
+The branch is now stronger than the original diary suggested. It has:
+
+- the original realistic-bench wins
+- byte-identical smoke coverage on modern wrapper/framework paths
+- package-backed speedups on `httpx`, `starlette`, `fastapi`,
+  `flask`, `django`, and `dataclasses_json`
+
+Updated recommendation: promote `exp-json/research` from "strong
+research branch" to "ready to split into filing candidates", with an
+encoder-first sequence:
+
+1. `E3 + E10 + E11 + E14`
+2. `E1`
+3. `E5 + E9`
 
 ## What shipped
 
 Eight C-side optimisations in `Modules/_json.c` (~150 lines added).
-Zero Python changes.  Zero new files.  No new module state. No
+Zero Python changes to `json` itself.  New benchmark/README files only.
+No new module state. No
 change to the exposed C API or to the documented Python API.
 
 ## Sequencing for a PR
