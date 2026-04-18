@@ -81,6 +81,27 @@ at the same code, that's a load-bearing observation.
      that rely on attribute presence at `record.__dict__` level (JSON
      loggers). Mitigate by making laziness opt-in initially via
      `logging.setLogRecordFactory`.
+   - **2026-04-18 follow-up**:
+     - The original lazy-attribute plan was rejected. `%` formatting
+       reads `record.__dict__` directly, so `__getattr__` laziness
+       does not preserve semantics.
+     - `Logger.getEffectiveLevel` was not actually open work:
+       `Logger.isEnabledFor` already carries a per-level cache.
+     - The investigation split into two branch-local diaries:
+       `exp-logging/hot-path` (Python-only caches in
+       `LogRecord.__init__` / `_is_internal_frame`) and
+       `exp-logging/c-helpers` (the same ideas prototyped inside
+       `_logging`).
+     - The Python-only branch remained the clean PR candidate. The
+       C-helper branch exposed four semantic hazards that had to be
+       fixed: unhashable `os.PathLike` cache keys, stale main-thread
+       names, `_style._fmt` rebinding after `usesTime()` caching, and
+       32-bit overflow when reading `_startTime`.
+     - After those fixes, the C-helper branch still beat stock 3.15 on
+       every emitted-path logging scenario we care about, but the extra
+       gain over the Python-only branch was small and noisy. Long-term
+       conclusion: keep the Python-only hot-path work as the low-risk
+       first PR and treat deeper C acceleration as a separate follow-up.
 
 ### Double-flagged
 
@@ -326,7 +347,7 @@ reach)**. Each target stands alone as a PR; none depends on another.
 
 | Rank | Target | Effort | Confidence | PR-shape |
 |---|---|---|---|---|
-| **1** | Logging hot path — lazy `LogRecord` + effective-level cache | Medium | High (3×) | Pure Python, opt-in initially |
+| **1** | Logging hot path — pure-function caches in `LogRecord` / `findCaller`; optional C-helper follow-up | Medium | High (3×) | Pure Python first; C helper separate |
 | **2** | AST `NodeVisitor.visit` dispatch cache | Tiny | Medium | 15 LoC, pure Python |
 | **3** | ABC / Protocol `__instancecheck__` cache + `Py_TYPE` short-circuit | Small-medium | High (2×) | One C file + `typing.py` |
 | **4** | `datetime.fromisoformat` length-dispatched fast path | Small | High | Single C file |
@@ -345,9 +366,9 @@ reach)**. Each target stands alone as a PR; none depends on another.
   either extend an existing module or stay in pure Python.
 - **Wire-format changes** (marshal, pickle protocol). The shipped work
   specifically preserves wire compat; any ideas here should too.
-- **Breaking back-compat on public attributes.** `LogRecord.thread`
-  etc. are public; the lazy approach must preserve `record.thread`
-  semantics for consumers that read it post-emit.
+- **Breaking back-compat on public attributes or `record.__dict__`
+  lookups.** `LogRecord.thread` and `record.__dict__['thread']` style
+  access are both real compatibility constraints for logging work.
 
 ## Provenance
 

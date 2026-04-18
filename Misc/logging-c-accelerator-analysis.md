@@ -32,6 +32,27 @@ Two AST passes in `Misc/logging-perf-data/logging_subclass_analysis.py`:
 Scale: **3,723 files scanned, 34 import-verified subclasses of logging
 classes** across 15+ packages.
 
+## 2026-04-18 prototype result
+
+A later prototype branch (`exp-logging/c-helpers`) validated the
+subclassing story here but exposed four behavioral hazards that are not
+visible from subclass counts alone:
+
+- caching `pathname` by arbitrary key breaks unhashable
+  `os.PathLike` inputs unless the cache is limited to `str` / `bytes`
+- caching the main-thread name at import time regresses later renames;
+  only the ident should be memoized, with `.name` read live
+- caching `usesTime()` once at formatter construction breaks code that
+  rebinds `_style._fmt` later
+- `_startTime` must be read with `PyLong_AsLongLong`, not
+  `PyLong_AsSsize_t`, or 32-bit builds overflow at import time
+
+After fixing those, the rebuilt branch still beat stock 3.15 on the
+realistic logging and Starlette request benches, but its advantage over
+the Python-only `exp-logging/hot-path` branch was small and noisy. The
+long-term lesson is that subclass compatibility is not the blocker;
+behavioral parity around `record.__dict__` semantics is.
+
 ## Override heat map (third-party only)
 
 Where `★` = docstring-flagged extension point. `Δ` = count of
