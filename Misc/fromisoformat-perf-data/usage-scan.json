@@ -1,0 +1,371 @@
+{
+  "roots": {
+    "Lib": 1,
+    "Lib/test": 1,
+    "Tools": 0,
+    "site-packages": 12
+  },
+  "package_counts": {
+    "datetimetester.py": 25,
+    "test": 25,
+    "cattrs": 11,
+    "sqlalchemy": 3,
+    "dataclasses_json": 1,
+    "jsonschema": 1,
+    "qcore": 1
+  },
+  "files": [
+    {
+      "root": "Lib",
+      "path": "test/datetimetester.py",
+      "calls": [
+        {
+          "lineno": 2042,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2078,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2087,
+          "target": "DateSubclass.fromisoformat"
+        },
+        {
+          "lineno": 2115,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2122,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3497,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3522,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3539,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3550,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3576,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3713,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3765,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3783,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3787,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3796,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3800,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3811,
+          "target": "DateTimeSubclass.fromisoformat"
+        },
+        {
+          "lineno": 4841,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4866,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4893,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4910,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4964,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5009,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5017,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5024,
+          "target": "TimeSubclass.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "datetimetester.py",
+      "calls": [
+        {
+          "lineno": 2042,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2078,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2087,
+          "target": "DateSubclass.fromisoformat"
+        },
+        {
+          "lineno": 2115,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 2122,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3497,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3522,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3539,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3550,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3576,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3713,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3765,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3783,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3787,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3796,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3800,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 3811,
+          "target": "DateTimeSubclass.fromisoformat"
+        },
+        {
+          "lineno": 4841,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4866,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4893,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4910,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 4964,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5009,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5017,
+          "target": "self.theclass.fromisoformat"
+        },
+        {
+          "lineno": 5024,
+          "target": "TimeSubclass.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/bson.py",
+      "calls": [
+        {
+          "lineno": 105,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/cbor2.py",
+      "calls": [
+        {
+          "lineno": 39,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/json.py",
+      "calls": [
+        {
+          "lineno": 49,
+          "target": "datetime.fromisoformat"
+        },
+        {
+          "lineno": 51,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/msgspec.py",
+      "calls": [
+        {
+          "lineno": 93,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/orjson.py",
+      "calls": [
+        {
+          "lineno": 55,
+          "target": "datetime.fromisoformat"
+        },
+        {
+          "lineno": 56,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/tomlkit.py",
+      "calls": [
+        {
+          "lineno": 78,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/tomllib.py",
+      "calls": [
+        {
+          "lineno": 79,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "cattrs/preconf/ujson.py",
+      "calls": [
+        {
+          "lineno": 47,
+          "target": "datetime.fromisoformat"
+        },
+        {
+          "lineno": 49,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "dataclasses_json/mm.py",
+      "calls": [
+        {
+          "lineno": 60,
+          "target": "datetime.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema/_format.py",
+      "calls": [
+        {
+          "lineno": 432,
+          "target": "date.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "qcore/microtime.py",
+      "calls": [
+        {
+          "lineno": 178,
+          "target": "datetime.fromisoformat"
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "sqlalchemy/engine/_py_processors.py",
+      "calls": [
+        {
+          "lineno": 117,
+          "target": "datetime_cls.fromisoformat"
+        },
+        {
+          "lineno": 125,
+          "target": "time_cls.fromisoformat"
+        },
+        {
+          "lineno": 133,
+          "target": "date_cls.fromisoformat"
+        }
+      ]
+    }
+  ]
+}
