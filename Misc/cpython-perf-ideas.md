@@ -530,6 +530,46 @@ Ideas that only one lens surfaced but with high individual ROI.
     - Plan: specialized `_siftup_tuple_first_float` path.
     - Payoff: event-loop-heavy apps spend 5–10% in heapq; cut in half.
     - Scope: medium.
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-heapq/asyncio-tuple-compare`; full notes
+        live in `Misc/heapq-asyncio-perf-diary.md` on that branch.
+      - The original asyncio-specific tuple hypothesis turned out to be
+        stale. Current `asyncio` stores `TimerHandle` objects, not
+        `(when, seq, handle)` tuples, so `_heapq` tuple specialization
+        is not an asyncio-service optimization by itself.
+      - The good news is that the tuple / namedtuple idea is still real
+        elsewhere. `sched`, `kombu.asynchronous.timer`, and
+        `celery.beat` all rely on tuple-like heap items with
+        `float` / `int` / `int` ordering prefixes.
+      - Best branch result was a small `_heapq` helper keyed on:
+        - tuple-like object (`PyTuple_Check`)
+        - built-in tuple rich-compare slot
+        - length `3` or `6`
+        - direct compare of slot `0` exact `float`, slot `1` exact
+          `int`, then slot `2` exact `int`
+        - fallback to the normal `PyObject_RichCompareBool(..., Py_LT)`
+          otherwise
+      - Representative deltas vs rebuilt baseline:
+        `M2_namedtuple3_pushpop -24.3%`,
+        `M3_sched_event_pushpop -20.6%`,
+        `M4_namedtuple3_heapify_pop -22.2%`,
+        `R1_sched_run -13.2%`,
+        `R3_kombu_timer -4.9%`,
+        while the real loopback `uvicorn` / `fastapi` workloads stayed
+        effectively flat.
+      - A longer focused rerun against rebuilt `main` kept the wrapper
+        results favorable: `sched` about `-13.3%`, `dateutil`
+        about `-0.9%`, and `kombu` about `-0.8%`.
+      - Validation on the final branch state:
+        - stdlib: `test_heapq test_sched test_queue test_asyncio`
+        - third-party: `484` local `jsonschema` tests passed once the
+          external-suite-checkout file was excluded
+        - import smoke passed for `dateutil`, `kombu`, `celery`,
+          `jsonschema`, `uvicorn`, `starlette`, `fastapi`, `httpx`,
+          `anyio`, `asgiref`, and `gunicorn`
+      - Updated recommendation: keep this as a plausible medium-priority
+        `_heapq` PR for tuple-heavy heaps, but do not frame it as the
+        next asyncio optimization branch.
 
 22. **`Modules/_collectionsmodule.c:2538` Counter specialization**
     - Current fast path still allocates `PyLong(n+1)` per increment.
