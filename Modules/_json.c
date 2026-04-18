@@ -883,13 +883,17 @@ _parse_array_unicode(PyScannerObject *s, PyObject *memo, PyObject *pystr, Py_ssi
     int kind;
     Py_ssize_t end_idx;
     PyObject *val = NULL;
-    PyObject *rval;
+    PyObject *rval = NULL;
     Py_ssize_t next_idx;
     Py_ssize_t comma_idx;
 
-    rval = PyList_New(0);
-    if (rval == NULL)
-        return NULL;
+    /* Accumulate items in a raw growable array; allocate the PyList
+     * once at the end. Avoids per-element PyList_Append overhead
+     * (function call + geometric resize book-keeping). Pattern from
+     * marshal Exp 1. */
+    PyObject **items = NULL;
+    Py_ssize_t n_items = 0;
+    Py_ssize_t cap_items = 0;
 
     str = PyUnicode_DATA(pystr);
     kind = PyUnicode_KIND(pystr);
@@ -907,10 +911,18 @@ _parse_array_unicode(PyScannerObject *s, PyObject *memo, PyObject *pystr, Py_ssi
             if (val == NULL)
                 goto bail;
 
-            if (PyList_Append(rval, val) == -1)
-                goto bail;
-
-            Py_CLEAR(val);
+            if (n_items >= cap_items) {
+                Py_ssize_t new_cap = cap_items < 8 ? 8 : cap_items * 2;
+                PyObject **new_items = PyMem_Realloc(items, new_cap * sizeof(PyObject *));
+                if (new_items == NULL) {
+                    PyErr_NoMemory();
+                    goto bail;
+                }
+                items = new_items;
+                cap_items = new_cap;
+            }
+            items[n_items++] = val;
+            val = NULL;
             idx = next_idx;
 
             /* skip whitespace between term and , */
@@ -942,6 +954,16 @@ _parse_array_unicode(PyScannerObject *s, PyObject *memo, PyObject *pystr, Py_ssi
         goto bail;
     }
     *next_idx_ptr = idx + 1;
+
+    rval = PyList_New(n_items);
+    if (rval == NULL)
+        goto bail;
+    for (Py_ssize_t i = 0; i < n_items; i++) {
+        PyList_SET_ITEM(rval, i, items[i]);
+    }
+    PyMem_Free(items);
+    items = NULL;
+
     /* if array_hook is not None: return array_hook(rval) */
     if (!Py_IsNone(s->array_hook)) {
         val = PyObject_CallOneArg(s->array_hook, rval);
@@ -951,7 +973,12 @@ _parse_array_unicode(PyScannerObject *s, PyObject *memo, PyObject *pystr, Py_ssi
     return rval;
 bail:
     Py_XDECREF(val);
-    Py_DECREF(rval);
+    if (items != NULL) {
+        for (Py_ssize_t i = 0; i < n_items; i++)
+            Py_DECREF(items[i]);
+        PyMem_Free(items);
+    }
+    Py_XDECREF(rval);
     return NULL;
 }
 
