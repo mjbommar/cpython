@@ -1191,9 +1191,30 @@ _match_number_unicode(PyScannerObject *s, PyObject *pystr, Py_ssize_t start, Py_
     else {
         Py_ssize_t i, n;
         char *buf;
+        n = idx - start;
+        /* Fast path (E9): for integers with digit-count that fits in
+         * a signed 64-bit integer (max 19 digits for positive, 20 for
+         * negative incl. sign), parse inline and skip the PyBytes
+         * allocation. 18 digits is the safe limit without overflow
+         * arithmetic. Handles the huge majority of timestamps, IDs,
+         * counts, indices seen in real JSON. */
+        if (!is_float) {
+            int neg = (PyUnicode_READ(kind, str, start) == '-');
+            Py_ssize_t digit_start = start + neg;
+            Py_ssize_t digit_n = idx - digit_start;
+            if (digit_n >= 1 && digit_n <= 18) {
+                long long v = 0;
+                for (i = 0; i < digit_n; i++) {
+                    Py_UCS4 c = PyUnicode_READ(kind, str, digit_start + i);
+                    v = v * 10 + (c - '0');
+                }
+                if (neg) v = -v;
+                *next_idx_ptr = idx;
+                return PyLong_FromLongLong(v);
+            }
+        }
         /* Straight conversion to ASCII, to avoid costly conversion of
            decimal unicode digits (which cannot appear here) */
-        n = idx - start;
         numstr = PyBytes_FromStringAndSize(NULL, n);
         if (numstr == NULL)
             return NULL;
