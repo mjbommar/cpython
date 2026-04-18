@@ -75,6 +75,34 @@ too close to descriptor / MRO correctness boundaries. Keep it off the
 recommended queue unless we come back with a deeper interpreter-level
 specialization plan.
 
+Another service-profile follow-up was explored more directly on
+`exp-asyncio/eventloop-hotpaths`
+(`Misc/asyncio-eventloop-perf-diary.md` on that branch). That branch
+used a real loopback `uvicorn` + `fastapi` corpus rather than
+`TestClient`, plus timer / selector micros, to check whether the
+service hot spots in `asyncio` and `selectors` had a small pure-Python
+patch worth filing. Short version:
+
+- `TimerHandle.__lt__` exact-type and tiny `Handle` / `call_at` debug
+  guard cleanups did move timer-heavy micros, but the real ASGI and
+  socket-loop workloads stayed near noise
+- `_run_once` local-binding rewrites were flat-to-worse and should be
+  treated as a dead end
+- the cleanest surviving patch was an `EpollSelector.select`
+  exact-event-mask fast path; it passed `test_asyncio`,
+  `test_selectors`, `test_socket`, and `test_heapq`, plus third-party
+  import smoke (`anyio`, `uvicorn`, `starlette`, `fastapi`, `httpx`,
+  `django`, `celery`, `gunicorn`, `prompt_toolkit`)
+- even the best confirmatory result was only modest:
+  roughly `-4%` on a selector/socketpair micro, `-3%` on a small
+  asyncio echo workload, and roughly flat on real `uvicorn` loopback
+  requests
+
+Conclusion: `asyncio` event-loop hot spots are real, but the first
+round of pure-Python local rewrites did not produce a strong filing
+candidate. Keep `selectors.EpollSelector.select` exact-mask handling as
+a low-priority follow-up, not the next PR target.
+
 ## Convergence — ideas that surfaced on multiple lists
 
 These are the strongest signals. When a compiler theorist, a graph
