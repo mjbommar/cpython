@@ -39,9 +39,11 @@ Each review produced 12 ranked ideas (36 total, minus overlap). Anything
 exact-container fast paths for pure Python (already done in the
 follow-up branch), copy.deepcopy memo as a structure (dict is correct),
 struct format cache (already present), `_json.c` string-scan via
-`memchr` and homogeneous-dict fast path (on our radar — **partially
+`memchr` and homogeneous-dict fast path (on our radar — **substantially
 done in `exp-json/research` 2026-04-18: see
-`Misc/json-perf-diary.md`**), `_csv.c` bulk scan (on our radar).
+`Misc/json-perf-diary.md`; the branch now has third-party validation
+and is ready to split into filing candidates**), `_csv.c` bulk scan
+(on our radar).
 
 ## Convergence — ideas that surfaced on multiple lists
 
@@ -102,6 +104,14 @@ at the same code, that's a load-bearing observation.
        gain over the Python-only branch was small and noisy. Long-term
        conclusion: keep the Python-only hot-path work as the low-risk
        first PR and treat deeper C acceleration as a separate follow-up.
+     - A broader 2026-04-18 rerun against wrapper/framework logging
+       paths (`structlog`, `uvicorn`, `flask`, `django`, `celery`)
+       still showed real wins over rebuilt `main` at about `-8%` to
+       `-14%` per emitted record, so the C-helper branch is technically
+       sound. That said, one extra `_loggingmodule.c` cleanup idea
+       (`PyObject_CallMethodNoArgs` tightening for the dynamic helper
+       calls) was flat-to-worse and got reverted. Recommendation
+       unchanged: do the Python-only branch first.
 
 ### Double-flagged
 
@@ -289,6 +299,15 @@ Ideas that only one lens surfaced but with high individual ROI.
     See `exp-json/research` / `Misc/json-perf-diary.md` for the
     8 other json experiments that did land (−13 to −16% on
     realistic encoder scenarios, −8.6% on NDJSON decode).
+    A deeper 2026-04-18 follow-up also validated the branch on
+    `httpx`, `starlette`, `fastapi`, `flask`, `django`, and
+    `dataclasses_json` wrapper paths with byte-identical smoke output
+    and package-backed wins ranging from about `-3%` to `-15%`.
+    Two smaller follow-up ideas were rejected after measurement:
+    exact-`str` key refcount elision and an exact-dict `sort_keys`
+    path. Updated recommendation: treat `exp-json/research` as ready
+    to split into encoder-first PRs rather than leaving it in pure
+    research status.
 
 15. **`Lib/traceback.py:1215` exception-graph SCC prepass**
     - `TracebackException` creates full formatted frames for every
