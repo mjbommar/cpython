@@ -213,6 +213,75 @@ All suites run against the combined-binary venv
 
 **Aggregate: ~3400 tests across 14 third-party packages, zero failures attributable to Phase 1, 2, or 3.** Tornado's one fork-deprecation error reproduces identically on main — verified.
 
+### Free-threading build (`--disable-gil`)
+
+Separate worktree `/tmp/cpython-ft` configured with `--disable-gil`,
+Phase 3 module declares `Py_MOD_GIL_NOT_USED`:
+
+| check | result |
+|-------|--------|
+| `sys._is_gil_enabled()` | `False` confirmed |
+| `test_logging` | 282 pass (same as GIL build) |
+| `test_logging` + `test_multiprocessing_fork` | 726 pass / 77 skip |
+| `phase3_compat_deep.py` | 35 / 35 pass |
+| Refcount/tracemalloc leak (3 × 200 000 bursts) | live `LogRecord` delta = 0 |
+| **Concurrent stress**: 4 / 8 / 16 / 32 threads × 10–25 k records = **1 020 000 total** | 0 lost records, 0 `threadName` / `pid` / `levelno` integrity failures, 361 k records/s average |
+
+Under no-GIL the stress harness runs **2.6× faster** than the same
+workload on the GIL build (304 k vs 117 k records/s at T=16, N=5000),
+which is the expected direction and confirms threads are genuinely
+parallel on LogRecord creation.
+
+### Sub-interpreters
+
+`_logging` module declares
+`Py_MOD_PER_INTERPRETER_GIL_SUPPORTED`; `_interpreters.create()` →
+`run_string(…)` loop confirms `logging.LogRecord.__init__` is the C
+version inside the sub-interpreter and a synthetic record populates
+`threadName` / `args` / `getMessage()` correctly. See
+`Misc/logging-perf-data/phase3_subinterp.py`.
+
+### Real-app sustained load
+
+Starlette 1.0 + uvicorn-shape `dictConfig` (3 formatters, 2 handlers,
+4 loggers, middleware), 30 s, 4 driver threads:
+- **51 051 requests / 1 701 RPS**, 0 exceptions
+- **136 136 access-log + error-log emits / 4 537 emits/s**
+- 14 MB stream + 1.4 MB error log sink, all records correctly formatted
+- `phase3_starlette_load.py` checked in under `Misc/logging-perf-data/`.
+
+### Refcount / memory
+
+`tracemalloc` snapshot after `baseline()` then 3 × 200 000 LogRecord
+bursts with `gc.collect()` between each:
+- Live `LogRecord` count delta = **0**
+- Top-5 allocations attributed to `tracemalloc`'s own book-keeping or
+  the test script itself, **not** `_loggingmodule.c`.
+
+### Phase 1 standalone validation
+
+All the third-party suites above re-run against the pure Phase-1
+binary (`/tmp/cpython-ph1/python`, worktree of `exp-logging/hot-path`)
+using a parallel venv (`/tmp/logging-ph1-venv`) pointing at the same
+site-packages:
+
+| suite | Phase 1 result |
+|-------|----------------|
+| structlog 25.5.0  | 877 pass / 19 skip |
+| python-json-logger (HEAD)  | 76 pass |
+| sentry-sdk logging  | 38 pass |
+| Django logging  | 54 pass (sequential) |
+| Sphinx logging  | 18 pass |
+| loguru (HEAD) full  | 1595 pass / 29 skip (2 unrelated bz2 fails, same as Phase 3) |
+
+Phase 1 matches Phase 3 exactly — expected since Phase 3 is a pure
+superset. No Phase-1-specific failures found.
+
+### Still not covered
+
+- **macOS** and **Windows** — Linux-only so far
+- **PGO / LTO** build — configured with `--enable-optimizations=no`.
+
 ### Deep compatibility tests (`/tmp/phase3_compat_deep.py`)
 
 35 targeted assertions against the Phase 3 binary, covering the edges
