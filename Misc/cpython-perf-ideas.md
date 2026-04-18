@@ -358,6 +358,38 @@ Ideas that only one lens surfaced but with high individual ROI.
     - Payoff: ~4× on the common case; meaningful for tracing-heavy
       microservices.
     - Scope: small; extend existing `_uuid` C module.
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-uuid/c-fastpath`; full notes live in
+        `Misc/uuid4-c-fastpath-perf-diary.md` on that branch.
+      - The winning shape is a small `_uuid.generate_random_int()`
+        helper plus `Lib/uuid.py` gating:
+        - Windows: `BCryptGenRandom`
+        - BSD / macOS: `arc4random_buf()` or `arc4random()`
+        - Unix: blocking `getrandom(..., 0)` with `ENOSYS` fallback
+          through `getentropy()` and then `/dev/urandom`
+        - keep the pure-Python fallback when the helper is absent
+      - The final branch also restored `_uuid` to the limited C API by
+        using the public 3.14 native-byte long APIs instead of the
+        private `_PyLong_FromByteArray`.
+      - Rebuilt-binary confirm result:
+        - `uuid.uuid4()` improved from about `543 ns` to `351 ns`
+          (`-35.4%`)
+        - `uuid.uuid7()` stayed effectively flat (`925 ns -> 915 ns`)
+      - The portable final helper gave back a little speed versus the
+        rough Linux-only prototype (`329 ns`), but still retained most
+        of the win.
+      - `test_uuid` passed on the final branch state, and the branch now
+        includes a targeted fallback test to pin the pure-Python path
+        when the helper is unavailable.
+      - Remaining open question: the runtime design now looks sound, but
+        the branch still relies on a broader `_uuid` build-shape change
+        so the helper can exist even without external `libuuid`
+        support. That is a policy / build-system decision separate from
+        the perf gain itself.
+      - Long-term conclusion: this is a promising small C optimization,
+        but it should only be treated as PR-ready once the `_uuid`
+        module-shape question has been validated on fork CI across
+        Windows and macOS.
 
 19. **`Modules/_hashopenssl.c:1350` one-shot `sha256_hex` API**
     - No `hashlib.sha256_hex(data)` today; users pay three C/Python
