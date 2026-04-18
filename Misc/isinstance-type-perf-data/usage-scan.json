@@ -1,0 +1,2812 @@
+{
+  "roots": {
+    "Lib": 41,
+    "Lib/test": 15,
+    "Tools": 1,
+    "site-packages": 78
+  },
+  "package_counts": {
+    "test": 74,
+    "test_typing.py": 63,
+    "django": 21,
+    "_pytest": 15,
+    "celery": 11,
+    "jsonschema": 7,
+    "pydantic": 7,
+    "typing.py": 7,
+    "typing_extensions.py": 6,
+    "referencing": 4,
+    "test_importlib": 4,
+    "tracemalloc.py": 4,
+    "packaging": 3,
+    "structlog": 3,
+    "typeguard": 3,
+    "click_repl": 2,
+    "pathlib": 2,
+    "starlette": 2,
+    "test_iter.py": 2,
+    "test_statistics.py": 2,
+    "annotated_types": 1,
+    "anyio": 1,
+    "asyncio": 1,
+    "http": 1,
+    "httpx": 1,
+    "importlib": 1,
+    "inspect.py": 1,
+    "jsonschema_specifications": 1,
+    "logging": 1,
+    "support": 1,
+    "test_context.py": 1,
+    "test_patma.py": 1,
+    "traceback.py": 1,
+    "_collections_abc.py": 0,
+    "_pyrepl": 0,
+    "asgiref": 0,
+    "attr": 0,
+    "clinic": 0,
+    "configparser.py": 0,
+    "contextlib.py": 0,
+    "dbm": 0,
+    "fastapi": 0,
+    "h11": 0,
+    "os.py": 0,
+    "profiling": 0,
+    "prompt_toolkit": 0,
+    "pydantic_core": 0,
+    "selectors.py": 0,
+    "test_abc.py": 0,
+    "test_collections.py": 0,
+    "test_dataclasses": 0,
+    "test_functools.py": 0,
+    "test_pprint.py": 0,
+    "test_pyexpat.py": 0,
+    "test_shelve.py": 0,
+    "uvicorn": 0,
+    "vine": 0,
+    "wsgiref": 0
+  },
+  "files": [
+    {
+      "root": "Lib",
+      "path": "_collections_abc.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "_DeprecateByteStringMeta"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "_pyrepl/_threading_handler.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ExceptHookArgs",
+        "ShowExceptions"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "_pyrepl/console.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Console"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "_pyrepl/input.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "InputTranslator"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "_pyrepl/pager.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "Pager"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "_pyrepl/render.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_ThemeSyntax"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "asyncio/base_events.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1588,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "configparser.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "ConverterMapping",
+        "RawConfigParser",
+        "SectionProxy"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "contextlib.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "AbstractAsyncContextManager",
+        "AbstractContextManager"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "dbm/sqlite3.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "_Database"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "http/client.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1092,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "importlib/metadata/_meta.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "PackageMetadata",
+        "SimplePath"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "importlib/resources/abc.py",
+      "runtime_protocols": [
+        "Traversable"
+      ],
+      "protocols": [
+        "Traversable"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "importlib/resources/simple.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "SimpleReader"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "inspect.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 371,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Awaitable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "logging/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 321,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "os.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "PathLike"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "pathlib/types.py",
+      "runtime_protocols": [
+        "PathInfo",
+        "_PathParser"
+      ],
+      "protocols": [
+        "PathInfo",
+        "_PathParser"
+      ],
+      "abc_bases": [
+        "_JoinablePath"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "profiling/sampling/collector.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Collector"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "profiling/sampling/live_collector/display.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "DisplayInterface"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "profiling/sampling/live_collector/widgets.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Widget"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "selectors.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "_SelectorMapping"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/support/threading_helper.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 264,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_abc.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "C"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_collections.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Both",
+        "Col",
+        "CustomSequence",
+        "FailOnClose",
+        "H",
+        "I",
+        "IgnoreGeneratorExit",
+        "ListSet",
+        "MinimalCoro",
+        "MinimalGen",
+        "MutableSequenceSubclass",
+        "MyComparableSet",
+        "MyMapping",
+        "MyNonComparableSet",
+        "MySet",
+        "OneTwoThreeSet",
+        "R",
+        "SequenceSubclass",
+        "SetUsingInstanceFromIterable",
+        "WithSet",
+        "Z"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_context.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 367,
+          "kind": "issubclass",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_dataclasses/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "P"
+      ],
+      "abc_bases": [
+        "A",
+        "Ordered"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_functools.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Abstract"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_importlib/metadata/_path.py",
+      "runtime_protocols": [
+        "TreeMaker"
+      ],
+      "protocols": [
+        "TreeMaker"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 33,
+          "kind": "isinstance",
+          "targets": [
+            "TreeMaker"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_importlib/resources/_path.py",
+      "runtime_protocols": [
+        "TreeMaker"
+      ],
+      "protocols": [
+        "TreeMaker"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 32,
+          "kind": "isinstance",
+          "targets": [
+            "TreeMaker"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_iter.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 139,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterator"
+          ]
+        },
+        {
+          "lineno": 238,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterator"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_patma.py",
+      "runtime_protocols": [
+        "P"
+      ],
+      "protocols": [
+        "P"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_pprint.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "MyMapping"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_pyexpat.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "AttackProtectionTestBase"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_shelve.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "byteskeydict"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_statistics.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 253,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        },
+        {
+          "lineno": 254,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "test/test_typing.py",
+      "runtime_protocols": [
+        "Base",
+        "CallableMembersProto",
+        "Child",
+        "Commentable",
+        "Custom",
+        "CustomReader",
+        "CustomWriter",
+        "Empty",
+        "EmptyProtocol",
+        "Foo",
+        "HasCallProtocol",
+        "HasX",
+        "MethodP",
+        "NonCallableMembers",
+        "P",
+        "P1",
+        "P2",
+        "PNonCall",
+        "PR",
+        "PSub",
+        "P_match",
+        "P_regular",
+        "Point",
+        "Position",
+        "Proto",
+        "ProtocolWithMethod",
+        "ProtocolWithMixedMembers",
+        "ProtocolWithNonCallableMember",
+        "RCProto1",
+        "RCProto2",
+        "RCProto3",
+        "ReleasableBuffer",
+        "RuntimeCheckable",
+        "Spam",
+        "SupportsStartsWith",
+        "SupportsTrunc",
+        "Vec2D",
+        "WeirdProto",
+        "WeirdProto2",
+        "WeirderProto"
+      ],
+      "protocols": [
+        "B1",
+        "B3",
+        "BP",
+        "BadP",
+        "BadP1",
+        "BareProto",
+        "Base",
+        "CallableMembersProto",
+        "Child",
+        "Commentable",
+        "Coordinate",
+        "Custom",
+        "CustomAsyncIterator",
+        "CustomContextManager",
+        "CustomPathLikeProtocol",
+        "CustomProtocol",
+        "CustomReader",
+        "CustomWriter",
+        "DeferredProto",
+        "Empty",
+        "EmptyProtocol",
+        "Foo",
+        "HasCallProtocol",
+        "HasX",
+        "IdenticalProto",
+        "InheritedRCProto1",
+        "InheritedRCProto2",
+        "InheritedRCProto3",
+        "MethodP",
+        "MixedMembersProto1",
+        "MixedMembersProto2",
+        "NewGeneric",
+        "NonCallableMembers",
+        "NonCallableMembersProto",
+        "NonCallableMembersSupersetProto",
+        "NotRuntimeCheckable",
+        "OldGeneric",
+        "P",
+        "P1",
+        "P2",
+        "PM",
+        "PNonCall",
+        "PR",
+        "PSub",
+        "P_match",
+        "P_regular",
+        "Point",
+        "Position",
+        "Proto",
+        "ProtocolWithMethod",
+        "ProtocolWithMixedMembers",
+        "ProtocolWithNonCallableMember",
+        "Q",
+        "R",
+        "RCProto1",
+        "RCProto2",
+        "RCProto3",
+        "ReleasableBuffer",
+        "RuntimeCheckable",
+        "Spam",
+        "SubProtocol",
+        "SupersetProto",
+        "SupportsStartsWith",
+        "SupportsTrunc",
+        "UnrelatedProtocol",
+        "Vec2D",
+        "WeirdProto",
+        "WeirdProto2",
+        "WeirderProto",
+        "XAxis",
+        "YAxis"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 3162,
+          "kind": "issubclass",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3174,
+          "kind": "issubclass",
+          "targets": [
+            "P"
+          ]
+        },
+        {
+          "lineno": 3178,
+          "kind": "issubclass",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3300,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3302,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3304,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3356,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3362,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3376,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3398,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3418,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3442,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3464,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3524,
+          "kind": "isinstance",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3952,
+          "kind": "issubclass",
+          "targets": [
+            "NotRuntimeCheckable"
+          ]
+        },
+        {
+          "lineno": 3954,
+          "kind": "isinstance",
+          "targets": [
+            "NotRuntimeCheckable"
+          ]
+        },
+        {
+          "lineno": 4021,
+          "kind": "issubclass",
+          "targets": [
+            "PR"
+          ]
+        },
+        {
+          "lineno": 4459,
+          "kind": "isinstance",
+          "targets": [
+            "P"
+          ]
+        },
+        {
+          "lineno": 4643,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithNonCallableMember"
+          ]
+        },
+        {
+          "lineno": 4646,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithNonCallableMember"
+          ]
+        },
+        {
+          "lineno": 4667,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithMixedMembers"
+          ]
+        },
+        {
+          "lineno": 4670,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithMixedMembers"
+          ]
+        },
+        {
+          "lineno": 4690,
+          "kind": "issubclass",
+          "targets": [
+            "Vec2D"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "traceback.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1365,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "tracemalloc.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Traceback",
+        "_Traces"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 216,
+          "kind": "isinstance",
+          "targets": [
+            "Traceback"
+          ]
+        },
+        {
+          "lineno": 221,
+          "kind": "isinstance",
+          "targets": [
+            "Traceback"
+          ]
+        },
+        {
+          "lineno": 330,
+          "kind": "isinstance",
+          "targets": [
+            "_Traces"
+          ]
+        },
+        {
+          "lineno": 458,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib",
+      "path": "typing.py",
+      "runtime_protocols": [
+        "SupportsAbs",
+        "SupportsBytes",
+        "SupportsComplex",
+        "SupportsFloat",
+        "SupportsIndex",
+        "SupportsInt",
+        "SupportsRound"
+      ],
+      "protocols": [
+        "SupportsAbs",
+        "SupportsBytes",
+        "SupportsComplex",
+        "SupportsFloat",
+        "SupportsIndex",
+        "SupportsInt",
+        "SupportsRound",
+        "_IdentityCallable"
+      ],
+      "abc_bases": [
+        "_ProtocolMeta"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib",
+      "path": "wsgiref/types.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ErrorStream",
+        "FileWrapper",
+        "InputStream",
+        "StartResponse",
+        "_Readable"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "support/threading_helper.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 264,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_abc.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "C"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_collections.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Both",
+        "Col",
+        "CustomSequence",
+        "FailOnClose",
+        "H",
+        "I",
+        "IgnoreGeneratorExit",
+        "ListSet",
+        "MinimalCoro",
+        "MinimalGen",
+        "MutableSequenceSubclass",
+        "MyComparableSet",
+        "MyMapping",
+        "MyNonComparableSet",
+        "MySet",
+        "OneTwoThreeSet",
+        "R",
+        "SequenceSubclass",
+        "SetUsingInstanceFromIterable",
+        "WithSet",
+        "Z"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_context.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 367,
+          "kind": "issubclass",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_dataclasses/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "P"
+      ],
+      "abc_bases": [
+        "A",
+        "Ordered"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_functools.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Abstract"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_importlib/metadata/_path.py",
+      "runtime_protocols": [
+        "TreeMaker"
+      ],
+      "protocols": [
+        "TreeMaker"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 33,
+          "kind": "isinstance",
+          "targets": [
+            "TreeMaker"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_importlib/resources/_path.py",
+      "runtime_protocols": [
+        "TreeMaker"
+      ],
+      "protocols": [
+        "TreeMaker"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 32,
+          "kind": "isinstance",
+          "targets": [
+            "TreeMaker"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_iter.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 139,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterator"
+          ]
+        },
+        {
+          "lineno": 238,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Iterator"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_patma.py",
+      "runtime_protocols": [
+        "P"
+      ],
+      "protocols": [
+        "P"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_pprint.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "MyMapping"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_pyexpat.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "AttackProtectionTestBase"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_shelve.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "byteskeydict"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_statistics.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 253,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        },
+        {
+          "lineno": 254,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Lib/test",
+      "path": "test_typing.py",
+      "runtime_protocols": [
+        "Base",
+        "CallableMembersProto",
+        "Child",
+        "Commentable",
+        "Custom",
+        "CustomReader",
+        "CustomWriter",
+        "Empty",
+        "EmptyProtocol",
+        "Foo",
+        "HasCallProtocol",
+        "HasX",
+        "MethodP",
+        "NonCallableMembers",
+        "P",
+        "P1",
+        "P2",
+        "PNonCall",
+        "PR",
+        "PSub",
+        "P_match",
+        "P_regular",
+        "Point",
+        "Position",
+        "Proto",
+        "ProtocolWithMethod",
+        "ProtocolWithMixedMembers",
+        "ProtocolWithNonCallableMember",
+        "RCProto1",
+        "RCProto2",
+        "RCProto3",
+        "ReleasableBuffer",
+        "RuntimeCheckable",
+        "Spam",
+        "SupportsStartsWith",
+        "SupportsTrunc",
+        "Vec2D",
+        "WeirdProto",
+        "WeirdProto2",
+        "WeirderProto"
+      ],
+      "protocols": [
+        "B1",
+        "B3",
+        "BP",
+        "BadP",
+        "BadP1",
+        "BareProto",
+        "Base",
+        "CallableMembersProto",
+        "Child",
+        "Commentable",
+        "Coordinate",
+        "Custom",
+        "CustomAsyncIterator",
+        "CustomContextManager",
+        "CustomPathLikeProtocol",
+        "CustomProtocol",
+        "CustomReader",
+        "CustomWriter",
+        "DeferredProto",
+        "Empty",
+        "EmptyProtocol",
+        "Foo",
+        "HasCallProtocol",
+        "HasX",
+        "IdenticalProto",
+        "InheritedRCProto1",
+        "InheritedRCProto2",
+        "InheritedRCProto3",
+        "MethodP",
+        "MixedMembersProto1",
+        "MixedMembersProto2",
+        "NewGeneric",
+        "NonCallableMembers",
+        "NonCallableMembersProto",
+        "NonCallableMembersSupersetProto",
+        "NotRuntimeCheckable",
+        "OldGeneric",
+        "P",
+        "P1",
+        "P2",
+        "PM",
+        "PNonCall",
+        "PR",
+        "PSub",
+        "P_match",
+        "P_regular",
+        "Point",
+        "Position",
+        "Proto",
+        "ProtocolWithMethod",
+        "ProtocolWithMixedMembers",
+        "ProtocolWithNonCallableMember",
+        "Q",
+        "R",
+        "RCProto1",
+        "RCProto2",
+        "RCProto3",
+        "ReleasableBuffer",
+        "RuntimeCheckable",
+        "Spam",
+        "SubProtocol",
+        "SupersetProto",
+        "SupportsStartsWith",
+        "SupportsTrunc",
+        "UnrelatedProtocol",
+        "Vec2D",
+        "WeirdProto",
+        "WeirdProto2",
+        "WeirderProto",
+        "XAxis",
+        "YAxis"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 3162,
+          "kind": "issubclass",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3174,
+          "kind": "issubclass",
+          "targets": [
+            "P"
+          ]
+        },
+        {
+          "lineno": 3178,
+          "kind": "issubclass",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3300,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3302,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3304,
+          "kind": "issubclass",
+          "targets": [
+            "Protocol"
+          ]
+        },
+        {
+          "lineno": 3356,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3362,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3376,
+          "kind": "issubclass",
+          "targets": [
+            "PNonCall"
+          ]
+        },
+        {
+          "lineno": 3398,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3418,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3442,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3464,
+          "kind": "issubclass",
+          "targets": [
+            "Spam"
+          ]
+        },
+        {
+          "lineno": 3524,
+          "kind": "isinstance",
+          "targets": [
+            "BadP"
+          ]
+        },
+        {
+          "lineno": 3952,
+          "kind": "issubclass",
+          "targets": [
+            "NotRuntimeCheckable"
+          ]
+        },
+        {
+          "lineno": 3954,
+          "kind": "isinstance",
+          "targets": [
+            "NotRuntimeCheckable"
+          ]
+        },
+        {
+          "lineno": 4021,
+          "kind": "issubclass",
+          "targets": [
+            "PR"
+          ]
+        },
+        {
+          "lineno": 4459,
+          "kind": "isinstance",
+          "targets": [
+            "P"
+          ]
+        },
+        {
+          "lineno": 4643,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithNonCallableMember"
+          ]
+        },
+        {
+          "lineno": 4646,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithNonCallableMember"
+          ]
+        },
+        {
+          "lineno": 4667,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithMixedMembers"
+          ]
+        },
+        {
+          "lineno": 4670,
+          "kind": "issubclass",
+          "targets": [
+            "ProtocolWithMixedMembers"
+          ]
+        },
+        {
+          "lineno": 4690,
+          "kind": "issubclass",
+          "targets": [
+            "Vec2D"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "Tools",
+      "path": "clinic/libclinic/parser.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "Parser"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/assertion/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "RewriteHook"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/assertion/util.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_HighlightFunc"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 122,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/capture.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "CaptureBase"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/config/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 185,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 912,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/fixtures.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "FixtureRequest"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/mark/expression.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ExpressionMatcher"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/mark/structures.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 121,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Collection"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/nodes.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Collector",
+        "Directory",
+        "FSCollector",
+        "File",
+        "Item",
+        "Node",
+        "NodeMeta"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 575,
+          "kind": "isinstance",
+          "targets": [
+            "Node"
+          ]
+        },
+        {
+          "lineno": 709,
+          "kind": "issubclass",
+          "targets": [
+            "Collector"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/pytester.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1698,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/python.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "PyCollector"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 1488,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 1526,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 1556,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/python_api.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 773,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 780,
+          "kind": "isinstance",
+          "targets": [
+            "Collection"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/raises.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "AbstractRaises"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/reports.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 210,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 212,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "_pytest/skipping.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 109,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "annotated_types/__init__.py",
+      "runtime_protocols": [
+        "GroupedMetadata"
+      ],
+      "protocols": [
+        "GroupedMetadata",
+        "SupportsDiv",
+        "SupportsGe",
+        "SupportsGt",
+        "SupportsLe",
+        "SupportsLt",
+        "SupportsMod"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "anyio/functools.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 386,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "asgiref/typing.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ASGI2Protocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "attr/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "AttrsInstance"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/app/amqp.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 78,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 334,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 427,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/app/routes.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 30,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 126,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/app/utils.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 330,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/canvas.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 697,
+          "kind": "isinstance",
+          "targets": [
+            "MutableSequence"
+          ]
+        },
+        {
+          "lineno": 1662,
+          "kind": "isinstance",
+          "targets": [
+            "MutableSequence"
+          ]
+        },
+        {
+          "lineno": 1863,
+          "kind": "isinstance",
+          "targets": [
+            "MutableSequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/fixups/django.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "DjangoDBModule"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/utils/abstract.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "CallableTask"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "celery/utils/collections.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "ChainMap"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 44,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 586,
+          "kind": "isinstance",
+          "targets": [
+            "Callable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "click_repl/utils.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 117,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 117,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/contrib/auth/models.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 413,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        },
+        {
+          "lineno": 419,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        },
+        {
+          "lineno": 607,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        },
+        {
+          "lineno": 612,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/core/checks/registry.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 90,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/db/backends/sqlite3/base.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 357,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 365,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/db/models/fields/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 315,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        },
+        {
+          "lineno": 321,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/db/models/sql/query.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 202,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 1591,
+          "kind": "isinstance",
+          "targets": [
+            "Iterator"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/template/defaulttags.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1329,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 1343,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/template/library.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 371,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/test/client.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 306,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/utils/choices.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 19,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/utils/datastructures.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "CaseInsensitiveMapping"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 210,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 316,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 334,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/utils/hashable.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 22,
+          "kind": "isinstance",
+          "targets": [
+            "Iterable"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "django/utils/html.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 161,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "fastapi/responses.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_OrjsonModule",
+        "_UjsonModule"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "h11/_events.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Event"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "httpx/_models.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 153,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema/_typing.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "SchemaKeywordValidator"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema/_utils.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "URIDict"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 138,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 138,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 140,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 140,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema/protocols.py",
+      "runtime_protocols": [
+        "Validator"
+      ],
+      "protocols": [
+        "Validator"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema/validators.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 951,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 1168,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "jsonschema_specifications/tests/test_jsonschema_specifications.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 11,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "packaging/dependency_groups.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 220,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 233,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "packaging/direct_url.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_FromMappingProtocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "packaging/pylock.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_FromMappingProtocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 85,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "prompt_toolkit/cursor_shapes.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "CursorShapeConfig"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "prompt_toolkit/formatted_text/base.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "MagicFormattedText"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "prompt_toolkit/layout/containers.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "MagicContainer"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/_internal/_core_utils.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 112,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 135,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/_internal/_dataclasses.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "PydanticDataclass"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/_internal/_decorators_v1.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "V1OnlyValueValidator",
+        "V1RootValidatorFunction",
+        "V1ValidatorWithKwargs",
+        "V1ValidatorWithValues",
+        "V1ValidatorWithValuesAndKwargs",
+        "V1ValidatorWithValuesKwOnly",
+        "V2CoreAfterRootValidator",
+        "V2CoreBeforeRootValidator"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/_internal/_model_construction.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "ModelMetaclass"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/_internal/_utils.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 219,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 219,
+          "kind": "isinstance",
+          "targets": [
+            "AbstractSet"
+          ]
+        },
+        {
+          "lineno": 284,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 286,
+          "kind": "isinstance",
+          "targets": [
+            "AbstractSet"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/deprecated/class_validators.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_OnlyValueValidatorClsMethod",
+        "_V1RootValidatorClsMethod",
+        "_V1ValidatorWithKwargsClsMethod",
+        "_V1ValidatorWithValuesAndKwargsClsMethod",
+        "_V1ValidatorWithValuesClsMethod",
+        "_V1ValidatorWithValuesKwOnlyClsMethod"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/experimental/pipeline.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "_SupportsLen",
+        "_SupportsRange"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/functional_validators.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "FreeModelBeforeValidator",
+        "FreeModelBeforeValidatorWithoutInfo",
+        "ModelBeforeValidator",
+        "ModelBeforeValidatorWithoutInfo",
+        "_OnlyValueValidatorClsMethod",
+        "_OnlyValueWrapValidatorClsMethod",
+        "_V2ValidatorClsMethod",
+        "_V2WrapValidatorClsMethod"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/json_schema.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 1216,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Set"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/plugin/__init__.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "BaseValidateHandlerProtocol",
+        "PydanticPluginProtocol",
+        "ValidateJsonHandlerProtocol",
+        "ValidatePythonHandlerProtocol",
+        "ValidateStringsHandlerProtocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/types.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "EncoderProtocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/v1/config.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "SchemaExtraCallable"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/v1/main.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "ModelMetaclass"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic/v1/types.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "SecretField"
+      ],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "pydantic_core/core_schema.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "FieldSerializationInfo",
+        "SerializerFunctionWrapHandler",
+        "ValidatorFunctionWrapHandler"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "referencing/_core.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 271,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "referencing/jsonschema.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 191,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 223,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        },
+        {
+          "lineno": 260,
+          "kind": "isinstance",
+          "targets": [
+            "Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "starlette/_utils.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "SupportsAsyncClose"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "starlette/datastructures.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 617,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        },
+        {
+          "lineno": 623,
+          "kind": "isinstance",
+          "targets": [
+            "Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "structlog/_native.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 139,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "structlog/dev.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ColumnFormatter"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "structlog/typing.py",
+      "runtime_protocols": [
+        "BindableLogger",
+        "ExceptionTransformer"
+      ],
+      "protocols": [
+        "BindableLogger",
+        "ExceptionTransformer",
+        "FilteringBoundLogger"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "typeguard/_checkers.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [],
+      "instancecheck_calls": [
+        {
+          "lineno": 222,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.MutableMapping"
+          ]
+        },
+        {
+          "lineno": 224,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        },
+        {
+          "lineno": 330,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Sequence"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "typing_extensions.py",
+      "runtime_protocols": [
+        "SupportsBytes",
+        "SupportsComplex",
+        "SupportsFloat",
+        "SupportsIndex",
+        "SupportsInt"
+      ],
+      "protocols": [
+        "SupportsBytes",
+        "SupportsComplex",
+        "SupportsFloat",
+        "SupportsIndex",
+        "SupportsInt"
+      ],
+      "abc_bases": [
+        "Buffer"
+      ],
+      "instancecheck_calls": [
+        {
+          "lineno": 779,
+          "kind": "isinstance",
+          "targets": [
+            "collections.abc.Mapping"
+          ]
+        }
+      ]
+    },
+    {
+      "root": "site-packages",
+      "path": "uvicorn/_types.py",
+      "runtime_protocols": [],
+      "protocols": [
+        "ASGI2Protocol"
+      ],
+      "abc_bases": [],
+      "instancecheck_calls": []
+    },
+    {
+      "root": "site-packages",
+      "path": "vine/abstract.py",
+      "runtime_protocols": [],
+      "protocols": [],
+      "abc_bases": [
+        "Thenable"
+      ],
+      "instancecheck_calls": []
+    }
+  ]
+}

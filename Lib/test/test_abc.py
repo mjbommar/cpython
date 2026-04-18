@@ -9,6 +9,7 @@
 import unittest
 
 import abc
+import collections
 import _py_abc
 from inspect import isabstract
 
@@ -148,6 +149,31 @@ def test_factory(abc_ABCMeta, abc_get_cache_token):
                 def foo(): return 4
             self.assertEqual(D.foo(), 4)
             self.assertEqual(D().foo(), 4)
+
+        def test_instancecheck_respects_dynamic___class__(self):
+            class MyMapping(collections.abc.Mapping):
+                def __iter__(self):
+                    return iter(())
+
+                def __len__(self):
+                    return 0
+
+                def __getitem__(self, key):
+                    raise KeyError(key)
+
+            class PropertyProxy:
+                @property
+                def __class__(self):
+                    return MyMapping
+
+            class GetattributeProxy:
+                def __getattribute__(self, name):
+                    if name == "__class__":
+                        return MyMapping
+                    return super().__getattribute__(name)
+
+            self.assertIsInstance(PropertyProxy(), collections.abc.Mapping)
+            self.assertIsInstance(GetattributeProxy(), collections.abc.Mapping)
 
         def test_object_new_with_one_abstractmethod(self):
             class C(metaclass=abc_ABCMeta):
