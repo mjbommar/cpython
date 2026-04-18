@@ -115,6 +115,26 @@ class AST_Tests(unittest.TestCase):
         with self.assertRaisesRegex(AttributeError, msg):
             ast.AST()
 
+    def test_nodevisitor_dynamic_method_lookup(self):
+        target = ast.parse("x = 1").body[0].targets[0]
+
+        class Visitor(ast.NodeVisitor):
+            def __init__(self):
+                self.events = []
+
+            def generic_visit(self, node):
+                self.events.append(("generic", type(node).__name__))
+
+        visitor = Visitor()
+        visitor.visit(target)
+        visitor.visit_Name = lambda node: visitor.events.append(("patched", node.id))
+        visitor.visit(target)
+
+        self.assertEqual(
+            visitor.events,
+            [("generic", "Name"), ("patched", "x")],
+        )
+
     def test_AST_garbage_collection(self):
         class X:
             pass

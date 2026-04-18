@@ -492,6 +492,10 @@ def compare(
         return False
     return True
 
+# AST node classes are fixed for the lifetime of the interpreter, so their
+# `visit_*` method names are stable and cheap to memoize.
+_node_visitor_method_names = {}
+
 
 class NodeVisitor(object):
     """
@@ -515,7 +519,11 @@ class NodeVisitor(object):
 
     def visit(self, node):
         """Visit a node."""
-        method = 'visit_' + node.__class__.__name__
+        node_type = node.__class__
+        method = _node_visitor_method_names.get(node_type)
+        if method is None:
+            method = 'visit_' + node_type.__name__
+            _node_visitor_method_names[node_type] = method
         visitor = getattr(self, method, self.generic_visit)
         return visitor(node)
 
