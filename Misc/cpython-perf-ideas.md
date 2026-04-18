@@ -126,6 +126,27 @@ at the same code, that's a load-bearing observation.
      everywhere in typed codebases (Pydantic, FastAPI dependency
      injection, tight validator loops).
    - **Scope**: small-to-medium. Touches one C file plus `typing.py`.
+   - **2026-04-18 follow-up**:
+     - Investigated on `exp-abc/instancecheck-cache`; full notes live in
+       `Misc/abc-instancecheck-perf-diary.md` on that branch.
+     - The best result was the smaller `_abc.c` patch: check
+       `Py_TYPE(instance)` against `_abc_cache` before fetching
+       `instance.__class__`.
+     - Averaged over two runs, that C-only patch improved
+       `inspect.isawaitable` by about `-7.7%`, `httpx` request-data
+       encoding by `-2.1%`, `typeguard` mapping checks by `-1.8%`,
+       `jsonschema._utils.equal` by `-4.7%`, and direct
+       `jsonschema.protocols.Validator` checks by `-8.6%`.
+     - The more aggressive exact-type fast path won harder on some
+       positive-hit micros, but lost its edge on the representative
+       real-workload average and added more proxy overhead.
+     - The `typing.py` protocol type-cache experiment should be dropped:
+       it was performance-unstable and could return false positives for
+       later instances of the same type when protocol satisfaction came
+       from instance attributes.
+     - Validation on the final branch state included `test_abc`,
+       `test_typing`, `test_inspect`, `test_context`,
+       `test_collections`, and `test_pathlib`.
 
 ## Single-lens standouts worth building
 
@@ -367,7 +388,7 @@ reach)**. Each target stands alone as a PR; none depends on another.
 |---|---|---|---|---|
 | **1** | Logging hot path — pure-function caches in `LogRecord` / `findCaller`; optional C-helper follow-up | Medium | High (3×) | Pure Python first; C helper separate |
 | **2** | AST `NodeVisitor.visit` method-name cache | Tiny | High | Pure Python, validated branch |
-| **3** | ABC / Protocol `__instancecheck__` cache + `Py_TYPE` short-circuit | Small-medium | High (2×) | One C file + `typing.py` |
+| **3** | ABC `__instancecheck__` subtype-cache fast path | Small | High | One C file, validated branch |
 | **4** | `datetime.fromisoformat` length-dispatched fast path | Small | High | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
 | **6** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
