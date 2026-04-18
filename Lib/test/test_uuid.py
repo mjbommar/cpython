@@ -698,6 +698,16 @@ class BaseTestUUID:
             uuids[u] = 1
         equal(len(uuids.keys()), 1000)
 
+    def test_uuid4_helper_fast_path(self):
+        expected = self.uuid.UUID('12345678-1234-4abc-8def-123456789abc')
+        with mock.patch.object(
+            self.uuid, '_generate_random_int', return_value=expected.int
+        ) as generate_random_int:
+            u = self.uuid.uuid4()
+
+        self.assertEqual(u, expected)
+        generate_random_int.assert_called_once_with()
+
     def test_uuid5(self):
         equal = self.assertEqual
 
