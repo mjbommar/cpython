@@ -1,0 +1,307 @@
+Scanned 3723 .py files across third-party venvs.
+Found 34 subclasses of logging classes (import-aware).
+
+================================================================================
+SUBCLASS COUNTS PER LOGGING BASE CLASS (import-verified)
+================================================================================
+
+Filter: 12 subclasses across 4 packages
+      6× in sphinx
+      3× in django
+      2× in tornado
+      1× in sentry_sdk
+
+Formatter: 11 subclasses across 10 packages
+      2× in django
+      1× in pythonjsonlogger
+      1× in colorlog
+      1× in dill
+      1× in structlog
+      1× in uvicorn
+      1× in tornado
+      1× in _pytest
+      1× in sphinx
+      1× in celery
+
+Handler: 4 subclasses across 4 packages
+      1× in rich
+      1× in sentry_sdk
+      1× in celery
+      1× in django
+
+LoggerAdapter: 1 subclasses across 1 packages
+      1× in dill
+
+StreamHandler: 1 subclasses across 1 packages
+      1× in werkzeug
+
+Logger: 1 subclasses across 1 packages
+      1× in structlog
+
+PercentStyle: 1 subclasses across 1 packages
+      1× in _pytest
+
+FileHandler: 1 subclasses across 1 packages
+      1× in _pytest
+
+NullHandler: 1 subclasses across 1 packages
+      1× in _pytest
+
+LogRecord: 1 subclasses across 1 packages
+      1× in sphinx
+
+================================================================================
+METHOD OVERRIDE HEAT MAP (per class, third-party only)
+================================================================================
+
+--- FileHandler (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                       1197                    
+  __repr__                       1270                    
+  _open                          1245                    
+  close                          1224                    
+  emit                           1254                    
+
+--- Filter (12 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                        789                7×  django,sphinx,tornado
+  __repr__                        800                    
+  filter                          803               12×  django,sentry_sdk,sphinx,tornado
+
+--- Formatter (11 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                        598                8×  celery,colorlog,dill,django,pythonjsonlogger,structlog,tornado,uvicorn
+  __repr__                        625                    
+  format                          699                8×  celery,dill,django,pythonjsonlogger,sphinx,structlog,tornado
+  formatException                 658                2×  celery,pythonjsonlogger
+  formatMessage                   683                2×  colorlog,uvicorn
+  formatStack                     686     ★          1×  pythonjsonlogger
+  formatTime                      631                1×  _pytest
+  usesTime                        677                    
+
+--- Handler (4 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                        934                2×  django,rich
+  __repr__                       1110                    
+  _at_fork_reinit                 968                    
+  acquire                         971                    
+  close                          1048     ★              
+  createLock                      961                    
+  emit                           1004     ★          2×  django,rich
+  flush                          1039     ★              
+  format                          991                    
+  get_name                        948                    
+  handle                         1014                    
+  handleError                    1063                1×  celery
+  release                         978                    
+  setFormatter                   1033                    
+  setLevel                        985                    
+  set_name                        951                    
+
+--- LogRecord (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                        295                    
+  __repr__                        384                    
+  getMessage                      388                1×  sphinx
+
+--- Logger (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                       1481                    
+  __reduce__                     1826                    
+  __repr__                       1822                    
+  _log                           1644                    
+  addHandler                     1686                    
+  callHandlers                   1724                    
+  critical                       1560                    
+  debug                          1501                    
+  error                          1542                    
+  exception                      1554                    
+  fatal                          1572                    
+  findCaller                     1595                1×  structlog
+  getChild                       1787                    
+  getChildren                    1806                    
+  getEffectiveLevel              1754                    
+  handle                         1670                    
+  hasHandlers                    1702                    
+  info                           1513                    
+  isEnabledFor                   1768                    
+  log                            1578                    
+  makeRecord                     1629     ★              
+  removeHandler                  1694                    
+  setLevel                       1494                    
+  warn                           1537                    
+  warning                        1525                    
+
+--- LoggerAdapter (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                       1856                1×  dill
+  __repr__                       1993                    
+  _log                           1975                    
+  critical                       1936                    
+  debug                          1901                    
+  error                          1924                    
+  exception                      1930                    
+  getEffectiveLevel              1963                    
+  hasHandlers                    1969                    
+  info                           1907                    
+  isEnabledFor                   1951                    
+  log                            1942                    
+  manager                        1986                    
+  name                           1990                    
+  process                        1881     ★          1×  dill
+  setLevel                       1957                    
+  warn                           1919                    
+  warning                        1913                    
+
+--- NullHandler (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  _at_fork_reinit                2306                    
+  createLock                     2303                    
+  emit                           2300                    
+  handle                         2297                    
+
+--- PercentStyle (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                        448                1×  _pytest
+  _format                         460                    
+  format                          467                1×  _pytest
+  usesTime                        452                    
+  validate                        455                    
+
+--- StreamHandler (1 subclasses) ---
+  method                         line  hint   overrides  packages
+  __init__                       1123                1×  werkzeug
+  __repr__                       1181                    
+  emit                           1142                    
+  flush                          1134                    
+  setStream                      1164                    
+
+================================================================================
+C-ACCELERATION SAFETY CLASSIFICATION
+================================================================================
+
+SAFE_TO_ACCELERATE  (86 methods):
+  BufferingFormatter.__init__                        overrides-seen=0
+  BufferingFormatter.format                          overrides-seen=0
+  BufferingFormatter.formatFooter                    overrides-seen=0
+  BufferingFormatter.formatHeader                    overrides-seen=0
+  FileHandler.__init__                        overrides-seen=0
+  FileHandler._open                           overrides-seen=0
+  FileHandler.close                           overrides-seen=0
+  FileHandler.emit                            overrides-seen=0
+  Filterer.__init__                        overrides-seen=0
+  Filterer.addFilter                       overrides-seen=0
+  Filterer.filter                          overrides-seen=0
+  Filterer.removeFilter                    overrides-seen=0
+  Formatter.usesTime                        overrides-seen=0
+  Handler._at_fork_reinit                 overrides-seen=0
+  Handler.acquire                         overrides-seen=0
+  Handler.createLock                      overrides-seen=0
+  Handler.format                          overrides-seen=0
+  Handler.get_name                        overrides-seen=0
+  Handler.handle                          overrides-seen=0
+  Handler.release                         overrides-seen=0
+  Handler.setFormatter                    overrides-seen=0
+  Handler.setLevel                        overrides-seen=0
+  Handler.set_name                        overrides-seen=0
+  LogRecord.__init__                        overrides-seen=0
+  Logger.__init__                        overrides-seen=0
+  Logger._log                            overrides-seen=0
+  Logger.addHandler                      overrides-seen=0
+  Logger.callHandlers                    overrides-seen=0
+  Logger.critical                        overrides-seen=0
+  Logger.debug                           overrides-seen=0
+  Logger.error                           overrides-seen=0
+  Logger.exception                       overrides-seen=0
+  Logger.fatal                           overrides-seen=0
+  Logger.getChild                        overrides-seen=0
+  Logger.getChildren                     overrides-seen=0
+  Logger.getEffectiveLevel               overrides-seen=0
+  Logger.handle                          overrides-seen=0
+  Logger.hasHandlers                     overrides-seen=0
+  Logger.info                            overrides-seen=0
+  Logger.isEnabledFor                    overrides-seen=0
+  Logger.log                             overrides-seen=0
+  Logger.removeHandler                   overrides-seen=0
+  Logger.setLevel                        overrides-seen=0
+  Logger.warn                            overrides-seen=0
+  Logger.warning                         overrides-seen=0
+  LoggerAdapter._log                            overrides-seen=0
+  LoggerAdapter.critical                        overrides-seen=0
+  LoggerAdapter.debug                           overrides-seen=0
+  LoggerAdapter.error                           overrides-seen=0
+  LoggerAdapter.exception                       overrides-seen=0
+  LoggerAdapter.getEffectiveLevel               overrides-seen=0
+  LoggerAdapter.hasHandlers                     overrides-seen=0
+  LoggerAdapter.info                            overrides-seen=0
+  LoggerAdapter.isEnabledFor                    overrides-seen=0
+  LoggerAdapter.log                             overrides-seen=0
+  LoggerAdapter.manager                         overrides-seen=0
+  LoggerAdapter.name                            overrides-seen=0
+  LoggerAdapter.setLevel                        overrides-seen=0
+  LoggerAdapter.warn                            overrides-seen=0
+  LoggerAdapter.warning                         overrides-seen=0
+  Manager.__init__                        overrides-seen=0
+  Manager._clear_cache                    overrides-seen=0
+  Manager._fixupChildren                  overrides-seen=0
+  Manager._fixupParents                   overrides-seen=0
+  Manager.disable                         overrides-seen=0
+  Manager.getLogger                       overrides-seen=0
+  Manager.setLogRecordFactory             overrides-seen=0
+  Manager.setLoggerClass                  overrides-seen=0
+  NullHandler._at_fork_reinit                 overrides-seen=0
+  NullHandler.createLock                      overrides-seen=0
+  NullHandler.emit                            overrides-seen=0
+  NullHandler.handle                          overrides-seen=0
+  PercentStyle._format                         overrides-seen=0
+  PercentStyle.usesTime                        overrides-seen=0
+  PercentStyle.validate                        overrides-seen=0
+  PlaceHolder.__init__                        overrides-seen=0
+  PlaceHolder.append                          overrides-seen=0
+  StrFormatStyle._format                         overrides-seen=0
+  StrFormatStyle.validate                        overrides-seen=0
+  StreamHandler.emit                            overrides-seen=0
+  StreamHandler.flush                           overrides-seen=0
+  StreamHandler.setStream                       overrides-seen=0
+  StringTemplateStyle.__init__                        overrides-seen=0
+  StringTemplateStyle._format                         overrides-seen=0
+  StringTemplateStyle.usesTime                        overrides-seen=0
+  StringTemplateStyle.validate                        overrides-seen=0
+
+LIKELY_SAFE  (11 methods):
+  Formatter.formatException                 overrides-seen=2
+  Formatter.formatMessage                   overrides-seen=2
+  Formatter.formatTime                      overrides-seen=1
+  Handler.__init__                        overrides-seen=2
+  Handler.handleError                     overrides-seen=1
+  LogRecord.getMessage                      overrides-seen=1
+  Logger.findCaller                      overrides-seen=1
+  LoggerAdapter.__init__                        overrides-seen=1
+  PercentStyle.__init__                        overrides-seen=1
+  PercentStyle.format                          overrides-seen=1
+  StreamHandler.__init__                        overrides-seen=1
+
+WIDELY_OVERRIDDEN  (4 methods):
+  Filter.__init__                        overrides-seen=7
+  Filter.filter                          overrides-seen=12
+  Formatter.__init__                        overrides-seen=8
+  Formatter.format                          overrides-seen=8
+
+EXTENSION_POINT  (6 methods):
+  Formatter.formatStack                     overrides-seen=1
+  Handler.close                           overrides-seen=0
+  Handler.emit                            overrides-seen=2
+  Handler.flush                           overrides-seen=0
+  Logger.makeRecord                      overrides-seen=0
+  LoggerAdapter.process                         overrides-seen=1
+
+dunder  (9 methods):
+  FileHandler.__repr__                        overrides-seen=0
+  Filter.__repr__                        overrides-seen=0
+  Formatter.__repr__                        overrides-seen=0
+  Handler.__repr__                        overrides-seen=0
+  LogRecord.__repr__                        overrides-seen=0
+  Logger.__reduce__                      overrides-seen=0
+  Logger.__repr__                        overrides-seen=0
+  LoggerAdapter.__repr__                        overrides-seen=0
+  StreamHandler.__repr__                        overrides-seen=0
