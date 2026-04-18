@@ -721,6 +721,44 @@ reach)**. Each target stands alone as a PR; none depends on another.
 | **9** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
 | **10** | `copy.deepcopy` SCC prepass | Small | Medium | Pure Python |
 
+## Combined winners stack
+
+- Branch: `exp-combined/winners-stack`
+- Purpose: integrate the strongest validated experiment branches and
+  measure the combined effect against rebuilt `main`
+- Included families:
+  - marshal self-reference fix
+  - pure-Python pickle exact-container work
+  - logging hot-path caches
+  - AST `NodeVisitor` cache
+  - `_json` research stack
+  - `isinstance` / type-lookup fast paths
+  - `datetime.fromisoformat` entry fast path
+  - `uuid.uuid4` C fast path
+  - `_PyUnicode_JoinArray` fast path
+  - `initialize_locals` no-keyword fast path
+- Excluded from the stack:
+  - negative-result or high-risk branches such as generic `getattr`,
+    asyncio eventloop rewrites, logging C helpers, and `_heapq`
+    tuple specialization with the documented `NaN` edge-case risk
+- Integrated benchmark result:
+  - broad-panel geometric mean of `10.1%` faster vs rebuilt `main`
+- Group geometric means:
+  - logging `-9.2%`
+  - json `-11.0%`
+  - ast `-20.5%`
+  - pickle `-17.6%`
+  - uuid `-20.3%`
+  - fromisoformat `-0.4%`
+  - unicode join `-0.4%`
+  - initialize_locals `-0.2%`
+- Interpretation:
+  - the large winners stack cleanly enough to produce a real integrated
+    gain
+  - smaller string/call-path wins flatten substantially once the larger
+    `json`, `logging`, `ast`, `pickle`, and `uuid` changes are present
+  - use this branch as an integration prototype, not as a filing target
+
 ## Non-goals / explicitly not recommended
 
 - **The opcode-dispatch interpreter loop (`Python/ceval.c`)** — the
