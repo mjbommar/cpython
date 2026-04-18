@@ -6034,6 +6034,38 @@ _find_isoformat_datetime_separator(const char *dtstr, Py_ssize_t len) {
     }
 }
 
+static inline Py_ssize_t
+_find_ascii_datetime_separator_fastpath(const char *dtstr, Py_ssize_t len)
+{
+    if (len >= 10 &&
+        Py_ISDIGIT(dtstr[0]) &&
+        Py_ISDIGIT(dtstr[1]) &&
+        Py_ISDIGIT(dtstr[2]) &&
+        Py_ISDIGIT(dtstr[3]) &&
+        dtstr[4] == '-' &&
+        Py_ISDIGIT(dtstr[5]) &&
+        Py_ISDIGIT(dtstr[6]) &&
+        dtstr[7] == '-' &&
+        Py_ISDIGIT(dtstr[8]) &&
+        Py_ISDIGIT(dtstr[9])) {
+        return 10;
+    }
+
+    if (len >= 8 &&
+        Py_ISDIGIT(dtstr[0]) &&
+        Py_ISDIGIT(dtstr[1]) &&
+        Py_ISDIGIT(dtstr[2]) &&
+        Py_ISDIGIT(dtstr[3]) &&
+        Py_ISDIGIT(dtstr[4]) &&
+        Py_ISDIGIT(dtstr[5]) &&
+        Py_ISDIGIT(dtstr[6]) &&
+        Py_ISDIGIT(dtstr[7])) {
+        return 8;
+    }
+
+    return _find_isoformat_datetime_separator(dtstr, len);
+}
+
 /*[clinic input]
 @classmethod
 datetime.datetime.fromisoformat
@@ -6053,26 +6085,35 @@ datetime_datetime_fromisoformat_impl(PyTypeObject *type, PyObject *string)
     // we don't have to sanitize it anything because that can only happen when
     // the separator is either '-' or a number. This should mostly be a noop
     // but it makes the reference counting easier if we still sanitize.
-    PyObject *dtstr_clean = _sanitize_isoformat_str(string);
-    if (dtstr_clean == NULL) {
-        goto invalid_string_error;
-    }
-
+    PyObject *dtstr_clean = NULL;
     Py_ssize_t len;
-    const char *dt_ptr = PyUnicode_AsUTF8AndSize(dtstr_clean, &len);
-
-    if (dt_ptr == NULL) {
-        if (PyErr_ExceptionMatches(PyExc_UnicodeEncodeError)) {
-            // Encoding errors are invalid string errors at this point
+    const char *dt_ptr;
+    const int ascii_input = PyUnicode_IS_ASCII(string);
+    if (ascii_input) {
+        len = PyUnicode_GET_LENGTH(string);
+        dt_ptr = (const char *)PyUnicode_1BYTE_DATA(string);
+    } else {
+        dtstr_clean = _sanitize_isoformat_str(string);
+        if (dtstr_clean == NULL) {
             goto invalid_string_error;
         }
-        else {
-            goto error;
+
+        dt_ptr = PyUnicode_AsUTF8AndSize(dtstr_clean, &len);
+
+        if (dt_ptr == NULL) {
+            if (PyErr_ExceptionMatches(PyExc_UnicodeEncodeError)) {
+                // Encoding errors are invalid string errors at this point
+                goto invalid_string_error;
+            }
+            else {
+                goto error;
+            }
         }
     }
 
-    const Py_ssize_t separator_location = _find_isoformat_datetime_separator(
-            dt_ptr, len);
+    const Py_ssize_t separator_location = ascii_input
+        ? _find_ascii_datetime_separator_fastpath(dt_ptr, len)
+        : _find_isoformat_datetime_separator(dt_ptr, len);
 
 
     const char *p = dt_ptr;
@@ -6144,13 +6185,13 @@ datetime_datetime_fromisoformat_impl(PyTypeObject *type, PyObject *string)
                                             second, microsecond, tzinfo, type);
 
     Py_DECREF(tzinfo);
-    Py_DECREF(dtstr_clean);
+    Py_XDECREF(dtstr_clean);
     return dt;
 
 invalid_iso_midnight:
     PyErr_SetString(PyExc_ValueError, "minute, second, and microsecond must be 0 when hour is 24");
     Py_DECREF(tzinfo);
-    Py_DECREF(dtstr_clean);
+    Py_XDECREF(dtstr_clean);
     return NULL;
 
 invalid_string_error:
