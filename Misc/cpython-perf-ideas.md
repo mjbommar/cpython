@@ -567,6 +567,13 @@ Ideas that only one lens surfaced but with high individual ROI.
         - import smoke passed for `dateutil`, `kombu`, `celery`,
           `jsonschema`, `uvicorn`, `starlette`, `fastapi`, `httpx`,
           `anyio`, `asgiref`, and `gunicorn`
+      - Remaining theorized risk: if the first compared slot is an
+        exact `float` `NaN`, the current helper can diverge from normal
+        tuple comparison because it falls through to slots `1` and `2`
+        after both `<` and `>` checks on slot `0` return false. That
+        edge case was not observed in the tested corpora, but it should
+        be fixed or regression-tested before treating the branch as
+        PR-ready.
       - Updated recommendation: keep this as a plausible medium-priority
         `_heapq` PR for tuple-heavy heaps, but do not frame it as the
         next asyncio optimization branch.
