@@ -2137,13 +2137,26 @@ _encoder_iterate_fast_seq_lock_held(PyEncoderObject *s, PyUnicodeWriter *writer,
     PyObject *seq, PyObject *s_fast,
     Py_ssize_t indent_level, PyObject *indent_cache, PyObject *separator)
 {
+    /* E14: apply the E10 ASCII separator shortcut here too. */
+    const char *sep_ascii = NULL;
+    Py_ssize_t sep_ascii_len = 0;
+    if (separator == s->item_separator && s->item_sep_ascii != NULL) {
+        sep_ascii = s->item_sep_ascii;
+        sep_ascii_len = s->item_sep_ascii_len;
+    }
+
     for (Py_ssize_t i = 0; i < PySequence_Fast_GET_SIZE(s_fast); i++) {
         PyObject *obj = PySequence_Fast_GET_ITEM(s_fast, i);
         // gh-142831: encoder_listencode_obj() can invoke user code
         // that mutates the sequence, invalidating this borrowed ref.
         Py_INCREF(obj);
         if (i) {
-            if (PyUnicodeWriter_WriteStr(writer, separator) < 0) {
+            if (sep_ascii != NULL) {
+                if (PyUnicodeWriter_WriteASCII(writer, sep_ascii, sep_ascii_len) < 0) {
+                    Py_DECREF(obj);
+                    return -1;
+                }
+            } else if (PyUnicodeWriter_WriteStr(writer, separator) < 0) {
                 Py_DECREF(obj);
                 return -1;
             }
