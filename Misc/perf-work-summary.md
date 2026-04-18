@@ -4,7 +4,7 @@ Companion to `Misc/cpython-perf-ideas.md`. That file is the *roster* of
 ideas; this file records what was actually built, measured, and filed
 against upstream.
 
-Three separate branches, each self-contained, each with its own diary
+Four separate branches, each self-contained, each with its own diary
 and raw bench data.  None depends on the others.
 
 ## Summary table
@@ -14,8 +14,9 @@ and raw bench data.  None depends on the others.
 | 1 | `marshal-safe-cycle-design` | gh-148653 | [python/cpython#148700](https://github.com/python/cpython/pull/148700) | open, filed |
 | 2 | `exp-pickle/4-pure-python-exact-containers` | gh-148706 | not yet opened | ready to file |
 | 3 | `exp-logging/hot-path` | not yet filed | not yet opened | drafts prepared |
+| 4 | `exp-json/research` | not yet filed | not yet opened | 8 experiments shipped, 10-16% gains |
 
-All three branches live on `mjbommar/cpython`; none were ever pushed to
+All four branches live on `mjbommar/cpython`; none were ever pushed to
 `python/cpython:main` directly.
 
 ## 1. marshal — safe-cycle fix + perf recovery
@@ -212,9 +213,77 @@ Celery/Airflow/Ray worker feels it") was directionally correct; the
 magnitude is 3% on real Starlette request wall-time, not the 50% the
 agent estimated.
 
+## 4. json — hot-path C optimisations
+
+**Branch**: `exp-json/research`
+**Upstream**: not yet filed
+
+### What shipped (8 experiments, stacked)
+
+| id | change |
+|----|--------|
+| E3 | exact-type dispatch reorder in `encoder_listencode_obj` |
+| E5 | raw `PyObject**` accumulator in `_parse_array_unicode` |
+| E1 | single-pass classifier scan for 1-byte-kind strings |
+| E9 | small-int fast path in `_match_number_unicode` |
+| E10 | cached ASCII separator buffers on the Encoder |
+| E11 | `PyUnicodeWriter_Create` size hint at encode entry |
+| E7 | direct `PyOS_double_to_string` → writer for finite floats |
+| E14 | extended cached ASCII separator to list/tuple encode |
+
+Combined: ~150 lines added to `Modules/_json.c`, zero Python changes,
+zero new files, zero new module state.
+
+### Measured impact vs `main`
+
+21-run trimmed mean, `taskset -c 0`:
+
+| Scenario | main | final | Δ |
+| --- | ---: | ---: | ---: |
+| J1 web-api dumps | 6.36 µs | 5.52 µs | **−13.2%** |
+| J2 log-line dumps | 2.09 µs | 1.76 µs | **−15.8%** |
+| J3 NDJSON loads | 1.65 µs | 1.51 µs | **−8.6%** |
+| J4 bulk dump 100k records | 80.6 ms | 69.0 ms | **−14.4%** |
+| J5b unicode `ensure_ascii=False` | 1421 µs | 1214 µs | **−14.6%** |
+| J6 numeric-heavy dumps | 27.5 ms | 25.2 ms | −8.5% |
+| J8 deep tree roundtrip | 3492 µs | 3047 µs | **−12.7%** |
+
+### Validation
+
+- Full CPython suite: `test_json` 226/226, `test_unittest` + `test_importlib` 2313/2313.
+- 25-check guardrails battery (subclass safety, exact-type rules,
+  lone surrogates, control-char escaping, signed zero, big int,
+  circular refs, `allow_nan`, `parse_float=Decimal`, insertion
+  order, trailing-comma rejection) — all pass.
+- Third-party smoke: simplejson / pydantic / jsonschema / fastapi
+  round-trip identical output to `main`.
+
+### Ideas that did **not** ship
+
+| Idea | Verdict |
+|------|---------|
+| E2 kind-specialised decoder string scan | Rejected — the compiler already auto-vectorises `PyUnicode_READ`; manual specialisation was +1–2 pp regression on J3. Anti-pattern A2. |
+| E4 module-level decoder key memo | Skipped — `Lib/json/__init__.py` already instantiates `_default_decoder = JSONDecoder()` as a module-level singleton, so the memo is already effectively module-scoped for the common case. |
+| E6 partial-eval Encoder on config | Deferred — too complex; easy parts (cached separators, size hint) captured as E10/E11. |
+| E8 stack-allocated circular-marker set | Deferred — complex rewrite for a predicted 2–4% win on top of 12–16% already captured. |
+
+### Artifacts
+
+- `Misc/json-perf-roadmap.md` — research roadmap built from 5 parallel Opus agent analyses (pattern-transfer, `_json.c` archaeology, compiler-theory, data-scientist / profiling, security / correctness).
+- `Misc/json-perf-diary.md` — experiment ledger.
+- `Misc/json-perf-data/research/` — raw agent outputs preserved verbatim.
+- `Misc/json-perf-data/` — bench harness (`json_realistic_bench.py`), guardrails (`guardrails.py`), aggregator (`aggregate.py`), 27 raw bench JSONs (3 runs × 9 configurations).
+
+### Idea this came from
+
+Not on the original roster. Added after the three-campaign run as the
+natural follow-on ("json is the next high-leverage target" — matched
+the roster's priority on hot-path stdlib C modules used by every web
+framework).
+
 ## Ideas from the roster still unshipped
 
-Ranked by what still looks promising after the three rounds:
+Ranked by what still looks promising after the four rounds:
 
 1. **ABC / Protocol `__instancecheck__`** (`Modules/_abc.c:632`,
    `Lib/typing.py:2076`). Double-flagged in roster. Caches keyed on
@@ -236,15 +305,20 @@ picks it up.
 
 ## Bottom-line numbers
 
-Across the three shipped branches:
+Across the four shipped branches:
 
 - **CPython interpreter startup**: 15.8% faster (marshal PR)
 - **Every `dill.dumps()` call**: 19–37% faster (pickle branch)
 - **Every emitted log record**: 10–12% faster, 3% on end-to-end
   Starlette request wall-time (logging branch)
-- Combined test coverage across branches: **~146,000 tests pass
-  across all three states**, with third-party validation on dill /
-  cloudpickle / joblib / attrs / Starlette showing identical
+- **Every `json.dumps()` / `json.loads()` call on realistic payloads**:
+  **8–16% faster** (json branch); web-api dumps −13.2%, log-line
+  dumps −15.8%, NDJSON loads −8.6%, bulk 100k dump −14.4%.
+- Combined test coverage across branches: **~146,000 CPython tests
+  plus ~3,400 third-party tests** across all four states, with
+  third-party validation on dill / cloudpickle / joblib / attrs /
+  Starlette / structlog / sentry-sdk / Django / Sphinx / loguru /
+  simplejson / pydantic / jsonschema / fastapi showing identical
   pass/fail behavior to `main`.
 
 ## Provenance

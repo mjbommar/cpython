@@ -39,8 +39,9 @@ Each review produced 12 ranked ideas (36 total, minus overlap). Anything
 exact-container fast paths for pure Python (already done in the
 follow-up branch), copy.deepcopy memo as a structure (dict is correct),
 struct format cache (already present), `_json.c` string-scan via
-`memchr` and homogeneous-dict fast path (on our radar), `_csv.c` bulk
-scan (on our radar).
+`memchr` and homogeneous-dict fast path (on our radar — **partially
+done in `exp-json/research` 2026-04-18: see
+`Misc/json-perf-diary.md`**), `_csv.c` bulk scan (on our radar).
 
 ## Convergence — ideas that surfaced on multiple lists
 
@@ -219,15 +220,15 @@ Ideas that only one lens surfaced but with high individual ROI.
     - Payoff: medium for mono-repos with thousands of tests.
     - Scope: tiny.
 
-14. **`Lib/json/decoder.py:349` module-level key-interning LRU**
-    - `self.memo = {}` is per-decoder-instance; every `json.loads` call
-      gets a fresh memo. Log-ingest pipelines call `json.loads`
-      once per line on patterns with enormous key repetition
-      (`"timestamp"`, `"level"`, `"message"`).
-    - Plan: bounded module-level key LRU shared across `json.loads`
-      calls.
-    - Payoff: medium-high for JSON-log ingestion.
-    - Scope: small; coordinate with `Modules/_json.c`.
+14. ~~**`Lib/json/decoder.py:349` module-level key-interning LRU**~~
+    **SKIPPED after investigation**: `Lib/json/__init__.py:244`
+    already instantiates `_default_decoder = JSONDecoder()` as a
+    module-level singleton, so the memo is already effectively
+    module-scoped for the common `json.loads(s)` call. Per-instance
+    memo only misses when the user passes a hook or `cls=`.
+    See `exp-json/research` / `Misc/json-perf-diary.md` for the
+    8 other json experiments that did land (−13 to −16% on
+    realistic encoder scenarios, −8.6% on NDJSON decode).
 
 15. **`Lib/traceback.py:1215` exception-graph SCC prepass**
     - `TracebackException` creates full formatted frames for every
