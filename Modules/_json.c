@@ -62,6 +62,14 @@ typedef struct _PyEncoderObject {
     char skipkeys;
     int allow_nan;
     int (*fast_encode)(PyUnicodeWriter *, PyObject *);
+    /* E10: if both separators are pure ASCII (the default
+     * (', ', ': ') and (',', ': ') both are), cache raw C-string
+     * versions so the hot path can use PyUnicodeWriter_WriteASCII
+     * instead of the full WriteStr + PyUnicode_Check traffic. */
+    const char *item_sep_ascii;
+    Py_ssize_t item_sep_ascii_len;
+    const char *key_sep_ascii;
+    Py_ssize_t key_sep_ascii_len;
 } PyEncoderObject;
 
 #define PyEncoderObject_CAST(op)    ((PyEncoderObject *)(op))
@@ -1481,6 +1489,19 @@ encoder_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     s->skipkeys = skipkeys;
     s->allow_nan = allow_nan;
     s->fast_encode = NULL;
+    /* E10: cache ASCII C strings for the separators if applicable. */
+    s->item_sep_ascii = NULL;
+    s->item_sep_ascii_len = 0;
+    s->key_sep_ascii = NULL;
+    s->key_sep_ascii_len = 0;
+    if (PyUnicode_Check(item_separator) && PyUnicode_IS_ASCII(item_separator)) {
+        s->item_sep_ascii = (const char *)PyUnicode_1BYTE_DATA(item_separator);
+        s->item_sep_ascii_len = PyUnicode_GET_LENGTH(item_separator);
+    }
+    if (PyUnicode_Check(key_separator) && PyUnicode_IS_ASCII(key_separator)) {
+        s->key_sep_ascii = (const char *)PyUnicode_1BYTE_DATA(key_separator);
+        s->key_sep_ascii_len = PyUnicode_GET_LENGTH(key_separator);
+    }
 
     if (PyCFunction_Check(s->encoder)) {
         PyCFunction f = PyCFunction_GetFunction(s->encoder);
@@ -1892,7 +1913,16 @@ encoder_encode_key_value(PyEncoderObject *s, PyUnicodeWriter *writer, bool *firs
         }
     }
     else {
-        if (PyUnicodeWriter_WriteStr(writer, item_separator) < 0) {
+        /* E10: use cached ASCII buffer if this encoder's item_separator
+         * is ASCII AND we're being called from the non-indent dict path
+         * (indent path passes a per-depth separator from the cache). */
+        if (item_separator == s->item_separator && s->item_sep_ascii != NULL) {
+            if (PyUnicodeWriter_WriteASCII(writer, s->item_sep_ascii,
+                                           s->item_sep_ascii_len) < 0) {
+                Py_DECREF(keystr);
+                return -1;
+            }
+        } else if (PyUnicodeWriter_WriteStr(writer, item_separator) < 0) {
             Py_DECREF(keystr);
             return -1;
         }
@@ -1904,7 +1934,12 @@ encoder_encode_key_value(PyEncoderObject *s, PyUnicodeWriter *writer, bool *firs
     if (rv < 0) {
         return -1;
     }
-    if (PyUnicodeWriter_WriteStr(writer, s->key_separator) < 0) {
+    if (s->key_sep_ascii != NULL) {
+        if (PyUnicodeWriter_WriteASCII(writer, s->key_sep_ascii,
+                                       s->key_sep_ascii_len) < 0) {
+            return -1;
+        }
+    } else if (PyUnicodeWriter_WriteStr(writer, s->key_separator) < 0) {
         return -1;
     }
     if (encoder_listencode_obj(s, writer, value, indent_level, indent_cache) < 0) {
