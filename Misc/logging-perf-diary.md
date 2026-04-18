@@ -1,7 +1,37 @@
-# logging hot-path — experiment diary
+# logging C helpers — experiment diary
 
-Branch: `exp-logging/hot-path`, off `main` at `2faceeec5c0`. No dependency
-on the marshal or pickle branches.
+Branch: `exp-logging/c-helpers`, derived from `exp-logging/hot-path`,
+off `main` at `2faceeec5c0`. This file started as the hot-path diary;
+the original profiling and Python-only benchmark notes still matter, but
+the branch-specific status for the `_logging` C-helper port lives here.
+
+## 2026-04-18 post-review update
+
+The first `_logging` port kept the hot-path wins but regressed four
+observable behaviors. `fix/logging-review-chelpers` fixes all four:
+
+- `_pathname_to_fields_cache` now only caches `str` / `bytes`
+  pathnames, so unhashable `os.PathLike` inputs fall back to the
+  pre-existing split logic instead of raising `TypeError`.
+- The main-thread fast path now caches the main-thread object plus its
+  ident and reads `_main_thread.name` live, so runtime renames are
+  reflected again.
+- `PercentStyle.usesTime()` and `StringTemplateStyle.usesTime()` now
+  self-invalidate when `_style._fmt` is rebound, so formatters that
+  start without `%(asctime)s` and later add it still populate
+  `record.asctime`.
+- `_startTime` in `_loggingmodule.c` now uses `PyLong_AsLongLong`,
+  which avoids import-time overflow on 32-bit builds.
+
+### Validation added with the fix set
+
+- `Lib/test/test_logging.py` now covers the unhashable path-like case,
+  main-thread rename visibility, and `_style._fmt` rebinding.
+- The rebuilt branch passes those three tests under `./python -m
+  unittest`.
+- A direct repro against the rebuilt original branch still shows the
+  pre-fix failures (`TypeError`, stale `MainThread`, and missing
+  `asctime`).
 
 ## Original hypothesis (from the stdlib perf-ideas brainstorm)
 
@@ -140,7 +170,58 @@ optimization doesn't touch. **−3% on the full request wall-time of a
 Starlette app is the headline for users**; the microbench is how we
 verified the fix landed on the right code.
 
+### Post-review delta vs the original `c-helpers` prototype
+
+After rebuilding both the original branch and the fixed branch with the
+same system `openssl` / `zlib` headers, the safety fixes were close to
+flat on the realistic bench:
+
+| Scenario | original `c-helpers` | fixed branch | Δ |
+| --- | ---: | ---: | ---: |
+| `R1_quiet_request`   | 9.709 µs | 9.777 µs | +0.7% |
+| `R2_verbose_request` | 13.566   | 13.662   | +0.7% |
+| `R3_deep_filtered`   | 0.122    | 0.119    | −2.6% |
+| `R4_access_log_only` | 4.937    | 4.878    | −1.2% |
+
+`starlette_logging_bench.py` was noisier, so the honest summary is the
+mean of three rebuilt-binary passes rather than a single run:
+
+| Config | original `c-helpers` | fixed branch | Δ |
+| --- | ---: | ---: | ---: |
+| INFO  (quiet)   | 293.0 µs | 301.0 µs | +2.7% |
+| DEBUG (verbose) | 299.4 µs | 300.0 µs | +0.2% |
+
+The fix set therefore costs little on the realistic bench and is
+roughly flat on the end-to-end Starlette bench.
+
+### Position vs stock interpreters after the fixes
+
+Using the rebuilt fixed branch, stock system `python3` 3.14.4, and a
+stock 3.15 build from `main` at `cecf564073f`, with two confirmatory
+passes averaged:
+
+| Scenario | stock 3.14.4 | stock 3.15 `main` | fixed `c-helpers` | vs 3.14 | vs 3.15 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `R1_quiet_request`   | 10.023 µs | 11.659 µs | 10.299 µs | +2.8% | **−11.7%** |
+| `R2_verbose_request` | 15.090    | 17.337    | 14.538    | **−3.6%** | **−16.1%** |
+| `R3_deep_filtered`   | 0.102     | 0.125     | 0.128     | +25.0% | +2.0% |
+| `R4_access_log_only` | 5.266     | 6.001     | 5.216     | **−1.0%** | **−13.1%** |
+
+For the end-to-end Starlette bench, averaged across two passes:
+
+| Config | stock 3.14.4 | stock 3.15 `main` | fixed `c-helpers` | vs 3.14 | vs 3.15 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| INFO  (quiet)   | 311.2 µs | 318.5 µs | 297.9 µs | **−4.3%** | **−6.5%** |
+| DEBUG (verbose) | 297.3    | 331.1    | 291.2    | **−2.0%** | **−12.0%** |
+
+Net: after the review fixes, this branch is still clearly ahead of
+stock 3.15 on every emitted-path workload that matters here, and still
+modestly ahead of stock 3.14 on `R2`, `R4`, and the Starlette request
+bench. `R1` and `R3` are not wins over 3.14.
+
 ## Validation
+
+Historical validation from the Python-only hot-path branch:
 
 - `test_logging`: 282/282 pass.
 - `test_asyncio`: 2708/2708 pass.
@@ -149,6 +230,17 @@ verified the fix landed on the right code.
 - `test_http_cookies`: 33/33 pass.
 - Full CPython suite (`./python -m test -j24 --timeout=600 -w`):
   **468 test files, 48,928 tests, 0 failures.**
+
+Branch-specific reruns for `exp-logging/c-helpers` on 2026-04-18:
+
+- rebuilt interpreters import `ssl`, `zlib`, and `_logging`
+- `./python -m unittest -v
+  test.test_logging.FormatterTest.test_uses_time_after_style_rebind
+  test.test_logging.LogRecordTest.test_pathlike_pathname_unhashable
+  test.test_logging.LogRecordTest.test_main_thread_rename_reflected`:
+  **3/3 pass**
+- compiled-binary `logging_realistic_bench.py` and
+  `starlette_logging_bench.py` rerun against the rebuilt interpreters
 
 ## Safety argument for the two persistent caches
 
@@ -168,18 +260,17 @@ new source files. Bounds:
 - Memory: each entry is ~200 bytes for the cache value + string key
   reference. 1000 entries ≈ 200 KB — comparable to `sys.modules`.
 
-`_main_thread_ident` / `_main_thread_name` are read once at import
-from `threading.main_thread()`. They're never mutated. If someone
-renames the main thread at runtime, `threadName` in log records would
-still reflect the import-time name — but renaming the main thread is
-vanishingly rare and the existing docs don't commit to reflecting it.
+`_main_thread_ident` / `_main_thread` are read once at import from
+`threading.main_thread()`. The import-time lookup only memoizes the
+identity; `threadName` now comes from `_main_thread.name` at record
+creation time, so later main-thread renames are reflected.
 
 ## What we didn't try
 
-- **C-level accelerator for `LogRecord`.** The `_logging` module
-  exists (for `Logger.info/debug/etc` fast paths) but does not
-  implement `LogRecord`. Porting LogRecord to C would be invasive
-  and was out of scope.
+- **Deeper C acceleration beyond the current helper port.** This branch
+  moves `LogRecord` hot-path work into `_logging`, but it still leaves
+  most of `logging` in Python. A full C `Logger` / `Handler`
+  accelerator remains a separate project.
 - **Per-Formatter field-demand propagation** (parse `%(fieldname)s`
   from `_fmt`, tell Logger not to populate unread fields). The cleanest
   path to safely skipping work, but requires coordination between
@@ -192,16 +283,16 @@ vanishingly rare and the existing docs don't commit to reflecting it.
 
 ## Recommended next moves
 
-1. This branch ships as a self-contained PR — ~75 lines of change,
-   all in `Lib/logging/__init__.py`, measurable 3% win on real
-   Starlette request handling.
-2. A follow-up exploring per-Formatter field-demand propagation
-   would unlock the next tier of savings (skip `threadName`,
-   `processName`, `taskName` computation when no formatter reads
-   them). Higher complexity; worth a separate issue.
-3. A C accelerator for `LogRecord` would be the ceiling — probably
-   2-5× gain for this module — but that's a multi-week project and
-   belongs on its own roadmap.
+1. Keep `exp-logging/hot-path` as the low-risk PR candidate. Its
+   Python-only subset landed most of the win and had the cleanest
+   review story.
+2. If `exp-logging/c-helpers` moves forward, keep the three new
+   regression tests and the 32-bit `_startTime` fix as non-negotiable.
+   The extra C complexity is only justified if the branch keeps a clear
+   advantage over stock builds.
+3. The next substantive optimization target is still per-Formatter
+   field-demand propagation. Handler-chain caching remains too small a
+   win for its invalidation complexity.
 
 ## Provenance
 

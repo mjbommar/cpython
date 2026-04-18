@@ -59,8 +59,8 @@ typedef struct {
     PyObject *threading_current_thread; /* callable */
     PyObject *sys_modules;          /* sys.modules dict */
     PyObject *main_thread_ident;    /* int */
-    PyObject *main_thread_name;     /* str */
-    Py_ssize_t start_time_ns;       /* int */
+    PyObject *main_thread;          /* threading.main_thread() */
+    long long start_time_ns;        /* int */
     /* Cached at install time to survive interpreter shutdown. */
     PyObject *time_module;          /* the `time` module; looked up
                                      * dynamically so patch('time.time_ns')
@@ -325,7 +325,7 @@ logging_find_caller(PyObject *module, PyObject *const *args, Py_ssize_t nargs)
  * _install_state(logging_module, pathname_cache, getLevelName,
  *                os_path_basename, os_path_splitext,
  *                threading_get_ident, threading_current_thread,
- *                main_thread_ident, main_thread_name, start_time_ns)
+ *                main_thread_ident, main_thread, start_time_ns)
  *
  * Captures references used by `_log_record_init` so the C __init__
  * can avoid attribute lookups on every call. Must be called once
@@ -343,16 +343,16 @@ logging_install_state(PyObject *module, PyObject *args)
     logging_state *state = get_logging_state(module);
     PyObject *log_mod, *pathname_cache, *getLevelName,
              *basename, *splitext, *get_ident, *current_thread,
-             *main_ident, *main_name, *start_time_ns_obj,
+             *main_ident, *main_thread, *start_time_ns_obj,
              *time_module, *os_getpid;
     if (!PyArg_ParseTuple(args, "OOOOOOOOOOOO",
             &log_mod, &pathname_cache, &getLevelName,
             &basename, &splitext, &get_ident, &current_thread,
-            &main_ident, &main_name, &start_time_ns_obj,
+            &main_ident, &main_thread, &start_time_ns_obj,
             &time_module, &os_getpid)) {
         return NULL;
     }
-    Py_ssize_t start_time_ns = PyLong_AsSsize_t(start_time_ns_obj);
+    long long start_time_ns = PyLong_AsLongLong(start_time_ns_obj);
     if (start_time_ns == -1 && PyErr_Occurred()) {
         return NULL;
     }
@@ -374,7 +374,7 @@ logging_install_state(PyObject *module, PyObject *args)
     Py_INCREF(get_ident);        Py_XSETREF(state->threading_get_ident, get_ident);
     Py_INCREF(current_thread);   Py_XSETREF(state->threading_current_thread, current_thread);
     Py_INCREF(main_ident);       Py_XSETREF(state->main_thread_ident, main_ident);
-    Py_INCREF(main_name);        Py_XSETREF(state->main_thread_name, main_name);
+    Py_INCREF(main_thread);      Py_XSETREF(state->main_thread, main_thread);
     Py_INCREF(time_module);      Py_XSETREF(state->time_module, time_module);
     Py_INCREF(os_getpid);        Py_XSETREF(state->os_getpid, os_getpid);
     Py_XSETREF(state->sys_modules, sys_modules);
@@ -501,8 +501,11 @@ logging_log_record_init(PyObject *module,
     /* filename, module lookups via pathname cache. */
     PyObject *filename = NULL;
     PyObject *mod_name = NULL;
-    PyObject *cached = PyDict_GetItemWithError(
-        state->pathname_cache, pathname);
+    int use_cache = PyUnicode_Check(pathname) || PyBytes_Check(pathname);
+    PyObject *cached = NULL;
+    if (use_cache) {
+        cached = PyDict_GetItemWithError(state->pathname_cache, pathname);
+    }
     if (cached != NULL) {
         if (!PyTuple_Check(cached) || PyTuple_GET_SIZE(cached) != 2) {
             PyErr_SetString(PyExc_TypeError,
@@ -515,7 +518,7 @@ logging_log_record_init(PyObject *module,
         mod_name = PyTuple_GET_ITEM(cached, 1);
         Py_INCREF(filename);
         Py_INCREF(mod_name);
-    } else if (PyErr_Occurred()) {
+    } else if (use_cache && PyErr_Occurred()) {
         Py_DECREF(levelname);
         Py_DECREF(time_ns);
         return NULL;
@@ -541,10 +544,12 @@ logging_log_record_init(PyObject *module,
             mod_name = state->str_UnknownModule;
         } else {
             /* Cache the successful result. */
-            PyObject *pair = PyTuple_Pack(2, filename, mod_name);
-            if (pair != NULL) {
-                PyDict_SetItem(state->pathname_cache, pathname, pair);
-                Py_DECREF(pair);
+            if (use_cache) {
+                PyObject *pair = PyTuple_Pack(2, filename, mod_name);
+                if (pair != NULL) {
+                    PyDict_SetItem(state->pathname_cache, pathname, pair);
+                    Py_DECREF(pair);
+                }
             }
         }
     }
@@ -613,8 +618,11 @@ logging_log_record_init(PyObject *module,
         Py_DECREF(tid);
         if (same < 0) goto error;
         if (same) {
-            PyDict_SetItem(self_dict, state->key_threadName,
-                state->main_thread_name);
+            PyObject *tname = PyObject_GetAttr(
+                state->main_thread, state->key_name_attr);
+            if (tname == NULL) goto error;
+            PyDict_SetItem(self_dict, state->key_threadName, tname);
+            Py_DECREF(tname);
         } else {
             PyObject *ct = PyObject_CallNoArgs(state->threading_current_thread);
             if (ct == NULL) goto error;
@@ -769,7 +777,7 @@ logging_traverse(PyObject *module, visitproc visit, void *arg)
     Py_VISIT(state->threading_current_thread);
     Py_VISIT(state->sys_modules);
     Py_VISIT(state->main_thread_ident);
-    Py_VISIT(state->main_thread_name);
+    Py_VISIT(state->main_thread);
     Py_VISIT(state->time_module);
     Py_VISIT(state->str_time_ns);
     Py_VISIT(state->os_getpid);
@@ -826,7 +834,7 @@ logging_clear(PyObject *module)
     Py_CLEAR(state->threading_current_thread);
     Py_CLEAR(state->sys_modules);
     Py_CLEAR(state->main_thread_ident);
-    Py_CLEAR(state->main_thread_name);
+    Py_CLEAR(state->main_thread);
     Py_CLEAR(state->time_module);
     Py_CLEAR(state->str_time_ns);
     Py_CLEAR(state->os_getpid);
