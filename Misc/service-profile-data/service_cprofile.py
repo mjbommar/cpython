@@ -1,9 +1,9 @@
 """
 Run one of the service workloads under cProfile and print useful slices:
 
-- top overall functions by cumulative time
-- top stdlib/frozen functions by cumulative time
-- top builtins/C-backed callables by cumulative time
+- top stdlib/frozen entry points by cumulative time
+- top builtins/C-backed callables by self time
+- optional top overall functions by cumulative time
 """
 
 from __future__ import annotations
@@ -106,6 +106,7 @@ def main() -> None:
     parser.add_argument("--sort", choices=["cumtime", "tottime"], default="cumtime")
     parser.add_argument("--limit", type=int, default=25)
     parser.add_argument("--dump-stats", default=None)
+    parser.add_argument("--show-overall", action="store_true")
     args = parser.parse_args()
 
     module = load_workload(args.workload)
@@ -137,22 +138,18 @@ def main() -> None:
     stats.sort_stats(args.sort)
     rows = iter_entries(stats)
     stdlib_dir = sysconfig.get_paths()["stdlib"]
+    stdlib_rows = [row for row in rows if is_stdlib(row, stdlib_dir)]
+    c_rows = [row for row in rows if is_c_builtin(row)]
+    c_rows.sort(key=lambda row: row.tottime, reverse=True)
 
     print(
         f"workload={args.workload} iterations={iterations} warmup={warmup} "
         f"sort={args.sort}"
     )
-    print_table("Top Overall", rows, args.limit)
-    print_table(
-        "Top Stdlib/Frozen",
-        (row for row in rows if is_stdlib(row, stdlib_dir)),
-        args.limit,
-    )
-    print_table(
-        "Top Builtins/C-backed",
-        (row for row in rows if is_c_builtin(row)),
-        args.limit,
-    )
+    print_table("Top Stdlib/Frozen Entry Points", stdlib_rows, args.limit)
+    print_table("Top Builtins/C-backed Callables", c_rows, args.limit)
+    if args.show_overall:
+        print_table("Top Overall", rows, args.limit)
 
 
 if __name__ == "__main__":

@@ -18,7 +18,8 @@ Current workloads:
     result retrieval without requiring Redis or RabbitMQ
 - `service_cprofile.py`
   - wraps either workload with `cProfile`
-  - prints top overall, stdlib-only, and builtins/C-backed hotspots
+  - defaults to stdlib-only and builtins/C-backed hotspots
+  - optional `--show-overall` includes framework wrappers too
 
 ## Dependencies
 
