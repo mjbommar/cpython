@@ -1704,6 +1704,29 @@ encoder_encode_float(PyEncoderObject *s, PyObject *obj)
 }
 
 static int
+encoder_write_float_direct(PyEncoderObject *s, PyUnicodeWriter *writer, PyObject *obj)
+{
+    /* E7: Fast path for finite floats — emit directly to the writer
+     * via PyOS_double_to_string, skipping the intermediate PyUnicode
+     * allocation that PyFloat_Type.tp_repr does. For NaN/Infinity
+     * fall back to the existing encoder_encode_float path (returns a
+     * cached interned string). */
+    double d = PyFloat_AS_DOUBLE(obj);
+    if (!isfinite(d)) {
+        PyObject *encoded = encoder_encode_float(s, obj);
+        if (encoded == NULL)
+            return -1;
+        return _steal_accumulate(writer, encoded);
+    }
+    char *buf = PyOS_double_to_string(d, 'r', 0, Py_DTSF_ADD_DOT_0, NULL);
+    if (buf == NULL)
+        return -1;
+    int rv = PyUnicodeWriter_WriteASCII(writer, buf, strlen(buf));
+    PyMem_Free(buf);
+    return rv;
+}
+
+static int
 encoder_write_string(PyEncoderObject *s, PyUnicodeWriter *writer, PyObject *obj)
 {
     /* Return the JSON representation of a string */
@@ -1772,10 +1795,7 @@ encoder_listencode_obj(PyEncoderObject *s, PyUnicodeWriter *writer,
         return PyUnicodeWriter_WriteRepr(writer, obj);
     }
     else if (tp == &PyFloat_Type) {
-        PyObject *encoded = encoder_encode_float(s, obj);
-        if (encoded == NULL)
-            return -1;
-        return _steal_accumulate(writer, encoded);
+        return encoder_write_float_direct(s, writer, obj);
     }
     else if (tp == &PyTuple_Type) {
         if (_Py_EnterRecursiveCall(" while encoding a JSON object"))
