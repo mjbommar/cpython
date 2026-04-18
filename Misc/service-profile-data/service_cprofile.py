@@ -21,7 +21,10 @@ from typing import Iterable
 
 THIS_DIR = Path(__file__).resolve().parent
 WORKLOADS = {
+    "django": THIS_DIR / "django_service_workload.py",
     "fastapi": THIS_DIR / "fastapi_service_workload.py",
+    "jinja2": THIS_DIR / "jinja2_template_workload.py",
+    "jsonschema": THIS_DIR / "jsonschema_validate_workload.py",
     "celery": THIS_DIR / "celery_service_workload.py",
 }
 
@@ -116,10 +119,20 @@ def main() -> None:
     workload = module.create_workload(**workload_kwargs)
 
     iterations = args.iterations if args.iterations is not None else (
-        3000 if args.workload == "fastapi" else 1500
+        3000
+        if args.workload in {"fastapi", "django", "jsonschema"}
+        else 6000
+        if args.workload == "jinja2"
+        else 1500
     )
     warmup = args.warmup if args.warmup is not None else (
-        300 if args.workload == "fastapi" else 100
+        300
+        if args.workload in {"fastapi", "jinja2"}
+        else 200
+        if args.workload == "django"
+        else 150
+        if args.workload == "jsonschema"
+        else 100
     )
 
     try:

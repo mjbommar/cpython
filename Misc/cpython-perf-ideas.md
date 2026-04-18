@@ -50,6 +50,8 @@ live in `Misc/service-profile-data/` on this branch. They are not
 optimization ideas by themselves; they exist to make FastAPI and Celery
 profiling repeatable across future experiments and to expose which
 stdlib and builtins / C-backed paths dominate under service-ish loads.
+The current harness set includes `fastapi`, `celery`, `django`,
+`jinja2`, and `jsonschema`.
 
 ## Convergence — ideas that surfaced on multiple lists
 

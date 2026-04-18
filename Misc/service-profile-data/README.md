@@ -1,7 +1,8 @@
-# Service Profiling Harnesses
+# Package Profiling Harnesses
 
-Reusable service-style workloads for profiling a CPython build on
-framework-heavy paths rather than isolated micros.
+Reusable framework-heavy and pure-Python-package workloads for profiling
+a CPython build on something closer to real application behavior than
+isolated micros.
 
 Current workloads:
 
@@ -9,6 +10,9 @@ Current workloads:
   - in-process FastAPI app
   - request parsing, dependency injection, Pydantic validation,
     response-model serialization, Starlette/httpx test transport
+- `django_service_workload.py`
+  - in-process Django client + view workload
+  - URL resolving, request parsing, form validation, template rendering
 - `celery_service_workload.py`
   - Celery app using `memory://` broker and `cache+memory://` backend
   - default mode uses eager execution for fast iterative profiling
@@ -16,6 +20,12 @@ Current workloads:
     `pool="solo"`
   - exercises task dispatch, tracing, Kombu JSON serialization, and
     result retrieval without requiring Redis or RabbitMQ
+- `jinja2_template_workload.py`
+  - pure-Python Jinja2 render loop
+  - template expansion, dict/attribute lookup, string-heavy output
+- `jsonschema_validate_workload.py`
+  - pure-Python schema validation loop
+  - nested object/array traversal, regex checks, repeated type checks
 - `service_cprofile.py`
   - wraps either workload with `cProfile`
   - defaults to stdlib-only and builtins/C-backed hotspots
@@ -27,8 +37,11 @@ These scripts assume the interpreter under test can import:
 
 - `fastapi`
 - `httpx`
+- `django`
 - `celery`
 - `cffi`
+- `jinja2`
+- `jsonschema`
 
 On this machine those packages live in `/tmp/perf-extra-pkgs`, so the
 typical invocation is:
@@ -158,3 +171,99 @@ Celery dispatch / apply / trace work rather than the small task body.
 Worker mode is still available when you want to include the in-process
 broker / worker loop, but it is much slower and better suited for short,
 confirmatory runs.
+
+### Django
+
+The Django client + view workload gives a cleaner pure-Python web-stack
+signal than the FastAPI harness because it avoids the heavy
+`pydantic_core` path.
+
+The first `cProfile` pass was dominated by C-backed builtins and stdlib
+plumbing:
+
+- `builtins.next`
+- `builtins.getattr`
+- `builtins.isinstance`
+- `builtins.len`
+- `bytes.join`
+- `builtins.hasattr`
+- `dict.get`
+
+At the native CPython-symbol level, the main user-space hotspots were:
+
+- `_PyEval_EvalFrameDefault`
+- `_PyObject_Malloc` / `_PyObject_Free`
+- `_Py_VectorCallInstrumentation_StackRefSteal`
+- `unicodekeys_lookup_unicode`
+- `_PyType_LookupStackRefAndVersion`
+- `_PyObject_GenericGetAttrWithDict`
+- `gc_collect_region`
+
+That makes Django a good harness for measuring generic interpreter
+overheads around iteration, attribute access, type checks, bytes/string
+assembly, and allocation pressure.
+
+### Jinja2
+
+The Jinja2 render workload is useful when you want a package-heavy path
+that is mostly Python-level templating and string shaping.
+
+Its first `cProfile` pass was dominated by:
+
+- `builtins.getattr`
+- `str.join`
+- `builtins.hasattr`
+- `builtins.sum`
+- `str.upper`
+- `markupsafe._speedups._escape_inner`
+
+At the native CPython-symbol level, the main user-space hotspots were:
+
+- `_PyEval_EvalFrameDefault`
+- `_PyObject_Malloc` / `_PyObject_Free`
+- `_PyEval_Vector`
+- `_Py_dict_lookup`
+- `unicodekeys_lookup_unicode`
+- `_PyType_LookupStackRefAndVersion`
+- `_PyObject_GenericGetAttrWithDict`
+- `_PyUnicode_JoinArray`
+
+One caveat: because the template name is `report.html`, Jinja2 enables
+HTML autoescaping and you will see `markupsafe._speedups` in the profile.
+That still gives useful signal, but it is less "pure Python" than the
+jsonschema workload below.
+
+### jsonschema
+
+The jsonschema workload is the cleanest current pure-Python package
+signal in this directory.
+
+The first `cProfile` pass was dominated by:
+
+- `builtins.isinstance`
+- `dict.get`
+- `builtins.getattr`
+- `dict.setdefault`
+- `_abc._abc_instancecheck`
+- `str.join`
+- `builtins.len`
+- `dict.items`
+- `re.Pattern.search`
+
+At the native CPython-symbol level, the main user-space hotspots were:
+
+- `_PyEval_EvalFrameDefault`
+- `_PyEval_Vector`
+- `initialize_locals`
+- `_PyEvalFramePushAndInit`
+- `_PyObject_Malloc` / `_PyObject_Free`
+- `_PyType_LookupStackRefAndVersion`
+- `_Py_dict_lookup`
+- `unicodekeys_lookup_unicode`
+- `PyObject_Vectorcall`
+- `dictiter_iternextitem`
+- `_PyObject_GenericGetAttrWithDict`
+
+This makes jsonschema especially useful for comparing branches that aim
+to reduce overhead in ABC checks, generic attribute lookup, dict access,
+or frame setup/teardown.
