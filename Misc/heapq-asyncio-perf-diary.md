@@ -335,6 +335,17 @@ Result:
 - the ignored file depends on an external checkout of the
   JSON-Schema-Test-Suite and is not runnable in this environment
 
+Remaining theorized semantic risk:
+
+- if the first compared slot is an exact `float` `NaN`, the current C
+  helper can diverge from normal tuple comparison semantics
+- why: the helper checks direct `<` / `>` on slot `0`, and if both are
+  false it continues on to slots `1` and `2`; ordinary tuple comparison
+  would stop at slot `0` once the floats compare unequal
+- this was not observed in the tested corpora, but it should be treated
+  as a real edge case until the helper is adjusted or a regression test
+  is added
+
 ## Final assessment
 
 This branch is a **real but narrow** C optimization candidate.
@@ -351,6 +362,8 @@ Important conclusions:
   prefix specialization for the common
   `(float, int, int, ...)` ordering shape while preserving the normal
   rich-compare fallback
+- the remaining blocker to calling it PR-ready is the `NaN` edge case
+  in the first float slot
 
 ## Recommendation
 
@@ -368,7 +381,9 @@ Keep the branch on the `C6` helper:
 I would treat this as a plausible medium-priority `_heapq` PR if we
 want a small C optimization with good stdlib coverage. I would **not**
 promote it ahead of the already stronger logging / AST / ABC work, and
-I would not frame it as an asyncio optimization anymore.
+I would not frame it as an asyncio optimization anymore. Before filing,
+the `NaN` first-slot behavior should be fixed or explicitly guarded by
+tests.
 
 ## Artifacts
 
