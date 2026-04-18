@@ -596,6 +596,56 @@ Ideas that only one lens surfaced but with high individual ROI.
       response serialization.
     - Scope: small.
 
+24. **`Objects/unicodeobject.c:9976` `_PyUnicode_JoinArray` control-flow
+    specialization**
+    - The current join implementation already has a memcpy fast path,
+      but it is under-specialized around the state that dominates the
+      workload scan: empty separators and short ASCII separators. It
+      also keeps the `i != 0` control edge live in the steady-state copy
+      loop.
+    - Plan: keep the algorithm, but specialize the control flow:
+      prepass on `last_kind` rather than `last_obj`, avoid letting
+      `seplen == 0` inherit separator kind into the memcpy gate, and
+      hoist the first element out of the recurrence.
+    - Payoff: small-to-medium. Meaningful in Jinja2 / Django /
+      `prompt_toolkit` / `jsonschema`-style formatting, but not broad
+      enough to outrank logging / AST / ABC / datetime.
+    - Scope: small, single C file.
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-unicode/joinarray-fastpaths`; full notes
+        live in `Misc/unicode-join-perf-diary.md` on that branch.
+      - The workload inventory showed `.join(...)` concentrated in
+        empty-string literals, `", "` separators, and framework-heavy
+        packages such as Django, Celery, Werkzeug, and
+        `prompt_toolkit`.
+      - Six candidates were tested. The recommended patch was the
+        simpler `C2` shape:
+        - replace `last_obj` with `last_kind` in the prepass
+        - stop letting `seplen == 0` disable the memcpy path
+        - hoist the first item out of both copy loops
+      - Representative confirmatory deltas vs rebuilt baseline:
+        `M1_ascii_empty_join -6.3%`,
+        `M3_bmp_empty_join -34.2%`,
+        `R1_jinja2_render -3.5%`,
+        `R2_django_template_render -5.1%`,
+        `R3_django_filter_join -5.5%`,
+        `R4_prompt_toolkit_flush -2.9%`,
+        `R5_jsonschema_error_strings -8.3%`.
+      - A separator-specific runner-up (`C5`) won much harder on the
+        `", "` micro, but did not beat the simpler patch consistently
+        enough on the broader real wrappers to justify the extra
+        complexity.
+      - Validation on the final branch state:
+        - stdlib: `test_str test_string test_json test_email
+          test_unicode_file test_unicode_file_functions
+          test_unicode_identifiers test_unicodedata test_userstring`
+        - third-party: branch-local Jinja2 / Django /
+          `prompt_toolkit` / `jsonschema` checks passed; `484`
+          local `jsonschema` tests passed with only the external-suite
+          checkout file excluded
+      - Recommendation: keep this as a plausible small C PR after the
+        higher-priority logging / AST / ABC / datetime work.
+
 ## Recommended implementation order
 
 Ranked by **(triple-convergence) × (concrete first-diff) × (ecosystem
@@ -608,11 +658,11 @@ reach)**. Each target stands alone as a PR; none depends on another.
 | **3** | `isinstance` / ABC / type-lookup fast paths (`_abc.c` + small `typeobject.c` helpers) | Small-Medium | Medium-high | Validated branch; lower-risk `PyType_IsSubtype` subset exists |
 | **4** | `datetime.fromisoformat` ASCII / separator entry fast path | Small | Medium-high | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
-| **6** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
-| **7** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
-| **8** | `copy.deepcopy` SCC prepass | Small | Medium | Pure Python |
-| **9** | `re.compile` id-keyed cache fast path | Tiny | Medium | Pure Python |
-| **10** | `dataclasses` skeleton-cached `__init__` | Medium-invasive | Medium | Pure Python |
+| **6** | `_PyUnicode_JoinArray` control-flow fast path | Small | Medium-high | Single C file, validated branch |
+| **7** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
+| **8** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
+| **9** | `copy.deepcopy` SCC prepass | Small | Medium | Pure Python |
+| **10** | `re.compile` id-keyed cache fast path | Tiny | Medium | Pure Python |
 
 ## Non-goals / explicitly not recommended
 
