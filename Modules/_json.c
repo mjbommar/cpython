@@ -122,6 +122,64 @@ encoder_encode_float(PyEncoderObject *s, PyObject *obj);
 #define S_CHAR(c) (c >= ' ' && c <= '~' && c != '\\' && c != '"')
 #define IS_WHITESPACE(c) (((c) == ' ') || ((c) == '\t') || ((c) == '\n') || ((c) == '\r'))
 
+/* Classifier tables: nonzero at byte b means "b must be escaped".
+ * _ascii_escape_tbl: used by write_escaped_ascii (ensure_ascii=True).
+ *   Escapes control chars 0x00-0x1f, '"', '\\', and everything >= 0x7f.
+ * _escape_tbl: used by write_escaped_unicode (ensure_ascii=False).
+ *   Escapes control chars 0x00-0x1f, '"', '\\' only. */
+static const unsigned char _ascii_escape_tbl[256] = {
+    [0]=1, [1]=1, [2]=1, [3]=1, [4]=1, [5]=1, [6]=1, [7]=1,
+    [8]=1, [9]=1, [10]=1,[11]=1,[12]=1,[13]=1,[14]=1,[15]=1,
+    [16]=1,[17]=1,[18]=1,[19]=1,[20]=1,[21]=1,[22]=1,[23]=1,
+    [24]=1,[25]=1,[26]=1,[27]=1,[28]=1,[29]=1,[30]=1,[31]=1,
+    ['"']=1, ['\\']=1,
+    [0x7f]=1,
+    [0x80]=1,[0x81]=1,[0x82]=1,[0x83]=1,[0x84]=1,[0x85]=1,[0x86]=1,[0x87]=1,
+    [0x88]=1,[0x89]=1,[0x8a]=1,[0x8b]=1,[0x8c]=1,[0x8d]=1,[0x8e]=1,[0x8f]=1,
+    [0x90]=1,[0x91]=1,[0x92]=1,[0x93]=1,[0x94]=1,[0x95]=1,[0x96]=1,[0x97]=1,
+    [0x98]=1,[0x99]=1,[0x9a]=1,[0x9b]=1,[0x9c]=1,[0x9d]=1,[0x9e]=1,[0x9f]=1,
+    [0xa0]=1,[0xa1]=1,[0xa2]=1,[0xa3]=1,[0xa4]=1,[0xa5]=1,[0xa6]=1,[0xa7]=1,
+    [0xa8]=1,[0xa9]=1,[0xaa]=1,[0xab]=1,[0xac]=1,[0xad]=1,[0xae]=1,[0xaf]=1,
+    [0xb0]=1,[0xb1]=1,[0xb2]=1,[0xb3]=1,[0xb4]=1,[0xb5]=1,[0xb6]=1,[0xb7]=1,
+    [0xb8]=1,[0xb9]=1,[0xba]=1,[0xbb]=1,[0xbc]=1,[0xbd]=1,[0xbe]=1,[0xbf]=1,
+    [0xc0]=1,[0xc1]=1,[0xc2]=1,[0xc3]=1,[0xc4]=1,[0xc5]=1,[0xc6]=1,[0xc7]=1,
+    [0xc8]=1,[0xc9]=1,[0xca]=1,[0xcb]=1,[0xcc]=1,[0xcd]=1,[0xce]=1,[0xcf]=1,
+    [0xd0]=1,[0xd1]=1,[0xd2]=1,[0xd3]=1,[0xd4]=1,[0xd5]=1,[0xd6]=1,[0xd7]=1,
+    [0xd8]=1,[0xd9]=1,[0xda]=1,[0xdb]=1,[0xdc]=1,[0xdd]=1,[0xde]=1,[0xdf]=1,
+    [0xe0]=1,[0xe1]=1,[0xe2]=1,[0xe3]=1,[0xe4]=1,[0xe5]=1,[0xe6]=1,[0xe7]=1,
+    [0xe8]=1,[0xe9]=1,[0xea]=1,[0xeb]=1,[0xec]=1,[0xed]=1,[0xee]=1,[0xef]=1,
+    [0xf0]=1,[0xf1]=1,[0xf2]=1,[0xf3]=1,[0xf4]=1,[0xf5]=1,[0xf6]=1,[0xf7]=1,
+    [0xf8]=1,[0xf9]=1,[0xfa]=1,[0xfb]=1,[0xfc]=1,[0xfd]=1,[0xfe]=1,[0xff]=1,
+};
+static const unsigned char _escape_tbl[256] = {
+    [0]=1, [1]=1, [2]=1, [3]=1, [4]=1, [5]=1, [6]=1, [7]=1,
+    [8]=1, [9]=1, [10]=1,[11]=1,[12]=1,[13]=1,[14]=1,[15]=1,
+    [16]=1,[17]=1,[18]=1,[19]=1,[20]=1,[21]=1,[22]=1,[23]=1,
+    [24]=1,[25]=1,[26]=1,[27]=1,[28]=1,[29]=1,[30]=1,[31]=1,
+    ['"']=1, ['\\']=1,
+};
+
+static inline int
+_scan_has_ascii_escape_1byte(const unsigned char *p, Py_ssize_t n)
+{
+    /* Return 1 if any byte in p[0..n-1] must be escaped under
+     * ensure_ascii=True. Lets write_escaped_ascii skip the sizing
+     * pass on the overwhelmingly common no-escape case. */
+    for (Py_ssize_t i = 0; i < n; i++) {
+        if (_ascii_escape_tbl[p[i]]) return 1;
+    }
+    return 0;
+}
+
+static inline int
+_scan_has_escape_1byte(const unsigned char *p, Py_ssize_t n)
+{
+    for (Py_ssize_t i = 0; i < n; i++) {
+        if (_escape_tbl[p[i]]) return 1;
+    }
+    return 0;
+}
+
 static Py_ssize_t
 ascii_escape_unichar(Py_UCS4 c, unsigned char *output, Py_ssize_t chars)
 {
@@ -247,6 +305,22 @@ write_escaped_ascii(PyUnicodeWriter *writer, PyObject *pystr)
     input_chars = PyUnicode_GET_LENGTH(pystr);
     input = PyUnicode_DATA(pystr);
     kind = PyUnicode_KIND(pystr);
+
+    /* Fast path for 1-byte-kind strings: do a single-pass classifier
+     * scan to check for any escape-needing byte. If none, emit the
+     * string directly as ASCII without running the size-computation
+     * pass. This is the common case for ASCII dict keys and short
+     * string values. Pattern: avoid the two-pass scan (see roadmap E1). */
+    if (kind == PyUnicode_1BYTE_KIND && PyUnicode_IS_ASCII(pystr)) {
+        if (!_scan_has_ascii_escape_1byte((const unsigned char *)input, input_chars)) {
+            if (PyUnicodeWriter_WriteChar(writer, '"') < 0)
+                return -1;
+            if (PyUnicodeWriter_WriteASCII(writer, input, input_chars) < 0)
+                return -1;
+            return PyUnicodeWriter_WriteChar(writer, '"');
+        }
+        /* fall through to the existing size-then-escape path */
+    }
 
     Py_ssize_t output_size = ascii_escape_size(input, kind, input_chars);
     if (output_size < 0) {
@@ -391,6 +465,21 @@ write_escaped_unicode(PyUnicodeWriter *writer, PyObject *pystr)
     const void *input = PyUnicode_DATA(pystr);
     int kind = PyUnicode_KIND(pystr);
     Py_UCS4 maxchar = PyUnicode_MAX_CHAR_VALUE(pystr);
+
+    /* Fast path (E1): single-pass classifier scan for 1-byte kind
+     * when the string has no escape-needing byte. Under
+     * ensure_ascii=False we only need to escape control chars, '"', '\\'.
+     * Non-ASCII (0x80-0xff) is written through verbatim. */
+    if (kind == PyUnicode_1BYTE_KIND) {
+        if (!_scan_has_escape_1byte((const unsigned char *)input, input_chars)) {
+            if (PyUnicodeWriter_WriteChar(writer, '"') < 0)
+                return -1;
+            if (_PyUnicodeWriter_WriteStr((_PyUnicodeWriter*)writer, pystr) < 0)
+                return -1;
+            return PyUnicodeWriter_WriteChar(writer, '"');
+        }
+        /* fall through */
+    }
 
     Py_ssize_t output_size = escape_size(input, kind, input_chars);
     if (output_size < 0) {
