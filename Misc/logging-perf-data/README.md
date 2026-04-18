@@ -26,6 +26,11 @@ Raw artifacts backing `Misc/logging-perf-diary.md`.
       VIRTUAL_ENV=/tmp/venv uv pip install starlette httpx
       taskset -c 0 /tmp/venv/bin/python starlette_logging_bench.py
 
+- `third_party_logging_bench.py` — wrapper / formatter workloads that
+  still route through stdlib logging: `structlog`, `uvicorn`,
+  `flask`, `django`, and `celery`. Intended for branch-vs-main
+  comparisons after the realistic and Starlette benches are stable.
+
 ## JSON files
 
 | File | Branch state |

@@ -219,6 +219,84 @@ stock 3.15 on every emitted-path workload that matters here, and still
 modestly ahead of stock 3.14 on `R2`, `R4`, and the Starlette request
 bench. `R1` and `R3` are not wins over 3.14.
 
+## 2026-04-18 deeper follow-up
+
+The original diary closed with the fixed-vs-stock interpreter story.
+This follow-up widened the evidence base in two ways:
+
+- package-backed validation on a 3.15-native environment
+- one additional `_loggingmodule.c` cleanup idea, measured and rejected
+
+### Broader package ecosystem coverage
+
+Imports succeeded on both `main` and the rebuilt branch for:
+
+- `starlette`
+- `fastapi`
+- `httpx`
+- `dataclasses_json`
+- `jsonschema`
+- `flask`
+- `django`
+- `structlog`
+- `uvicorn`
+- `gunicorn`
+- `celery`
+- `simplejson`
+- `orjson`
+- `ujson`
+
+Not all of those packages exercise stdlib logging directly, but they
+were the full 3.15 package set used for compatibility checks while the
+logging-specific workloads focused on the wrappers and formatters that
+actually hit `logging` hot paths.
+
+`Misc/logging-perf-data/third_party_logging_bench.py` was added to make
+the package-backed reruns reproducible.
+
+### Package-backed logging bench (vs rebuilt `main`)
+
+All results below are trimmed-mean microseconds per emitted record:
+
+| scenario | `main` | `c-helpers` | delta |
+| --- | ---: | ---: | ---: |
+| `structlog_stdlib` | 8.84 µs | 7.80 µs | **−11.8%** |
+| `uvicorn_access`   | 9.33    | 8.55    | **−8.4%** |
+| `flask_app_logger` | 5.37    | 4.67    | **−13.0%** |
+| `django_server`    | 7.16    | 6.28    | **−12.3%** |
+| `celery_color`     | 5.34    | 4.60    | **−13.9%** |
+
+The deterministic smoke outputs for the package-backed formatter paths
+matched `main` byte-for-byte for the `structlog`, `uvicorn`, `flask`,
+`django`, and `celery` cases.
+
+### Additional idea tested and rejected
+
+I tried one more `_loggingmodule.c` cleanup after the review-fix branch
+was stable:
+
+- replace a few dynamic attr lookup + `CallNoArgs` pairs with direct
+  `PyObject_CallMethodNoArgs(...)` plus interned method names for
+  `time.time_ns`, `multiprocessing.current_process`,
+  `asyncio.current_task`, and `Task.get_name`
+
+`test_logging` still passed, but the results did not justify keeping
+it:
+
+| scenario | branch baseline | extra patch | delta |
+| --- | ---: | ---: | ---: |
+| `R1_quiet_request` | 9.92 µs | 9.96 µs | +0.4% |
+| `R2_verbose_request` | 13.91 | 14.05 | +1.0% |
+| `R4_access_log_only` | 4.97 | 5.04 | +1.4% |
+| `structlog_stdlib` | 7.48 | 7.49 | +0.1% |
+| `uvicorn_access` | 8.06 | 8.13 | +0.9% |
+| `celery_color` | 4.42 | 4.25 | −3.8% |
+
+That patch was reverted. The remaining branch recommendation is
+unchanged: the C-helper path is real and broadly compatible, but the
+Python-only `exp-logging/hot-path` branch is still the better first PR
+because it gets most of the win with far less maintenance surface.
+
 ## Validation
 
 Historical validation from the Python-only hot-path branch:
