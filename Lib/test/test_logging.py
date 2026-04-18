@@ -4650,6 +4650,14 @@ class FormatterTest(unittest.TestCase, AssertErrorMessage):
         f = logging.Formatter('${asctime}--', style='$')
         self.assertTrue(f.usesTime())
 
+    def test_uses_time_after_style_rebind(self):
+        r = self.get_record()
+        f = logging.Formatter('%(message)s')
+        self.assertFalse(f.usesTime())
+        f._style._fmt = '%(asctime)s %(message)s'
+        self.assertTrue(f.usesTime())
+        self.assertIn('Message with 2 placeholders', f.format(r))
+
     def test_format_validate(self):
         # Check correct formatting
         # Percentage style
@@ -5344,6 +5352,28 @@ class LogRecordTest(BaseTest):
         self.assertEqual(h.records[0].message, 'less is more')
         r.removeHandler(h)
         h.close()
+
+    def test_pathlike_pathname_unhashable(self):
+        class UnhashablePathLike(os.PathLike):
+            __hash__ = None
+
+            def __fspath__(self):
+                return os.path.join('path', 'to', 'dummy.ext')
+
+        r = logging.LogRecord('name', logging.INFO, UnhashablePathLike(), 42,
+                              'msg', (), None)
+        self.assertEqual(r.filename, 'dummy.ext')
+        self.assertEqual(r.module, 'dummy')
+
+    def test_main_thread_rename_reflected(self):
+        current = threading.current_thread()
+        old_name = current.name
+        current.name = 'RenamedMainThread'
+        try:
+            r = logging.makeLogRecord({})
+            self.assertEqual(r.threadName, 'RenamedMainThread')
+        finally:
+            current.name = old_name
 
     @staticmethod # pickled as target of child process in the following test
     def _extract_logrecord_process_name(key, logMultiprocessing, conn=None):
