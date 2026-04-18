@@ -314,14 +314,40 @@ Ideas that only one lens surfaced but with high individual ROI.
       path-heavy; 5–15% of collection time is pathlib.
     - Scope: medium. Natural first C-accelerator target (`_pathlib`).
 
-17. **`Modules/_datetimemodule.c:6048` `fromisoformat` length-dispatched
-    fast path**
+17. **`Modules/_datetimemodule.c:6048` `fromisoformat` parser-entry fast
+    path**
     - 99% of real-world ISO strings are `YYYY-MM-DDTHH:MM:SS.ffffff`
       (length 26) or `YYYY-MM-DDTHH:MM:SS+HH:MM` (length 25). The
       current code does a generic byte-by-byte separator scan.
     - Plan: if `len(s) in {26, 25, 19}`, direct digit-unroll.
     - Payoff: 2–3× on the common case. Log-aggregation bottleneck.
     - Scope: small (~150 LoC of C).
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-datetime/fromisoformat-fastpath`; full
+        notes live in `Misc/fromisoformat-perf-diary.md` on that
+        branch.
+      - The winning experiment was the smaller entry fast path inside
+        `datetime.datetime.fromisoformat()`:
+        - skip `_sanitize_isoformat_str()` and
+          `PyUnicode_AsUTF8AndSize()` for ASCII input
+        - short-circuit separator discovery for obvious
+          `YYYY-MM-DD` / `YYYYMMDD` prefixes
+      - A broader family-wide fast path for `date` / `time` did not
+        justify the extra patch surface and was dropped.
+      - Clean sequential reruns against rebuilt `main` showed the final
+        patch improving direct datetime micros by about `-8.9%`
+        (`YYYY-MM-DDTHH:MM:SS`), `-7.9%` (microseconds), `-4.8%`
+        (timezone), and `-3.4%` (week-date).
+      - Representative wrappers were mixed but mostly near-flat:
+        `dataclasses_json` about `-4.8%`, `jsonschema` `-2.1%`,
+        `qcore` `-2.4%`, while `sqlalchemy` wrappers ranged from
+        `+0.7%` to `+3.4%` and `cattrs` was `+2.6%`.
+      - Validation on the branch included a full rebuild plus
+        `test_datetime`.
+      - Long-term conclusion: this is still a reasonable narrow C
+        micro-PR, but the safe version is a single-digit optimization,
+        not the original 2–3x hypothesis. A true digit-unrolled parser
+        would need a separate, more invasive experiment.
 
 18. **`Lib/uuid.py:775` `uuid4` byte-path fast**
     - `int.from_bytes(os.urandom(16))` → big-int mask → `int.to_bytes(16)`:
@@ -389,7 +415,7 @@ reach)**. Each target stands alone as a PR; none depends on another.
 | **1** | Logging hot path — pure-function caches in `LogRecord` / `findCaller`; optional C-helper follow-up | Medium | High (3×) | Pure Python first; C helper separate |
 | **2** | AST `NodeVisitor.visit` method-name cache | Tiny | High | Pure Python, validated branch |
 | **3** | ABC `__instancecheck__` subtype-cache fast path | Small | High | One C file, validated branch |
-| **4** | `datetime.fromisoformat` length-dispatched fast path | Small | High | Single C file |
+| **4** | `datetime.fromisoformat` ASCII / separator entry fast path | Small | Medium-high | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
 | **6** | `uuid.uuid4` byte-path C fast | Small | High | Extend `_uuid` |
 | **7** | `hashlib.sha256_hex` one-shot | Small | Medium | Stdlib API addition |
