@@ -1574,7 +1574,51 @@ encoder_listencode_obj(PyEncoderObject *s, PyUnicodeWriter *writer,
     PyObject *newobj;
     int rv;
 
-    if (obj == Py_None) {
+    /* Exact-type fast paths first. bool is Py_True/Py_False identity —
+     * MUST come before PyLong_Check because bool is a subclass of int.
+     * Most real-world JSON payloads are dominated by str/dict/list/int
+     * with exact builtin types; a single Py_TYPE load + pointer
+     * compare avoids walking tp_flags / MRO via PyFoo_Check. */
+    PyTypeObject *tp = Py_TYPE(obj);
+    if (tp == &PyUnicode_Type) {
+        return encoder_write_string(s, writer, obj);
+    }
+    else if (tp == &PyDict_Type) {
+        if (_Py_EnterRecursiveCall(" while encoding a JSON object"))
+            return -1;
+        rv = encoder_listencode_dict(s, writer, obj, indent_level, indent_cache);
+        _Py_LeaveRecursiveCall();
+        return rv;
+    }
+    else if (tp == &PyList_Type) {
+        if (_Py_EnterRecursiveCall(" while encoding a JSON object"))
+            return -1;
+        rv = encoder_listencode_list(s, writer, obj, indent_level, indent_cache);
+        _Py_LeaveRecursiveCall();
+        return rv;
+    }
+    else if (tp == &PyLong_Type) {
+        // Exact int (not IntEnum subclass) — route through PyLong_Type.tp_repr
+        return PyUnicodeWriter_WriteRepr(writer, obj);
+    }
+    else if (tp == &PyFloat_Type) {
+        PyObject *encoded = encoder_encode_float(s, obj);
+        if (encoded == NULL)
+            return -1;
+        return _steal_accumulate(writer, encoded);
+    }
+    else if (tp == &PyTuple_Type) {
+        if (_Py_EnterRecursiveCall(" while encoding a JSON object"))
+            return -1;
+        rv = encoder_listencode_list(s, writer, obj, indent_level, indent_cache);
+        _Py_LeaveRecursiveCall();
+        return rv;
+    }
+    /* Identity checks for singletons (None, True, False). True/False are
+     * also PyLong instances, so these must happen AFTER the PyLong_Type
+     * exact check has filtered out pure ints but BEFORE the subclass
+     * PyLong_Check below — otherwise True would encode as "1". */
+    else if (obj == Py_None) {
       return PyUnicodeWriter_WriteASCII(writer, "null", 4);
     }
     else if (obj == Py_True) {
@@ -1583,14 +1627,12 @@ encoder_listencode_obj(PyEncoderObject *s, PyUnicodeWriter *writer,
     else if (obj == Py_False) {
       return PyUnicodeWriter_WriteASCII(writer, "false", 5);
     }
+    /* Subclass fallbacks — preserved so user-defined subclasses keep
+     * their __iter__/__repr__/etc. overrides. */
     else if (PyUnicode_Check(obj)) {
         return encoder_write_string(s, writer, obj);
     }
     else if (PyLong_Check(obj)) {
-        if (PyLong_CheckExact(obj)) {
-            // Fast-path for exact integers
-            return PyUnicodeWriter_WriteRepr(writer, obj);
-        }
         PyObject *encoded = PyLong_Type.tp_repr(obj);
         if (encoded == NULL)
             return -1;
