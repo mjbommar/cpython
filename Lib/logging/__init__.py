@@ -191,12 +191,39 @@ _srcfile = os.path.normcase(addLevelName.__code__.co_filename)
 # The following is based on warnings._is_internal_frame. It makes sure that
 # frames of the import mechanism are skipped when logging at module level and
 # using a stacklevel value greater than one.
+#
+# Fast path: cache the result per co_filename so findCaller's per-frame
+# os.path.normcase + string compare runs at most once per distinct file.
+# Entries are never cleared — the set of import paths in a live process is
+# bounded and small. Filled lazily by _is_internal_frame().
+_internal_frame_cache = {}
+
+# Cache mapping pathname -> (filename, module) so LogRecord.__init__ can skip
+# os.path.basename + os.path.splitext on every emit. Pathname values come
+# from PyCodeObject.co_filename and the set of distinct values is bounded
+# by the number of python source files in the process (typically < 1000).
+# Unbounded by design — same as _internal_frame_cache.
+_pathname_to_fields_cache = {}
+
+# Main-thread ident + name cached at import time. LogRecord.__init__ can
+# short-circuit threading.current_thread().name on the main thread without
+# a dict lookup or bound-method call.
+_main_thread_ident = threading.main_thread().ident
+_main_thread_name = threading.main_thread().name
+
+
 def _is_internal_frame(frame):
     """Signal whether the frame is a CPython or logging module internal."""
-    filename = os.path.normcase(frame.f_code.co_filename)
-    return filename == _srcfile or (
+    co_filename = frame.f_code.co_filename
+    cached = _internal_frame_cache.get(co_filename)
+    if cached is not None:
+        return cached
+    filename = os.path.normcase(co_filename)
+    is_internal = filename == _srcfile or (
         "importlib" in filename and "_bootstrap" in filename
     )
+    _internal_frame_cache[co_filename] = is_internal
+    return is_internal
 
 
 def _checkLevel(level):
@@ -325,12 +352,19 @@ class LogRecord(object):
         self.levelname = getLevelName(level)
         self.levelno = level
         self.pathname = pathname
-        try:
-            self.filename = os.path.basename(pathname)
-            self.module = os.path.splitext(self.filename)[0]
-        except (TypeError, ValueError, AttributeError):
-            self.filename = pathname
-            self.module = "Unknown module"
+        cached = _pathname_to_fields_cache.get(pathname)
+        if cached is not None:
+            self.filename, self.module = cached
+        else:
+            try:
+                filename = os.path.basename(pathname)
+                module = os.path.splitext(filename)[0]
+            except (TypeError, ValueError, AttributeError):
+                filename = pathname
+                module = "Unknown module"
+            self.filename = filename
+            self.module = module
+            _pathname_to_fields_cache[pathname] = (filename, module)
         self.exc_info = exc_info
         self.exc_text = None      # used to cache the traceback text
         self.stack_info = sinfo
@@ -348,8 +382,15 @@ class LogRecord(object):
 
         self.relativeCreated = (ct - _startTime) / 1e6
         if logThreads:
-            self.thread = threading.get_ident()
-            self.threadName = threading.current_thread().name
+            tid = threading.get_ident()
+            self.thread = tid
+            # Main-thread fast path: skip the Python-level
+            # threading.current_thread() lookup (which hits
+            # threading._active under _active_limbo_lock).
+            if tid == _main_thread_ident:
+                self.threadName = _main_thread_name
+            else:
+                self.threadName = threading.current_thread().name
         else: # pragma: no cover
             self.thread = None
             self.threadName = None
@@ -443,14 +484,19 @@ class PercentStyle(object):
     default_format = '%(message)s'
     asctime_format = '%(asctime)s'
     asctime_search = '%(asctime)'
+    # Cached result of `asctime_search in self._fmt`, set in __init__.
+    # Formatter.format() hits usesTime() on every record, and the answer
+    # doesn't change after construction in any documented use.
+    _uses_time = False
     validation_pattern = re.compile(r'%\(\w+\)[#0+ -]*(\*|\d+)?(\.(\*|\d+))?[diouxefgcrsa%]', re.I)
 
     def __init__(self, fmt, *, defaults=None):
         self._fmt = fmt or self.default_format
         self._defaults = defaults
+        self._uses_time = self._fmt.find(self.asctime_search) >= 0
 
     def usesTime(self):
-        return self._fmt.find(self.asctime_search) >= 0
+        return self._uses_time
 
     def validate(self):
         """Validate the input format, ensure it matches the correct style"""
@@ -513,10 +559,11 @@ class StringTemplateStyle(PercentStyle):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._tpl = Template(self._fmt)
-
-    def usesTime(self):
+        # Template style allows either ``${asctime}`` or the legacy
+        # ``$asctime`` spelling, so recompute _uses_time with both.
         fmt = self._fmt
-        return fmt.find('$asctime') >= 0 or fmt.find(self.asctime_search) >= 0
+        self._uses_time = (fmt.find('$asctime') >= 0
+                           or fmt.find(self.asctime_search) >= 0)
 
     def validate(self):
         pattern = Template.pattern
