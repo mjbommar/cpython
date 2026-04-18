@@ -228,11 +228,29 @@ Ideas that only one lens surfaced but with high individual ROI.
       `getattr` on `self` for every AST node. A visitor with 10
       overrides over a 100k-node AST does 100k `getattr` misses that
       all fall through to `generic_visit`.
-    - Plan: per-visitor-class `{node_class: bound_method}` cache built on
-      first dispatch.
+    - Plan: some form of dispatch cache built on first encounter of a
+      node type.
     - Payoff: medium. Every stdlib AST tool (compileall, linters — flake8,
       pyflakes, bandit, codemods) benefits.
     - Scope: tiny (~15 LoC).
+    - **2026-04-18 follow-up**:
+      - Investigated on `exp-ast/nodevisitor-cache`; full notes in
+        `Misc/ast-nodevisitor-perf-diary.md` on that branch.
+      - The fastest prototype was a per-instance bound-method cache, but
+        it changed dynamic lookup semantics: monkeypatching
+        `visitor.visit_Name` after the first visit stopped taking effect,
+        and `__getattr__`-driven visitor lookup was only consulted once
+        per node type.
+      - The recommended patch is therefore the safer **method-name
+        cache**: memoize only `"visit_" + node_type.__name__`, but keep
+        `getattr(self, ...)` on every dispatch.
+      - That conservative patch still showed meaningful wins in the
+        branch measurements: roughly `-15.7%` on recursive generic
+        traversal, `-15.1%` on `pygettext`, `-12.8%` on `pyupgrade`,
+        `-10.2%` on Black's notebook-magic visitors, and `-6.1%` on
+        `_ast_unparse`, while preserving current behavior.
+      - Validation on the branch included `test_ast`, `test_unparse`,
+        `test_pyclbr`, and `test_tools.test_i18n`.
 
 13. **`Lib/unittest/loader.py:408` per-directory realpath memo**
     - `_find_test_path` does `os.path.realpath` on every test file and
@@ -348,7 +366,7 @@ reach)**. Each target stands alone as a PR; none depends on another.
 | Rank | Target | Effort | Confidence | PR-shape |
 |---|---|---|---|---|
 | **1** | Logging hot path — pure-function caches in `LogRecord` / `findCaller`; optional C-helper follow-up | Medium | High (3×) | Pure Python first; C helper separate |
-| **2** | AST `NodeVisitor.visit` dispatch cache | Tiny | Medium | 15 LoC, pure Python |
+| **2** | AST `NodeVisitor.visit` method-name cache | Tiny | High | Pure Python, validated branch |
 | **3** | ABC / Protocol `__instancecheck__` cache + `Py_TYPE` short-circuit | Small-medium | High (2×) | One C file + `typing.py` |
 | **4** | `datetime.fromisoformat` length-dispatched fast path | Small | High | Single C file |
 | **5** | `pickle` type-strategy dispatch cache (carry-over from earlier #2 list) | Medium | Medium | Pure Python, composes with Exp #4 |
