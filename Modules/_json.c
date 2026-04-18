@@ -1615,7 +1615,19 @@ encoder_call(PyObject *op, PyObject *args, PyObject *kwds)
                                      &obj, &indent_level))
         return NULL;
 
-    PyUnicodeWriter *writer = PyUnicodeWriter_Create(0);
+    /* E11: cheap size hint for the writer. Exact-type container
+     * length gives a crude but useful lower bound. Overshoot a bit
+     * to avoid the first 2-3 reallocations. Falls back to 0 hint
+     * when the top-level is not a list/dict. */
+    Py_ssize_t size_hint = 0;
+    if (PyDict_CheckExact(obj)) {
+        size_hint = PyDict_GET_SIZE(obj) * 24;
+    } else if (PyList_CheckExact(obj)) {
+        size_hint = PyList_GET_SIZE(obj) * 8;
+    } else if (PyTuple_CheckExact(obj)) {
+        size_hint = PyTuple_GET_SIZE(obj) * 8;
+    }
+    PyUnicodeWriter *writer = PyUnicodeWriter_Create(size_hint);
     if (writer == NULL) {
         return NULL;
     }
