@@ -734,6 +734,19 @@ class ElementTree:
             if method == "text":
                 _serialize_text(write, self._root)
             else:
+                if (
+                    method == "xml"
+                    and default_namespace is None
+                    and _c_serialize_xml_exact is not None
+                    and not isinstance(file_or_filename, _ListDataStream)
+                ):
+                    serialized = _c_serialize_xml_exact(
+                        self._root,
+                        short_empty_elements=short_empty_elements,
+                    )
+                    if serialized is not None:
+                        write(serialized)
+                        return
                 qnames, namespaces = _namespaces(self._root, default_namespace)
                 serialize = _serialize[method]
                 serialize(write, self._root, qnames, namespaces,
@@ -974,6 +987,8 @@ _serialize = {
 # this optional method is imported at the end of the module
 #   "c14n": _serialize_c14n,
 }
+
+_c_serialize_xml_exact = None
 
 
 def register_namespace(prefix, uri):
@@ -2100,6 +2115,7 @@ try:
     # Element, SubElement, ParseError, TreeBuilder, XMLParser, _set_factories
     from _elementtree import *
     from _elementtree import _set_factories
+    from _elementtree import _serialize_xml_exact as _c_serialize_xml_exact
 except ImportError:
     pass
 else:

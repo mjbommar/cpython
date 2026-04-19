@@ -4464,6 +4464,34 @@ class IOTest(unittest.TestCase):
             ET.tostring(root, 'unicode', short_empty_elements=False),
             '<tag>a<x></x>b<y></y>c</tag>')
 
+    def test_c_serialize_xml_exact_matches_python_serializer(self):
+        helper = getattr(ET, '_c_serialize_xml_exact', None)
+        if helper is None:
+            self.skipTest('requires _elementtree exact serializer helper')
+
+        elem = ET.Element('root', {'quote': '"', 'ws': '\r\n\t'})
+        elem.text = 'alpha<&>omega'
+        child = ET.SubElement(elem, 'child', {'k': 'v<&>'})
+        child.text = 'text<&>'
+        child.tail = 'tail<&>'
+
+        self.assertEqual(
+            helper(elem, short_empty_elements=True),
+            pyET.tostring(elem, encoding='unicode'),
+        )
+
+    def test_c_serialize_xml_exact_fallbacks(self):
+        helper = getattr(ET, '_c_serialize_xml_exact', None)
+        if helper is None:
+            self.skipTest('requires _elementtree exact serializer helper')
+
+        class MyElement(ET.Element):
+            pass
+
+        self.assertIsNone(helper(MyElement('root')))
+        self.assertIsNone(helper(ET.Element('{ns}root')))
+        self.assertIsNone(helper(ET.Comment('comment')))
+
 
 class ParseErrorTest(unittest.TestCase):
     def test_subclass(self):

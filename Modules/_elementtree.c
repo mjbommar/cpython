@@ -611,6 +611,206 @@ element_get_tail(ElementObject* self)
     return res;
 }
 
+enum {
+    SERIALIZE_EXACT_ERROR = -1,
+    SERIALIZE_EXACT_OK = 0,
+    SERIALIZE_EXACT_FALLBACK = 1,
+};
+
+static int
+serialize_exact_has_namespace(PyObject *text)
+{
+    return PyUnicode_GET_LENGTH(text) > 0 && PyUnicode_READ_CHAR(text, 0) == '{';
+}
+
+static int
+serialize_exact_write_escaped(PyUnicodeWriter *writer, PyObject *text,
+                              int is_attrib)
+{
+    Py_ssize_t length = PyUnicode_GET_LENGTH(text);
+    if (length == 0) {
+        return 0;
+    }
+
+    int kind = PyUnicode_KIND(text);
+    void *data = PyUnicode_DATA(text);
+    Py_ssize_t start = 0;
+
+    for (Py_ssize_t i = 0; i < length; i++) {
+        Py_UCS4 ch = PyUnicode_READ(kind, data, i);
+        const char *replacement = NULL;
+        Py_ssize_t replacement_len = 0;
+
+        switch (ch) {
+            case '&':
+                replacement = "&amp;";
+                replacement_len = 5;
+                break;
+            case '<':
+                replacement = "&lt;";
+                replacement_len = 4;
+                break;
+            case '>':
+                replacement = "&gt;";
+                replacement_len = 4;
+                break;
+            case '"':
+                if (is_attrib) {
+                    replacement = "&quot;";
+                    replacement_len = 6;
+                }
+                break;
+            case '\r':
+                if (is_attrib) {
+                    replacement = "&#13;";
+                    replacement_len = 5;
+                }
+                break;
+            case '\n':
+                if (is_attrib) {
+                    replacement = "&#10;";
+                    replacement_len = 5;
+                }
+                break;
+            case '\t':
+                if (is_attrib) {
+                    replacement = "&#09;";
+                    replacement_len = 5;
+                }
+                break;
+        }
+
+        if (replacement == NULL) {
+            continue;
+        }
+
+        if (start < i &&
+                PyUnicodeWriter_WriteSubstring(writer, text, start, i) < 0) {
+            return -1;
+        }
+        if (PyUnicodeWriter_WriteASCII(writer, replacement,
+                                       replacement_len) < 0) {
+            return -1;
+        }
+        start = i + 1;
+    }
+
+    if (start == 0) {
+        return PyUnicodeWriter_WriteStr(writer, text);
+    }
+    if (start < length) {
+        return PyUnicodeWriter_WriteSubstring(writer, text, start, length);
+    }
+    return 0;
+}
+
+static int
+serialize_exact_write_attrib(PyUnicodeWriter *writer, PyObject *key,
+                             PyObject *value)
+{
+    if (!PyUnicode_Check(key) || !PyUnicode_Check(value) ||
+            serialize_exact_has_namespace(key)) {
+        return SERIALIZE_EXACT_FALLBACK;
+    }
+
+    if (PyUnicodeWriter_WriteChar(writer, ' ') < 0 ||
+            PyUnicodeWriter_WriteStr(writer, key) < 0 ||
+            PyUnicodeWriter_WriteASCII(writer, "=\"", 2) < 0 ||
+            serialize_exact_write_escaped(writer, value, 1) < 0 ||
+            PyUnicodeWriter_WriteChar(writer, '"') < 0) {
+        return SERIALIZE_EXACT_ERROR;
+    }
+    return SERIALIZE_EXACT_OK;
+}
+
+static int
+serialize_exact_element(elementtreestate *st, PyUnicodeWriter *writer,
+                        PyObject *element_obj, int short_empty_elements)
+{
+    if (!Element_CheckExact(st, element_obj)) {
+        return SERIALIZE_EXACT_FALLBACK;
+    }
+
+    ElementObject *element = (ElementObject *)element_obj;
+    PyObject *tag = element->tag;
+    if (!PyUnicode_Check(tag) || serialize_exact_has_namespace(tag)) {
+        return SERIALIZE_EXACT_FALLBACK;
+    }
+
+    if (PyUnicodeWriter_WriteChar(writer, '<') < 0 ||
+            PyUnicodeWriter_WriteStr(writer, tag) < 0) {
+        return SERIALIZE_EXACT_ERROR;
+    }
+
+    if (element->extra && element->extra->attrib) {
+        if (!PyAnyDict_Check(element->extra->attrib)) {
+            return SERIALIZE_EXACT_FALLBACK;
+        }
+
+        PyObject *key;
+        PyObject *value;
+        Py_ssize_t pos = 0;
+        while (PyDict_Next(element->extra->attrib, &pos, &key, &value)) {
+            int status = serialize_exact_write_attrib(writer, key, value);
+            if (status != SERIALIZE_EXACT_OK) {
+                return status;
+            }
+        }
+    }
+
+    PyObject *text = element_get_text(element);
+    if (text == NULL) {
+        return SERIALIZE_EXACT_ERROR;
+    }
+    if (text != Py_None && !PyUnicode_Check(text)) {
+        return SERIALIZE_EXACT_FALLBACK;
+    }
+
+    int has_children = element->extra && element->extra->length > 0;
+    int has_text = text != Py_None && PyUnicode_GET_LENGTH(text) > 0;
+
+    if (has_text || has_children || !short_empty_elements) {
+        if (PyUnicodeWriter_WriteChar(writer, '>') < 0) {
+            return SERIALIZE_EXACT_ERROR;
+        }
+        if (text != Py_None && serialize_exact_write_escaped(writer, text, 0) < 0) {
+            return SERIALIZE_EXACT_ERROR;
+        }
+        if (has_children) {
+            for (Py_ssize_t i = 0; i < element->extra->length; i++) {
+                int status = serialize_exact_element(
+                    st, writer, element->extra->children[i], short_empty_elements);
+                if (status != SERIALIZE_EXACT_OK) {
+                    return status;
+                }
+            }
+        }
+        if (PyUnicodeWriter_WriteASCII(writer, "</", 2) < 0 ||
+                PyUnicodeWriter_WriteStr(writer, tag) < 0 ||
+                PyUnicodeWriter_WriteChar(writer, '>') < 0) {
+            return SERIALIZE_EXACT_ERROR;
+        }
+    }
+    else if (PyUnicodeWriter_WriteASCII(writer, " />", 3) < 0) {
+        return SERIALIZE_EXACT_ERROR;
+    }
+
+    PyObject *tail = element_get_tail(element);
+    if (tail == NULL) {
+        return SERIALIZE_EXACT_ERROR;
+    }
+    if (tail != Py_None) {
+        if (!PyUnicode_Check(tail)) {
+            return SERIALIZE_EXACT_FALLBACK;
+        }
+        if (serialize_exact_write_escaped(writer, tail, 0) < 0) {
+            return SERIALIZE_EXACT_ERROR;
+        }
+    }
+
+    return SERIALIZE_EXACT_OK;
+}
+
 static PyObject*
 subelement(PyObject *self, PyObject *args, PyObject *kwds)
 {
@@ -4419,8 +4619,49 @@ static PyType_Spec xmlparser_spec = {
 /* ==================================================================== */
 /* python module interface */
 
+PyDoc_STRVAR(elementtree_serialize_xml_exact__doc__,
+"_serialize_xml_exact($module, element, short_empty_elements=True, /)\n"
+"--\n"
+"\n"
+"Return an exact-tree XML serialization or None to request Python fallback.");
+
+static PyObject *
+elementtree_serialize_xml_exact(PyObject *module, PyObject *args,
+                                PyObject *kwargs)
+{
+    static char *kwlist[] = {"element", "short_empty_elements", NULL};
+    PyObject *element;
+    int short_empty_elements = 1;
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O|p:_serialize_xml_exact",
+                                     kwlist, &element, &short_empty_elements)) {
+        return NULL;
+    }
+
+    elementtreestate *st = get_elementtree_state(module);
+    PyUnicodeWriter *writer = PyUnicodeWriter_Create(0);
+    if (writer == NULL) {
+        return NULL;
+    }
+
+    int status = serialize_exact_element(st, writer, element,
+                                         short_empty_elements);
+    if (status == SERIALIZE_EXACT_OK) {
+        return PyUnicodeWriter_Finish(writer);
+    }
+
+    PyUnicodeWriter_Discard(writer);
+    if (status == SERIALIZE_EXACT_FALLBACK) {
+        Py_RETURN_NONE;
+    }
+    return NULL;
+}
+
 static PyMethodDef _functions[] = {
     {"SubElement", _PyCFunction_CAST(subelement), METH_VARARGS | METH_KEYWORDS},
+    {"_serialize_xml_exact",
+     (PyCFunction)(void(*)(void))elementtree_serialize_xml_exact,
+     METH_VARARGS | METH_KEYWORDS,
+     elementtree_serialize_xml_exact__doc__},
     _ELEMENTTREE__SET_FACTORIES_METHODDEF
     {NULL, NULL}
 };
