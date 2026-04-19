@@ -97,6 +97,54 @@ Focused serializer benchmark (`xml_serializer_bench.py`, 100 iterations, 9 repea
 - `xml_etree_parse`: `160 ms +- 3 ms` -> `144 ms +- 4 ms` (`1.11x faster`)
 - `xml_etree_process`: `75.0 ms +- 1.1 ms` -> `15.1 ms +- 0.4 ms` (`4.97x faster`)
 
+## Third-Party Coverage
+
+Date: `2026-04-19`
+
+Rationale:
+
+- `openpyxl` is a real-world stdlib `xml.etree` consumer when `lxml` is not
+  installed; its XML compat layer imports `Element`, `SubElement`, `tostring`,
+  and `iterparse` from stdlib ET on that path.
+- `et_xmlfile` was inspected as an additional target but version `2.0.0`
+  vendors its own incremental serializer in `incremental_tree.py`, so it is
+  not a clean measurement of this CPython serializer change.
+- A `pandas` follow-up through `engine="openpyxl"` was attempted but blocked on
+  the current `pandas` / `numpy` packaging path for Python `3.15` in this
+  environment.
+
+Harness:
+
+- `Misc/xml-serializer-perf-data/xml_third_party_bench.py`
+- package: `openpyxl 3.1.5`
+- `openpyxl.LXML == False`
+- timings are end-to-end build+save to `BytesIO`
+
+Openpyxl build+save benchmarks (`repeat=5`, `warmup=1`):
+
+- `openpyxl-basic`: `493.926 ms` -> `498.729 ms` (`+0.97%`)
+- `openpyxl-write-only`: `450.273 ms` -> `453.918 ms` (`+0.81%`)
+- `openpyxl-charts`: `119.542 ms` -> `121.019 ms` (`+1.23%`)
+- `openpyxl-comments`: `255.185 ms` -> `233.881 ms` (`-8.35%`)
+- `openpyxl-styles`: `1334.898 ms` -> `1222.403 ms` (`-8.43%`)
+- `openpyxl-tables`: `254.720 ms` -> `261.669 ms` (`+2.73%`)
+
+Follow-up confirmation (`repeat=10`, `warmup=1`) on the strongest signals:
+
+- `openpyxl-comments`: `278.673 ms` -> `250.918 ms` (`-9.96%`)
+- `openpyxl-styles`: `1342.896 ms` -> `1247.814 ms` (`-7.08%`)
+- `openpyxl-tables`: `261.115 ms` -> `262.650 ms` (`+0.59%`, effectively flat)
+
+Read:
+
+- The serializer fast path clearly helps `openpyxl` workloads that spend more
+  time emitting exact `Element` trees through `tostring()`, especially comment
+  sheets and large style sheets.
+- It does not materially move the sheet-data-heavy write paths, which continue
+  to be dominated by openpyxl's worksheet writer and `et_xmlfile`.
+- There is no strong evidence yet of a broad `openpyxl` regression from this
+  branch; the initial `tables` slowdown mostly disappeared on the longer rerun.
+
 ## Notes
 
 - The first implementation broke `tostringlist()` chunking by collapsing the
