@@ -746,6 +746,39 @@ Ideas that only one lens surfaced but with high individual ROI.
     jump ahead of `json`, logging, AST, ABC, datetime, UUID, unicode
     join, or call-setup work.
 
+## `xml.etree` serializer fast-path follow-up
+
+- **2026-04-19 follow-up**:
+  - Investigated on `exp-xml/serializer-fastpaths`; full notes live in
+    `Misc/xml-serializer-perf-diary.md` on that branch.
+  - Profiling of `pyperformance`'s `xml_etree` benchmark showed the hot
+    path was overwhelmingly Python-side serialization
+    (`ElementTree._serialize_xml` + `_namespaces`), not parsing or
+    `ElementPath`.
+  - The first safe shape was a private `_elementtree`
+    exact-tree serializer using `PyUnicodeWriter`, dispatched only for
+    `method="xml"`, no `default_namespace`, and exact built-in
+    `Element` trees. Namespaces, comments / processing instructions,
+    subclasses, non-string payloads, and `tostringlist()` continue to
+    use the Python serializer.
+  - Confirmatory deltas on the branch-local harness:
+    `serialize-root -95.2%`,
+    `serialize-result -92.8%`,
+    `process -77.9%`.
+  - Confirmatory deltas on `pyperformance`:
+    `xml_etree_generate 3.27x faster`,
+    `xml_etree_process 4.97x faster`,
+    `xml_etree_parse 1.11x faster`,
+    `xml_etree_iterparse 1.03x slower`.
+  - Validation on the branch state:
+    - stdlib: `test_xml_etree test_xml_etree_c`
+    - branch-local helper parity + fallback tests for namespaces,
+      comments, and subclasses
+  - Recommendation: this is now the clearest XML optimization path.
+    Next follow-ups, if we continue, should be
+    namespace-aware serializer support and a separate narrow branch for
+    common `ElementPath` shapes like `.//tag` and `.//a/b`.
+
 Ranked by **(triple-convergence) × (concrete first-diff) × (ecosystem
 reach)**. Each target stands alone as a PR; none depends on another.
 

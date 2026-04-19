@@ -4,7 +4,7 @@ Companion to `Misc/cpython-perf-ideas.md`. That file is the *roster* of
 ideas; this file records what was actually built, measured, and filed
 against upstream.
 
-Four separate branches, each self-contained, each with its own diary
+Five separate branches, each self-contained, each with its own diary
 and raw bench data.  None depends on the others.
 
 ## Summary table
@@ -15,8 +15,9 @@ and raw bench data.  None depends on the others.
 | 2 | `exp-pickle/4-pure-python-exact-containers` | gh-148706 | not yet opened | ready to file |
 | 3 | `exp-logging/hot-path` | not yet filed | not yet opened | drafts prepared |
 | 4 | `exp-json/research` | not yet filed | not yet opened | 8 experiments shipped, 10-16% gains |
+| 5 | `exp-xml/serializer-fastpaths` | not yet filed | not yet opened | fresh branch, validated, large xml-etree wins |
 
-All four branches live on `mjbommar/cpython`; none were ever pushed to
+All five branches live on `mjbommar/cpython`; none were ever pushed to
 `python/cpython:main` directly.
 
 ## 1. marshal — safe-cycle fix + perf recovery
@@ -281,9 +282,68 @@ natural follow-on ("json is the next high-leverage target" — matched
 the roster's priority on hot-path stdlib C modules used by every web
 framework).
 
+## 5. `xml.etree` — exact-tree serializer fast path
+
+**Branch**: `exp-xml/serializer-fastpaths`
+**Upstream**: not yet filed
+
+### What shipped
+
+- Private `_elementtree._serialize_xml_exact()` helper using
+  `PyUnicodeWriter` to serialize exact built-in `Element` trees into a
+  single `str`.
+- `ElementTree.write()` dispatch for the common `method="xml"`,
+  no-namespace case, with explicit fallback for namespaces,
+  comments / processing instructions, subclasses, non-string values,
+  and `tostringlist()`'s `_ListDataStream` chunked writer.
+- Branch-local diary and focused benchmark harness in
+  `Misc/xml-serializer-perf-diary.md` and
+  `Misc/xml-serializer-perf-data/`.
+
+### Measured impact vs rebuilt `main`
+
+Focused serializer benchmark (`100` iterations, `9` repeats):
+
+| Scenario | main | final | Δ |
+| --- | ---: | ---: | ---: |
+| `serialize-root` | 910.7 ms | 43.4 ms | **−95.2%** |
+| `serialize-result` | 2299.4 ms | 165.1 ms | **−92.8%** |
+| `process` | 2715.1 ms | 600.4 ms | **−77.9%** |
+
+`pyperformance run --fast --benchmarks xml_etree`:
+
+| Benchmark | main | final | Δ |
+| --- | ---: | ---: | ---: |
+| `xml_etree_generate` | 108 ms | 33 ms | **3.27x faster** |
+| `xml_etree_iterparse` | 101 ms | 104 ms | 1.03x slower |
+| `xml_etree_parse` | 160 ms | 144 ms | **1.11x faster** |
+| `xml_etree_process` | 75.0 ms | 15.1 ms | **4.97x faster** |
+
+### Validation
+
+- `test_xml_etree` and `test_xml_etree_c`: pass
+- direct helper tests added for serializer parity and fallback on
+  namespaces, comments, and subclasses
+- one compatibility regression was caught and fixed during the branch
+  work: `tostringlist()` chunking now stays on the Python serializer
+
+### Artifacts
+
+- `Misc/xml-serializer-perf-diary.md`
+- `Misc/xml-serializer-perf-data/README.md`
+- `Misc/xml-serializer-perf-data/xml_serializer_bench.py`
+
+### Idea this came from
+
+Not on the original roster. This branch came from the later XML
+profiling pass during the combined-winners attribution work: the hot
+path was overwhelmingly Python-side serialization
+(`ElementTree._serialize_xml` + `_namespaces`), not parsing or
+`ElementPath`.
+
 ## Ideas from the roster still unshipped
 
-Ranked by what still looks promising after the four rounds:
+Ranked by what still looks promising after the five rounds:
 
 1. **ABC / Protocol `__instancecheck__`** (`Modules/_abc.c:632`,
    `Lib/typing.py:2076`). Double-flagged in roster. Caches keyed on
@@ -305,7 +365,7 @@ picks it up.
 
 ## Bottom-line numbers
 
-Across the four shipped branches:
+Across the five shipped branches:
 
 - **CPython interpreter startup**: 15.8% faster (marshal PR)
 - **Every `dill.dumps()` call**: 19–37% faster (pickle branch)
@@ -314,12 +374,17 @@ Across the four shipped branches:
 - **Every `json.dumps()` / `json.loads()` call on realistic payloads**:
   **8–16% faster** (json branch); web-api dumps −13.2%, log-line
   dumps −15.8%, NDJSON loads −8.6%, bulk 100k dump −14.4%.
-- Combined test coverage across branches: **~146,000 CPython tests
-  plus ~3,400 third-party tests** across all four states, with
-  third-party validation on dill / cloudpickle / joblib / attrs /
+- **`xml.etree` tree generation / transformation**: `xml_etree_generate`
+  **3.27x faster** and `xml_etree_process` **4.97x faster** on
+  `pyperformance`; focused exact-tree serialization
+  **77.9%–95.2% faster** on the branch-local harness.
+- Combined test coverage across the earlier four heavy-validation
+  branches: **~146,000 CPython tests plus ~3,400 third-party tests**,
+  with third-party validation on dill / cloudpickle / joblib / attrs /
   Starlette / structlog / sentry-sdk / Django / Sphinx / loguru /
   simplejson / pydantic / jsonschema / fastapi showing identical
-  pass/fail behavior to `main`.
+  pass/fail behavior to `main`; the XML branch adds targeted
+  `test_xml_etree` / `test_xml_etree_c` validation on top.
 
 ## Provenance
 
