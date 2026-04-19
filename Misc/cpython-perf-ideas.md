@@ -705,6 +705,47 @@ Ideas that only one lens surfaced but with high individual ROI.
 
 ## Recommended implementation order
 
+## `html.escape` fast path follow-up
+
+- **2026-04-18 follow-up**:
+  - Investigated on `exp-html/escape-fastpath`; full notes live in
+    `Misc/html-escape-perf-diary.md` on that branch.
+  - Usage inventory from `Lib/`, `Lib/test/`, and the local third-party
+    sample environment found `43` direct `html.escape(...)` call sites,
+    concentrated in `stdlib (28)`, `pygments (6)`, `starlette (5)`,
+    `django (3)`, and `gunicorn (1)`.
+  - The main semantic trap was `str` subclasses: current behavior
+    returns a plain `str` even when no escaping is needed, so any no-op
+    fast path must only return the original object for exact `str`.
+  - Seven variants were tested. The best shape was the smallest one:
+    exact-`str` no-op fast path, then the existing chained
+    `replace()` logic.
+  - Confirmatory deltas on the branch-local corpus:
+    `M1_safe_short +30.1%`,
+    `M2_safe_medium +72.2%`,
+    `M8_bmp_safe +55.2%`,
+    `R1_stdlib_http_server +4.4%`,
+    `R4_django_template +5.2%`,
+    `R5_starlette_error +0.6%`,
+    with small regressions on escape-heavy wrappers:
+    `R2_stdlib_pydoc_lines -4.7%`,
+    `R3_django_escape -2.9%`,
+    `R7_pygments_options -2.9%`
+  - Validation on the final branch state:
+    - stdlib: `test_html test_httpservers test_xmlrpc
+      test_profiling.test_heatmap`
+    - third-party: import smoke for `django`, `starlette`, `gunicorn`,
+      `pygments`, `jinja2`, `fastapi`, `httpx`, `anyio`, `werkzeug`;
+      plus deterministic branch-local wrapper checks
+  - `test_pydoc` was intentionally not treated as a branch regression in
+    this setup because `pydoc`'s stdlib-path heuristic breaks when
+    `/tmp/cpython-main-bench/python` is run against
+    `/tmp/cpython-html-escape/Lib` via `PYTHONPATH`.
+  - Recommendation: keep as a low-priority pure-Python follow-up. It is
+    a real win for safe/no-op template traffic, but it is too mixed to
+    jump ahead of `json`, logging, AST, ABC, datetime, UUID, unicode
+    join, or call-setup work.
+
 Ranked by **(triple-convergence) × (concrete first-diff) × (ecosystem
 reach)**. Each target stands alone as a PR; none depends on another.
 
