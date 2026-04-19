@@ -16,6 +16,12 @@ def escape(s, quote=True):
     characters, both double quote (") and single quote (') characters are also
     translated.
     """
+    if type(s) is str:
+        if quote:
+            if "&" not in s and "<" not in s and ">" not in s and '"' not in s and "'" not in s:
+                return s
+        elif "&" not in s and "<" not in s and ">" not in s:
+            return s
     s = s.replace("&", "&amp;") # Must be done first!
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")

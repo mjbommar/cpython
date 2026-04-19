@@ -15,6 +15,31 @@ class HtmlTests(unittest.TestCase):
             html.escape('\'<script>"&foo;"</script>\'', False),
             '\'&lt;script&gt;"&amp;foo;"&lt;/script&gt;\'')
 
+    def test_escape_safe_exact_str_is_identity(self):
+        text = "safe plain text"
+        self.assertIs(html.escape(text), text)
+        self.assertIs(html.escape(text, quote=False), text)
+
+    def test_escape_safe_subclass_returns_str(self):
+        class S(str):
+            pass
+
+        value = S("safe plain text")
+        escaped = html.escape(value)
+        escaped_no_quote = html.escape(value, quote=False)
+        self.assertEqual(escaped, value)
+        self.assertEqual(escaped_no_quote, value)
+        self.assertIs(type(escaped), str)
+        self.assertIs(type(escaped_no_quote), str)
+
+    def test_escape_non_string_errors(self):
+        with self.assertRaises(AttributeError):
+            html.escape(123)
+        with self.assertRaises(AttributeError):
+            html.escape(None)
+        with self.assertRaises(TypeError):
+            html.escape(b"abc")
+
     def test_unescape(self):
         numeric_formats = ['&#%d', '&#%d;', '&#x%x', '&#x%x;']
         errmsg = 'unescape(%r) should have returned %r'

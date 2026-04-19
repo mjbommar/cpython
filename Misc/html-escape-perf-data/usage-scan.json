@@ -1,0 +1,371 @@
+{
+  "arg_kinds": [
+    [
+      "name",
+      19
+    ],
+    [
+      "call",
+      12
+    ],
+    [
+      "attr",
+      5
+    ],
+    [
+      "const_str",
+      4
+    ],
+    [
+      "fstring",
+      2
+    ],
+    [
+      "Mod",
+      1
+    ]
+  ],
+  "quote_kinds": [
+    [
+      "default",
+      33
+    ],
+    [
+      "False",
+      8
+    ],
+    [
+      "True",
+      2
+    ]
+  ],
+  "sample_calls": [
+    {
+      "arg_kind": "Mod",
+      "line": 2468,
+      "path": "Lib/pydoc.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 2492,
+      "path": "Lib/pydoc.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 2616,
+      "path": "Lib/pydoc.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "attr",
+      "line": 896,
+      "path": "Lib/xmlrpc/server.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1987,
+      "path": "Lib/test/test_xml_etree.py",
+      "quote_kind": "True"
+    },
+    {
+      "arg_kind": "fstring",
+      "line": 615,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 637,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1171,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "const_str",
+      "line": 12,
+      "path": "Lib/test/test_html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "const_str",
+      "line": 15,
+      "path": "Lib/test/test_html.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 396,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "attr",
+      "line": 432,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "attr",
+      "line": 433,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 925,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 986,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1019,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1072,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 1100,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1114,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1246,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1247,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 1260,
+      "path": "Lib/profiling/sampling/heatmap_collector.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1987,
+      "path": "Lib/test/test_xml_etree.py",
+      "quote_kind": "True"
+    },
+    {
+      "arg_kind": "fstring",
+      "line": 615,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 637,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 1171,
+      "path": "Lib/test/test_httpservers.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "const_str",
+      "line": 12,
+      "path": "Lib/test/test_html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "const_str",
+      "line": 15,
+      "path": "Lib/test/test_html.py",
+      "quote_kind": "False"
+    },
+    {
+      "arg_kind": "name",
+      "line": 331,
+      "path": "/tmp/perf-extra-pkgs/gunicorn/util.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 60,
+      "path": "/tmp/perf-extra-pkgs/django/utils/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 177,
+      "path": "/tmp/perf-extra-pkgs/django/test/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 196,
+      "path": "/tmp/perf-extra-pkgs/django/test/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 191,
+      "path": "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "attr",
+      "line": 213,
+      "path": "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "attr",
+      "line": 217,
+      "path": "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "name",
+      "line": 242,
+      "path": "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 242,
+      "path": "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 427,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 428,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 434,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 457,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 458,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    },
+    {
+      "arg_kind": "call",
+      "line": 459,
+      "path": "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      "quote_kind": "default"
+    }
+  ],
+  "top_files": [
+    [
+      "Lib/profiling/sampling/heatmap_collector.py",
+      12
+    ],
+    [
+      "Lib/test/test_httpservers.py",
+      6
+    ],
+    [
+      "/tmp/perf-extra-pkgs/pygments/formatters/html.py",
+      6
+    ],
+    [
+      "/tmp/perf-extra-pkgs/starlette/middleware/errors.py",
+      5
+    ],
+    [
+      "Lib/test/test_html.py",
+      4
+    ],
+    [
+      "Lib/pydoc.py",
+      3
+    ],
+    [
+      "Lib/test/test_xml_etree.py",
+      2
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/test/html.py",
+      2
+    ],
+    [
+      "Lib/xmlrpc/server.py",
+      1
+    ],
+    [
+      "/tmp/perf-extra-pkgs/gunicorn/util.py",
+      1
+    ],
+    [
+      "/tmp/perf-extra-pkgs/django/utils/html.py",
+      1
+    ]
+  ],
+  "top_packages": [
+    [
+      "stdlib",
+      28
+    ],
+    [
+      "pygments",
+      6
+    ],
+    [
+      "starlette",
+      5
+    ],
+    [
+      "django",
+      3
+    ],
+    [
+      "gunicorn",
+      1
+    ]
+  ],
+  "total_calls": 43
+}
