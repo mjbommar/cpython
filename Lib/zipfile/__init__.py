@@ -2207,15 +2207,18 @@ class PyZipFile(ZipFile):
         When it is False, the file or directory is skipped.
         """
         pathname = os.fspath(pathname)
+        is_dir = os.path.isdir(pathname)
         if filterfunc and not filterfunc(pathname):
             if self.debug:
-                label = 'path' if os.path.isdir(pathname) else 'file'
+                label = 'path' if is_dir else 'file'
                 print('%s %r skipped by filterfunc' % (label, pathname))
             return
         dir, name = os.path.split(pathname)
-        if os.path.isdir(pathname):
+        if is_dir:
             initname = os.path.join(pathname, "__init__.py")
             if os.path.isfile(initname):
+                with os.scandir(pathname) as it:
+                    dirlist = sorted(it, key=lambda entry: entry.name)
                 # This is a package directory, add it
                 if basename:
                     basename = "%s/%s" % (basename, name)
@@ -2227,18 +2230,18 @@ class PyZipFile(ZipFile):
                 if self.debug:
                     print("Adding", arcname)
                 self.writestr(arcname, bytecode)
-                dirlist = sorted(os.listdir(pathname))
-                dirlist.remove("__init__.py")
                 # Add all *.py files and package subdirectories
-                for filename in dirlist:
-                    path = os.path.join(pathname, filename)
-                    root, ext = os.path.splitext(filename)
-                    if os.path.isdir(path):
+                for entry in dirlist:
+                    filename = entry.name
+                    if filename == "__init__.py":
+                        continue
+                    path = entry.path
+                    if entry.is_dir():
                         if os.path.isfile(os.path.join(path, "__init__.py")):
                             # This is a package directory, add it
                             self.writepy(path, basename,
                                          filterfunc=filterfunc)  # Recursive call
-                    elif ext == ".py":
+                    elif filename.endswith(".py"):
                         if filterfunc and not filterfunc(path):
                             if self.debug:
                                 print('file %r skipped by filterfunc' % path)
@@ -2253,8 +2256,7 @@ class PyZipFile(ZipFile):
                     print("Adding files from directory", pathname)
                 for filename in sorted(os.listdir(pathname)):
                     path = os.path.join(pathname, filename)
-                    root, ext = os.path.splitext(filename)
-                    if ext == ".py":
+                    if filename.endswith(".py"):
                         if filterfunc and not filterfunc(path):
                             if self.debug:
                                 print('file %r skipped by filterfunc' % path)
