@@ -391,3 +391,43 @@ What we learned:
   so the guard belongs at dict-key and set-member insertion sites
 - module-level caches in stdlib hot paths must not retain lifecycle-sensitive
   objects such as `threading.Thread` instances across `fork()`
+
+## 2026-04-22 update: importlib `_find_and_load()` loaded-module fast path
+
+Accepted and cherry-picked commit:
+
+- `fe49f1cb16a` / `3572c122f67`
+  `perf: fast path already-loaded imports`
+
+Clean-mainline result
+(`/tmp/importlib-find-load-baseline.json` vs
+`/tmp/importlib-find-load-candidate-e2.json`):
+
+- `loaded_builtin`: `249 ns` -> `184 ns`, `1.35x faster`
+- `loaded_python`: `244 ns` -> `183 ns`, `1.34x faster`
+- reload and missing-module cases: no significant change
+- pyperf significant geometric mean: about `1.10x faster`
+
+Validation:
+
+- clean-mainline focused import tests:
+  `test_importlib test_import test_zipimport`, `1,477` tests,
+  `31` skipped, `SUCCESS` in `9.9 sec`
+- clean-mainline full suite:
+  `49,881` tests, `2,624` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 15 sec`
+- stacked focused import tests:
+  `1,477` tests, `31` skipped, `SUCCESS` in `9.3 sec`
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 13 sec`
+
+What we learned:
+
+- already-loaded imports are cheap but high-volume enough that shaving the
+  lock/spec path is still measurable
+- the fast return is only safe for exact module objects whose `__spec__` is
+  `None` or exact `ModuleSpec`; custom specs must stay on the original path
+  because reading `_initializing` may execute Python and mutate `sys.modules`
+- `_bootstrap.py` cannot reference injected `sys` at module import time, so
+  the exact module type cache must be initialized in `_setup()`
