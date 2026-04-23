@@ -259,6 +259,77 @@ Direct `get_code()` panel result
 - `G1_timestamp_pyc_hit`: `-5.93%`
 - `G2_unchecked_hash_pyc_hit`: `-4.53%`
 
+## 2026-04-23 update: concurrent interpreters queue reload blocker
+
+Accepted and cherry-picked commit:
+
+- `374a801488f` / `d4de12c4641`
+  `concurrent: preserve queue UNBOUND across reload`
+
+Why this is in the stack:
+
+- this is a correctness fix, not a throughput win
+- it fixes a real baseline bug around
+  `concurrent.interpreters.create_queue` aliases surviving
+  `importlib.reload(concurrent.interpreters._queues)`
+- that bug was also blocking clean validation for newer importlib-family work
+
+Validation:
+
+- clean blocker branch `fix-concurrent/queues-reload-unbound` passed
+  `./python -m test -j4`: `49,882` run, `2,625` skipped,
+  `SUCCESS` in `5 min 32 sec`
+- stacked branch passed focused concurrent/import regression slices after the
+  cherry-pick:
+  `test_concurrent_futures.test_interpreter_pool`,
+  `test_interpreters`,
+  `test_struct`,
+  `test_httpservers`,
+  and `test_profiling`
+
+What we learned:
+
+- the earlier reduced-order `test_struct` failure was a real baseline bug, not
+  an importlib regression
+- the fix is small enough to stand as an independent winner and should sit
+  underneath later importlib-family promotions
+
+## 2026-04-23 update: importlib `_call_with_frames_removed()` fast path
+
+Accepted and cherry-picked commit:
+
+- `f861e6c4766` / `62601d5f522`
+  `importlib: fast-path _call_with_frames_removed`
+
+Validation:
+
+- clean importlib branch
+  `exp-importlib/call-with-frames-removed-mainline` passed
+  focused import tests plus `./python -m test -j4`:
+  `49,882` run, `2,623` skipped, `SUCCESS` in `5 min 31 sec`
+- stacked branch passed focused import/concurrent regression slices after the
+  cherry-pick:
+  `test_importlib`, `test_import`, `test_zipimport`, `test_runpy`,
+  `test_concurrent_futures.test_interpreter_pool`, `test_interpreters`,
+  `test_struct`, `test_httpservers`, and `test_profiling`
+- stacked branch then passed `./python -m test -j4`:
+  `49,892` run, `2,622` skipped, `SUCCESS` in `5 min 32 sec`
+
+Focused importlib result:
+
+- Python callable, no kwargs: `223.6 ns -> 181.1 ns`
+- builtin callable, no kwargs: `171.8 ns -> 136.8 ns`
+- tiny Python-module import: `94,382.9 ns -> 88,356.3 ns`
+
+What we learned:
+
+- `_call_with_frames_removed()` was paying avoidable
+  `CALL_FUNCTION_EX` / empty-kwargs overhead on the common path
+- the no-kwargs split is reviewable, semantics-safe, and broad enough to matter
+  across import-heavy flows
+- the family only became promotable after separating the unrelated concurrent
+  interpreters blocker into its own accepted fix
+
 ## 2026-04-23 update: pure-Python JSON `JSONObject()` direct-dict path
 
 Accepted and cherry-picked commit:
@@ -621,3 +692,56 @@ What we learned:
 - the first baseline taken against a separately built binary overstated the
   result; the accepted numbers came only from stricter same-worktree revert /
   rebuild / benchmark / reapply / rebuild / benchmark cycles
+
+## 2026-04-23 update: runpy `_run_code()` globals setup
+
+Accepted and cherry-picked commit:
+
+- `396e682fb51` / `3714f215cf2`
+  `runpy: speed up _run_code globals setup`
+
+Clean-mainline focused result:
+
+- direct `_run_code()` common path:
+  `680.5 ns -> 596.8 ns` (`+14.02%`)
+- direct `_run_code()` with `init_globals`:
+  `894.7 ns -> 711.8 ns` (`+25.70%`)
+- direct `_run_code()` script path:
+  `648.0 ns -> 572.8 ns` (`+13.13%`)
+- `run_module()` tiny source module:
+  `52,471.2 ns -> 49,136.0 ns` (`+6.79%`)
+- `run_module(..., alter_sys=True)`:
+  `58,443.0 ns -> 53,765.2 ns` (`+8.70%`)
+- `run_module()` tiny package `__main__`:
+  `56,411.3 ns -> 53,912.4 ns` (`+4.64%`)
+- focused-harness geomean: about `+11.96%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_runpy_namespace_semantics.py` passed
+- clean-mainline focused tests:
+  `test_runpy`, `test_cmd_line`, `test_multiprocessing_main_handling`,
+  `test_pdb`: `SUCCESS`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 21 sec`
+- stacked focused tests:
+  `test_runpy test_profile`, and
+  `test_cmd_line test_multiprocessing_main_handling test_pdb test_profiling`:
+  `SUCCESS`
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 24 sec`
+
+What we learned:
+
+- `runpy._run_code()` was still paying measurable overhead for the common
+  namespace setup path even though the operation is just six fixed globals
+- the smaller direct-assignment rewrite was better than the more specialized
+  branchy prototype as a first real patch: it kept the surface area tiny and
+  still preserved most of the measured win
+- this is a good example of the funnel working correctly: the profile found a
+  real pure-Python hotspot, the prototype harness proved it, the clean branch
+  validated it, and the stacked branch accepted it without needing broader
+  subsystem surgery
