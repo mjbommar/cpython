@@ -349,3 +349,45 @@ What we learned:
 - the fast path must exclude subclasses that override equality
 - current `-j8` full-suite validation removed the older sequential
   full-suite ambiguity around unrelated local failures
+
+## 2026-04-22 update: stacked-suite correctness cleanup
+
+The stacked winner branch initially failed the full suite in three places:
+
+- `test_descr`
+- `test_marshal`
+- `test_threading`
+
+Focused reruns confirmed these were deterministic stack failures, not
+flaky test noise.
+
+Accepted cleanups:
+
+- removed the unsafe `PyType_IsSubtype()` and `find_name_in_mro()` prototype
+  shortcuts from the `isinstance/type-lookup` experiment
+- changed marshal tuple handling so legal indirect tuple self-references
+  remain accepted, while incomplete tuples are rejected only at hash-based
+  insertion sites (`dict` keys and `set`/`frozenset` members)
+- fixed the logging hot-path experiment to cache only the main-thread ident,
+  not the `threading.main_thread()` object itself
+
+Validation:
+
+- `./python -m test -q test_descr`: `SUCCESS`
+- `./python -m test -q test_marshal`: `SUCCESS`
+- `./python -m test -q test_descr test_marshal test_threading test_logging`:
+  `765` tests, `17` skipped, `SUCCESS` in `33.0 sec`
+- `./python -m test -q -j8`: `49,892` tests, `2,620` skipped,
+  `491/502` test files, `SUCCESS` in `4 min 13 sec`
+
+What we learned:
+
+- subtype and MRO lookup fast paths are high-risk unless they preserve custom
+  MRO behavior exactly; the current shortcut shape is rejected for the stack
+- marshal cannot globally delay tuple reference registration because existing
+  version-3+ data depends on list/dict values being able to point back to the
+  tuple under construction
+- the narrow marshal hazard is hash-based insertion of an incomplete tuple,
+  so the guard belongs at dict-key and set-member insertion sites
+- module-level caches in stdlib hot paths must not retain lifecycle-sensitive
+  objects such as `threading.Thread` instances across `fork()`

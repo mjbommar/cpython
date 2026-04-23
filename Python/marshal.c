@@ -1152,6 +1152,21 @@ r_ref_insert(PyObject *o, Py_ssize_t idx, int flag, RFILE *p)
     return o;
 }
 
+static int
+is_incomplete_tuple(PyObject *v)
+{
+    if (!PyTuple_CheckExact(v)) {
+        return 0;
+    }
+    Py_ssize_t n = PyTuple_GET_SIZE(v);
+    for (Py_ssize_t i = 0; i < n; i++) {
+        if (PyTuple_GET_ITEM(v, i) == NULL) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 /* combination of both above, used when an object can be
  * created whenever it is seen in the file, as opposed to
  * after having loaded its sub-objects.
@@ -1418,9 +1433,7 @@ r_object(RFILE *p)
         }
     _read_tuple:
         v = PyTuple_New(n);
-        idx = r_ref_reserve(flag, p);
-        if (idx < 0)
-            Py_CLEAR(v);
+        R_REF(v);
         if (v == NULL)
             break;
 
@@ -1435,7 +1448,6 @@ r_object(RFILE *p)
             }
             PyTuple_SET_ITEM(v, i, v2);
         }
-        v = r_ref_insert(v, idx, flag, p);
         retval = v;
         break;
 
@@ -1490,6 +1502,13 @@ r_object(RFILE *p)
             val = r_object(p);
             if (val == NULL) {
                 Py_DECREF(key);
+                break;
+            }
+            if (is_incomplete_tuple(key)) {
+                PyErr_SetString(PyExc_ValueError,
+                                "bad marshal data (invalid reference)");
+                Py_DECREF(key);
+                Py_DECREF(val);
                 break;
             }
             if (PyDict_SetItem(v, key, val) < 0) {
@@ -1550,6 +1569,13 @@ r_object(RFILE *p)
                         PyErr_SetString(PyExc_TypeError,
                             "NULL object in marshal data for set");
                     Py_SETREF(v, NULL);
+                    break;
+                }
+                if (is_incomplete_tuple(v2)) {
+                    PyErr_SetString(PyExc_ValueError,
+                                    "bad marshal data (invalid reference)");
+                    Py_DECREF(v2);
+                    Py_CLEAR(v);
                     break;
                 }
                 if (PySet_Add(v, v2) == -1) {

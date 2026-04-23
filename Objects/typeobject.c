@@ -2927,9 +2927,6 @@ is_subtype_with_mro(PyObject *a_mro, PyTypeObject *a, PyTypeObject *b)
 int
 PyType_IsSubtype(PyTypeObject *a, PyTypeObject *b)
 {
-    if (a == b || a->tp_base == b || b == &PyBaseObject_Type) {
-        return 1;
-    }
     return is_subtype_with_mro(a->tp_mro, a, b);
 }
 
@@ -6082,23 +6079,6 @@ find_name_in_mro(PyTypeObject *type, PyObject *name, _PyStackRef *out)
         }
     }
 
-    PyObject *dict = lookup_tp_dict(type);
-    assert(dict && PyDict_Check(dict));
-    Py_ssize_t ix = _Py_dict_lookup_threadsafe_stackref(
-        (PyDictObject *)dict, name, hash, out);
-    if (ix == DKIX_ERROR) {
-        PyErr_Clear();
-        return -1;
-    }
-    if (!PyStackRef_IsNull(*out)) {
-        return 1;
-    }
-
-    mro = lookup_tp_mro(type);
-    if (mro == NULL) {
-        return -1;
-    }
-
     int res = 0;
     PyThreadState *tstate = _PyThreadState_GET();
     /* Keep a strong reference to mro because type->tp_mro can be replaced
@@ -6107,11 +6087,11 @@ find_name_in_mro(PyTypeObject *type, PyObject *name, _PyStackRef *out)
     _PyThreadState_PushCStackRef(tstate, &mro_ref);
     mro_ref.ref = PyStackRef_FromPyObjectNew(mro);
     Py_ssize_t n = PyTuple_GET_SIZE(mro);
-    for (Py_ssize_t i = 1; i < n; i++) {
+    for (Py_ssize_t i = 0; i < n; i++) {
         PyObject *base = PyTuple_GET_ITEM(mro, i);
-        dict = lookup_tp_dict(_PyType_CAST(base));
+        PyObject *dict = lookup_tp_dict(_PyType_CAST(base));
         assert(dict && PyDict_Check(dict));
-        ix = _Py_dict_lookup_threadsafe_stackref(
+        Py_ssize_t ix = _Py_dict_lookup_threadsafe_stackref(
             (PyDictObject *)dict, name, hash, out);
         if (ix == DKIX_ERROR) {
             PyErr_Clear();

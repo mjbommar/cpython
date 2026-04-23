@@ -206,11 +206,10 @@ _internal_frame_cache = {}
 # (typically < 1000). Unbounded by design — same as _internal_frame_cache.
 _pathname_to_fields_cache = {}
 
-# Main-thread object + ident cached at import time. LogRecord.__init__ can
-# short-circuit threading.current_thread() on the main thread while still
-# reflecting runtime main-thread renames via _main_thread.name.
-_main_thread = threading.main_thread()
-_main_thread_ident = _main_thread.ident
+# Main-thread ident cached at import time. LogRecord.__init__ can short-circuit
+# threading.current_thread() on the main thread without keeping the thread
+# object alive across fork.
+_main_thread_ident = threading.main_thread().ident
 
 
 def _is_internal_frame(frame):
@@ -394,7 +393,7 @@ class LogRecord(object):
             # threading.current_thread() lookup (which hits
             # threading._active under _active_limbo_lock).
             if tid == _main_thread_ident:
-                self.threadName = _main_thread.name
+                self.threadName = threading.main_thread().name
             else:
                 self.threadName = threading.current_thread().name
         else: # pragma: no cover
