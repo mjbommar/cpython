@@ -517,3 +517,51 @@ What we learned:
   because reading `_initializing` may execute Python and mutate `sys.modules`
 - `_bootstrap.py` cannot reference injected `sys` at module import time, so
   the exact module type cache must be initialized in `_setup()`
+
+## 2026-04-23 update: pathlib glob `_StringGlobber.scandir()` tuple fast path
+
+Accepted and cherry-picked commit:
+
+- `a447c868d00` / `a0a9f825350`
+  `perf: speed up pathlib glob scandir tuples`
+
+Clean-mainline result
+(`baseline3` / `candidate5`, `baseline4` / `candidate6`):
+
+- `G1_flat_star`: about `+1.32%`
+- `G2_flat_py`: about `+1.98%`
+- `G3_tree_py_recursive`: about `+3.75%`
+- `G4_tree_literal`: about `+0.80%`
+- `G5_deep_target_recursive`: about `+5.72%`
+- exact-patch two-run average geomean: about `+2.70%`
+
+Validation:
+
+- clean-mainline guardrails: passed
+- clean-mainline focused tests:
+  `test_glob test_pathlib`, `1,395` tests, `407` skipped,
+  `SUCCESS` in `1.8 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,624` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 31 sec`
+- stacked focused tests:
+  `test_glob test_pathlib`, `1,395` tests, `407` skipped,
+  `SUCCESS` in `1.8 sec`
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 29 sec`
+
+What we learned:
+
+- the original `glob` microbench was pointed at the wrong code; the full-suite
+  tracker item was really `pathlib` consuming `Lib/glob.py`, not public
+  `glob.glob()`
+- once retargeted to `Path.glob()` / `Path.rglob()`, the hotspot was
+  `_StringGlobber.scandir()`, `select_wildcard()`, and
+  `select_recursive_step()`, not selector construction itself
+- changing the entry contract for `_GlobberBase` was too invasive because
+  `_PathGlobber` and `zipfile.Path` still rely on the historical
+  `(entry, name, path)` shape
+- the winning patch is therefore intentionally small: preserve the contract,
+  but materialize the tuple list directly inside the `os.scandir()` context
+  instead of `list(scandir_it)` plus a generator expression
