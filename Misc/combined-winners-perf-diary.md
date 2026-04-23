@@ -979,3 +979,59 @@ What we learned:
   acceptance. `test_venv` exposed the same mixed-origin pitfall seen in other
   families, so the trustworthy gate was a fully built clean worktree and then a
   stacked full-suite rerun
+
+## 2026-04-23 update: pyclbr readmodule fast path
+
+Accepted and cherry-picked commit:
+
+- `721c91b1137` / `322cf1c8650`
+  `pyclbr: defer plain import scans`
+
+Clean-mainline focused result:
+
+- `bench_pyclbr_readmodule.py` source proof:
+  - real-module geomean: about `+21.87%`
+  - `R1_pyclbr`: `-1.67%`
+  - `R2_random`: `+8.52%`
+  - `R3_pickle`: `+15.74%`
+  - `R4_pydoc`: `+116.05%`
+  - `R5_email_parser`: `+0.75%`
+  - synthetic unused-import cases improved by orders of magnitude, but those
+    were treated as supporting evidence rather than the acceptance headline
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_pyclbr_readmodule_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_pyclbr test_pydoc test_tools.test_i18n`:
+  `SUCCESS` in `3.0 sec`
+- clean-mainline focused tests:
+  `idlelib.idle_test.test_browser`:
+  `Ran 16 tests`, `OK (skipped=1)`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 20 sec`
+- stacked guardrail:
+  `check_pyclbr_readmodule_semantics.py`: `ok`
+- stacked focused tests:
+  `test_pyclbr test_pydoc test_tools.test_i18n`:
+  `SUCCESS` in `3.0 sec`
+- stacked focused tests:
+  `idlelib.idle_test.test_browser`:
+  `Ran 16 tests`, `OK (skipped=1)`
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 57 sec`
+
+What we learned:
+
+- the useful leverage was not another importlib/spec micro-optimization.
+  `pyclbr` time was dominated by AST visitor work and eager import scanning, so
+  the winning archetype was a small common-case split around top-level plain
+  imports
+- deferring only the simple `import mod` case was enough to capture the real
+  workloads that mattered (`pydoc`, `pickle`, `random`) without widening the
+  semantics surface
+- alias and dotted plain-import superclass resolution are already unresolved in
+  baseline pyclbr. Keeping those unchanged made this a safe, reviewable winner
