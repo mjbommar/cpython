@@ -32,6 +32,7 @@ def _object_name(obj):
 _thread = None
 _warnings = None
 _weakref = None
+_module_type = None
 
 # Import done by _install_external_importers()
 _bootstrap_external = None
@@ -1212,7 +1213,7 @@ def _find_and_load_unlocked(name, import_):
         getattr(sys, "meta_path", None),
         getattr(sys, "path_hooks", None)
     )
-    parent = name.rpartition('.')[0]
+    parent, _, child = name.rpartition('.')
     parent_spec = None
     if parent:
         if parent not in sys.modules:
@@ -1234,7 +1235,6 @@ def _find_and_load_unlocked(name, import_):
         module = sys.modules.get(name)
         if module is not None:
             return module
-        child = name.rpartition('.')[2]
     spec = _find_spec(name, path)
     if spec is None:
         raise ModuleNotFoundError(f'{_ERR_MSG_PREFIX}{name!r}', name=name)
@@ -1274,6 +1274,11 @@ def _find_and_load(name, import_):
     # Optimization: we avoid unneeded module locking if the module
     # already exists in sys.modules and is fully initialized.
     module = sys.modules.get(name, _NEEDS_LOADING)
+    if type(module) is _module_type:
+        spec = module.__spec__
+        if spec is None or type(spec) is ModuleSpec:
+            if not getattr(spec, "_initializing", False):
+                return module
     if (module is _NEEDS_LOADING or
         getattr(getattr(module, "__spec__", None), "_initializing", False)):
         with _ModuleLockManager(name):
@@ -1433,14 +1438,14 @@ def _setup(sys_module, _imp_module):
     modules, those two modules must be explicitly passed in.
 
     """
-    global _imp, sys, _blocking_on
+    global _imp, sys, _blocking_on, _module_type
     _imp = _imp_module
     sys = sys_module
+    _module_type = type(sys)
 
     # Set up the spec for existing builtin/frozen modules.
-    module_type = type(sys)
     for name, module in sys.modules.items():
-        if isinstance(module, module_type):
+        if isinstance(module, _module_type):
             if name in sys.builtin_module_names:
                 loader = BuiltinImporter
             elif _imp.is_frozen(name):
