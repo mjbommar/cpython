@@ -258,6 +258,49 @@ Direct `get_code()` panel result
 
 - `G1_timestamp_pyc_hit`: `-5.93%`
 - `G2_unchecked_hash_pyc_hit`: `-4.53%`
+
+## 2026-04-23 update: pure-Python JSON `JSONObject()` direct-dict path
+
+Accepted and cherry-picked commit:
+
+- `82e23d571c7` / `5a988a0db2a`
+  `perf: speed up pure Python JSON object decode`
+
+Validation:
+
+- clean-mainline branch `exp-json/pure-decoder-mainline` passed
+  `./python -m test test_json`: `226` tests, `3` skipped,
+  `SUCCESS` in `4.1 sec`
+- clean-mainline branch passed `./python -m test -j0`:
+  `49,881` tests run, `2,623` skipped, `SUCCESS` in `4 min 31 sec`
+- stacked branch passed `./python -m test test_json`:
+  `226` tests, `3` skipped, `SUCCESS` in `4.1 sec`
+- stacked branch passed `./python -m test -j0`:
+  `49,892` tests run, `2,621` skipped, `SUCCESS` in `4 min 33 sec`
+
+Clean-mainline pure-decoder panel result
+(`json-pure-decoder-baseline*.json` vs `json-pure-decoder-candidate*.json`,
+two-run average):
+
+- `P1_decode_line`: `+3.03%`
+- `P2_decode_nested`: `+8.67%`
+- `P3_raw_decode_whitespace`: `+3.34%`
+- `P4_object_direct_large`: `+1.61%`
+- `P5_object_direct_duplicate`: `+5.63%`
+- `P6_object_pairs_hook`: `+0.49%`
+- geometric mean: about `+3.76%`
+
+What we learned:
+
+- the pure-Python JSON fallback still has a worthwhile internal hot path
+  even after the larger C-backed JSON work
+- the winning simplification is narrow and semantics-preserving:
+  `JSONObject()` now constructs the result dict directly in the common
+  `object_pairs_hook is None` case instead of building a list of pairs
+  and converting it with `dict(pairs)` at the end
+- a more aggressive split-loop rewrite was tested and rejected because
+  it did not beat the simpler version enough to justify the added code
+  complexity
 - `G3_checked_hash_pyc_hit`: `-3.92%`
 - `G4_source_compile_no_write`: `+0.82%`
 - `G5_stale_timestamp_pyc`: `-2.13%`
