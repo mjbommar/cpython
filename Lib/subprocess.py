@@ -809,6 +809,18 @@ _USE_POSIX_SPAWN = _use_posix_spawn()
 _HAVE_POSIX_SPAWN_CLOSEFROM = hasattr(os, 'POSIX_SPAWN_CLOSEFROM')
 
 
+def _get_posix_spawn_setsigdef():
+    sigset = []
+    for signame in ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ'):
+        signum = getattr(signal, signame, None)
+        if signum is not None:
+            sigset.append(signum)
+    return sigset
+
+
+_POSIX_SPAWN_SETSIGDEF = _get_posix_spawn_setsigdef()
+
+
 class Popen:
     """ Execute a child program in a new process.
 
@@ -1354,6 +1366,16 @@ class Popen:
         # self._devnull is not always defined.
         devnull_fd = getattr(self, '_devnull', None)
 
+        # The common spawn path has no inherited pipe/devnull descriptors to
+        # clean up, so avoid building an ExitStack that would stay empty.
+        if (not _mswindows
+                and devnull_fd is None
+                and (p2cread == -1 or p2cwrite == -1)
+                and (c2pread == -1 or c2pwrite == -1)
+                and (errread == -1 or errwrite == -1)):
+            self._closed_child_pipe_fds = True
+            return
+
         with contextlib.ExitStack() as stack:
             if _mswindows:
                 if p2cread != -1:
@@ -1844,12 +1866,7 @@ class Popen:
             kwargs = {}
             if restore_signals:
                 # See _Py_RestoreSignals() in Python/pylifecycle.c
-                sigset = []
-                for signame in ('SIGPIPE', 'SIGXFZ', 'SIGXFSZ'):
-                    signum = getattr(signal, signame, None)
-                    if signum is not None:
-                        sigset.append(signum)
-                kwargs['setsigdef'] = sigset
+                kwargs['setsigdef'] = _POSIX_SPAWN_SETSIGDEF
 
             file_actions = []
             for fd in (p2cwrite, c2pread, errread):
@@ -1910,8 +1927,15 @@ class Popen:
 
             sys.audit("subprocess.Popen", executable, args, cwd, env)
 
+            if isinstance(executable, str):
+                executable_has_dir = '/' in executable
+            elif isinstance(executable, bytes):
+                executable_has_dir = b'/' in executable
+            else:
+                executable_has_dir = os.path.dirname(executable)
+
             if (_USE_POSIX_SPAWN
-                    and os.path.dirname(executable)
+                    and executable_has_dir
                     and preexec_fn is None
                     and (not close_fds or _HAVE_POSIX_SPAWN_CLOSEFROM)
                     and not pass_fds
