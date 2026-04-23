@@ -925,3 +925,57 @@ What we learned:
   even for a pure-Python stdlib patch, because `test_inspect` surfaced the
   usual mixed-origin artifact; the correct acceptance gate was a built clean
   worktree, which stayed green and then stacked cleanly as well
+
+## 2026-04-23 update: venv paths snapshot
+
+Accepted and cherry-picked commit:
+
+- `b2584c6e64b` / `c6de2567c3b`
+  `venv: cache venv sysconfig paths`
+
+Clean-mainline focused result:
+
+- `bench_venv_paths.py` imported-stdlib proof:
+  - `V1_light_create`: `+74.23%`
+  - `V2_real_create_symlinks`: `+33.66%`
+  - `V3_real_create_copies`: `+2.72%`
+  - focused-harness geomean: about `+33.74%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_venv_paths_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_venv test_ensurepip`:
+  `SUCCESS` in `4.1 sec`
+- clean-mainline focused tests:
+  `test_site test_cmd_line test_cmd_line_script`:
+  `SUCCESS` in `4.4 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 19 sec`
+- stacked guardrail:
+  `check_venv_paths_semantics.py`: `ok`
+- stacked focused tests:
+  `test_venv test_ensurepip`:
+  `SUCCESS` in `4.0 sec`
+- stacked focused tests:
+  `test_site test_cmd_line test_cmd_line_script`:
+  `SUCCESS` in `4.5 sec`
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 16 sec`
+
+What we learned:
+
+- this was a good fit for the `precomputed snapshot of immutable state`
+  archetype: `EnvBuilder.ensure_directories()` was recomputing the same
+  `sysconfig` mapping three times for one env dir, and collapsing that into a
+  single `get_paths()` call produced a durable win with no semantic drift
+- the win is highly shape-dependent: light or symlink-heavy env creation gets
+  a large benefit, while copy-heavy creation is only modestly faster because
+  filesystem work dominates once the Python overhead becomes a smaller share
+- `PYTHONPATH`-based validation was useful for benchmark proof but not for
+  acceptance. `test_venv` exposed the same mixed-origin pitfall seen in other
+  families, so the trustworthy gate was a fully built clean worktree and then a
+  stacked full-suite rerun
