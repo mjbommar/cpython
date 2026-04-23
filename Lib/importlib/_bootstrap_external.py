@@ -1336,9 +1336,17 @@ class FileFinder:
             self.path = _os.getcwd()
         else:
             self.path = _path_abspath(path)
+        if self.path.endswith(path_sep_tuple):
+            self._path_prefix = self.path
+        else:
+            self._path_prefix = self.path + path_sep
         self._path_mtime = -1
         self._path_cache = set()
+        self._path_file_cache = set()
+        self._path_dir_cache = set()
         self._relaxed_path_cache = set()
+        self._relaxed_file_cache = set()
+        self._relaxed_dir_cache = set()
 
     def invalidate_caches(self):
         """Invalidate the directory mtime."""
@@ -1366,33 +1374,34 @@ class FileFinder:
         # tail_module keeps the original casing, for __file__ and friends
         if _relax_case():
             cache = self._relaxed_path_cache
+            file_cache = self._relaxed_file_cache
+            dir_cache = self._relaxed_dir_cache
             cache_module = tail_module.lower()
         else:
             cache = self._path_cache
+            file_cache = self._path_file_cache
+            dir_cache = self._path_dir_cache
             cache_module = tail_module
         # Check if the module is the name of a directory (and thus a package).
-        if cache_module in cache:
-            base_path = _path_join(self.path, tail_module)
+        if cache_module in dir_cache:
+            base_path = self._path_prefix + tail_module
             for suffix, loader_class in self._loaders:
                 init_filename = '__init__' + suffix
-                full_path = _path_join(base_path, init_filename)
+                full_path = base_path + path_sep + init_filename
                 if _path_isfile(full_path):
                     return self._get_spec(loader_class, fullname, full_path, [base_path], target)
             else:
                 # If a namespace package, return the path if we don't
                 #  find a module in the next section.
-                is_namespace = _path_isdir(base_path)
+                is_namespace = True
         # Check for a file w/ a proper suffix exists.
         for suffix, loader_class in self._loaders:
-            try:
-                full_path = _path_join(self.path, tail_module + suffix)
-            except ValueError:
-                return None
+            filename = cache_module + suffix
+            full_path = self._path_prefix + tail_module + suffix
             _bootstrap._verbose_message('trying {}', full_path, verbosity=2)
-            if cache_module + suffix in cache:
-                if _path_isfile(full_path):
-                    return self._get_spec(loader_class, fullname, full_path,
-                                          None, target)
+            if filename in file_cache:
+                return self._get_spec(loader_class, fullname, full_path,
+                                      None, target)
         if is_namespace:
             _bootstrap._verbose_message('possible namespace for {}', base_path)
             spec = _bootstrap.ModuleSpec(fullname, None)
@@ -1404,15 +1413,35 @@ class FileFinder:
         """Fill the cache of potential modules and packages for this directory."""
         path = self.path
         try:
-            contents = _os.listdir(path or _os.getcwd())
+            contents = list(_os.scandir(path or _os.getcwd()))
         except (FileNotFoundError, PermissionError, NotADirectoryError):
             # Directory has either been removed, turned into a file, or made
             # unreadable.
             contents = []
+        path_cache = set()
+        file_cache = set()
+        dir_cache = set()
+        for entry in contents:
+            name = entry.name
+            try:
+                is_dir = entry.is_dir()
+            except OSError:
+                is_dir = False
+            try:
+                is_file = entry.is_file()
+            except OSError:
+                is_file = False
+            path_cache.add(name)
+            if is_dir:
+                dir_cache.add(name)
+            if is_file:
+                file_cache.add(name)
         # We store two cached versions, to handle runtime changes of the
         # PYTHONCASEOK environment variable.
         if not sys.platform.startswith('win'):
-            self._path_cache = set(contents)
+            self._path_cache = path_cache
+            self._path_file_cache = file_cache
+            self._path_dir_cache = dir_cache
         else:
             # Windows users can import modules with case-insensitive file
             # suffixes (for legacy reasons). Make the suffix lowercase here
@@ -1420,16 +1449,26 @@ class FileFinder:
             # the specified suffixes to check against are always specified in a
             # case-sensitive manner.
             lower_suffix_contents = set()
-            for item in contents:
+            lower_suffix_files = set()
+            lower_suffix_dirs = set()
+            for item in path_cache:
                 name, dot, suffix = item.partition('.')
                 if dot:
                     new_name = f'{name}.{suffix.lower()}'
                 else:
                     new_name = name
                 lower_suffix_contents.add(new_name)
+                if item in file_cache:
+                    lower_suffix_files.add(new_name)
+                if item in dir_cache:
+                    lower_suffix_dirs.add(new_name)
             self._path_cache = lower_suffix_contents
+            self._path_file_cache = lower_suffix_files
+            self._path_dir_cache = lower_suffix_dirs
         if sys.platform.startswith(_CASE_INSENSITIVE_PLATFORMS):
-            self._relaxed_path_cache = {fn.lower() for fn in contents}
+            self._relaxed_path_cache = {fn.lower() for fn in path_cache}
+            self._relaxed_file_cache = {fn.lower() for fn in file_cache}
+            self._relaxed_dir_cache = {fn.lower() for fn in dir_cache}
 
     @classmethod
     def path_hook(cls, *loader_details):
