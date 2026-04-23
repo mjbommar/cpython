@@ -91,7 +91,17 @@ class Handle:
 
     def _run(self):
         try:
-            self._context.run(self._callback, *self._args)
+            callback = self._callback
+            args = self._args
+            ctx = self._context
+            if not args:
+                ctx.run(callback)
+            elif len(args) == 1:
+                ctx.run(callback, args[0])
+            elif len(args) == 2:
+                ctx.run(callback, args[0], args[1])
+            else:
+                ctx.run(callback, *args)
         except (SystemExit, KeyboardInterrupt):
             raise
         except BaseException as exc:
@@ -107,6 +117,7 @@ class Handle:
             if self._source_traceback:
                 context['source_traceback'] = self._source_traceback
             self._loop.call_exception_handler(context)
+        callback = args = ctx = None
         self = None  # Needed to break cycles when an exception occurs.
 
 # _ThreadSafeHandle is used for callbacks scheduled with call_soon_threadsafe
