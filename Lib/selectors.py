@@ -399,6 +399,23 @@ class _PollLikeSelector(_BaseSelectorImpl):
         except InterruptedError:
             return ready
 
+        if not fd_event_list:
+            return ready
+
+        if len(fd_event_list) == 1:
+            fd, event = fd_event_list[0]
+            key = self._fd_to_key.get(fd)
+            if key:
+                if event == self._EVENT_READ:
+                    events = EVENT_READ
+                elif event == self._EVENT_WRITE:
+                    events = EVENT_WRITE
+                else:
+                    events = ((event & ~self._EVENT_READ and EVENT_WRITE)
+                               | (event & ~self._EVENT_WRITE and EVENT_READ))
+                ready.append((key, events & key.events))
+            return ready
+
         fd_to_key_get = self._fd_to_key.get
         for fd, event in fd_event_list:
             key = fd_to_key_get(fd)
