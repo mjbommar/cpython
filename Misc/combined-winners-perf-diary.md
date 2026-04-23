@@ -19,6 +19,7 @@ the wins stack cleanly enough to justify a broader prototype branch.
 - `exp-uuid/c-fastpath`
 - `exp-unicode/joinarray-fastpaths`
 - `exp-ceval/initialize-locals-fastpath`
+- `exp-importlib/file-dir-cache-mainline`
 
 ### Deliberately excluded
 
@@ -114,3 +115,42 @@ Keep this branch as an integration prototype, not as a PR candidate.
   once the larger changes are in place, so branch-level filing
   decisions should still be made per family rather than by this
   aggregate branch alone.
+
+## 2026-04-22 update: importlib `FileFinder` cache split
+
+Accepted and cherry-picked commit:
+
+- `45dc9000986` / `d7572b84494`
+  `perf: cache FileFinder file and directory entries`
+
+Validation:
+
+- clean-mainline branch `exp-importlib/file-dir-cache-mainline` passed
+  `./python -m test -q -j8`: `49,882` tests, `491/502` files,
+  `SUCCESS` in `4 min 19 sec`
+- stacked branch passed focused import tests after the cherry-pick:
+  `test_importlib`, `test_import`, `test_zipimport`, `test_pkgutil`,
+  and `test_runpy`
+
+Stacked import panel result
+(`baseline-e3-guardrails.json` vs `stacked-after-importlib-e3.json`):
+
+- `I1_top_level_source`: `-4.33%`
+- `I2_top_level_pyc`: `-10.44%`
+- `I3_package_child_source`: `-4.93%`
+- `I4_package_child_pyc`: `-5.23%`
+- `I5_loaded_hit_top_level`: `+2.37%`
+- `I6_find_spec_package_child`: `-5.28%`
+- `I7_find_spec_missing_cold`: `-14.00%`
+- `I8_find_spec_missing_warm`: `-21.33%`
+- geometric mean: about `-8.15%`
+
+What we learned:
+
+- the importlib candidate stacks well in the integration branch, even
+  though the clean-mainline package-child scenarios were noisier
+- the biggest durable wins come from repeated `find_spec` and
+  missing-module paths, where avoiding positive-hit restats and repeated
+  mode checks matters
+- already-loaded imports do not benefit, as expected, because they
+  return before `FileFinder`
