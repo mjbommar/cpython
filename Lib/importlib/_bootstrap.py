@@ -489,6 +489,8 @@ def _call_with_frames_removed(f, *args, **kwds):
     frames introduces unwanted noise into the traceback (e.g. when executing
     module code)
     """
+    if not kwds:
+        return f(*args)
     return f(*args, **kwds)
 
 
