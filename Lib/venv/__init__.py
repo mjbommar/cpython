@@ -172,9 +172,13 @@ class EnvBuilder:
         context.executable = executable
         context.python_dir = dirname
         context.python_exe = exename
-        binpath = self._venv_path(env_dir, 'scripts')
-        libpath = self._venv_path(env_dir, 'purelib')
-        platlibpath = self._venv_path(env_dir, 'platlib')
+        paths = sysconfig.get_paths(
+            scheme='venv',
+            vars={'base': env_dir, 'platbase': env_dir},
+        )
+        binpath = paths['scripts']
+        libpath = paths['purelib']
+        platlibpath = paths['platlib']
 
         # PEP 405 says venvs should create a local include directory.
         # See https://peps.python.org/pep-0405/#include-files
