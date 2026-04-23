@@ -565,3 +565,59 @@ What we learned:
 - the winning patch is therefore intentionally small: preserve the contract,
   but materialize the tuple list directly inside the `os.scandir()` context
   instead of `list(scandir_it)` plus a generator expression
+
+## 2026-04-23 update: exact `_pickle` dump/load hook fast path
+
+Accepted and cherry-picked commit:
+
+- `a469fc615e6` / `089b1d72a88`
+  `perf: speed up exact _pickle dump and load hooks`
+
+Clean-mainline result:
+
+- exact-type two-run average:
+  - `P1_dump_none_exact`: `+117.09%`
+  - `P2_dump_small_list_exact`: `+64.99%`
+  - `P3_dump_nested_exact`: `+7.18%`
+  - `P4_load_none_exact`: `+18.10%`
+  - `P5_load_small_list_exact`: `+6.53%`
+  - `P6_load_nested_exact`: `-1.03%`
+  - geometric mean: `+29.79%`
+- broader mixed-stream exact benchmark:
+  - `B1_dump_stream_mixed_exact`: `+91.61%`
+  - `B2_load_stream_mixed_exact`: `+3.56%`
+  - `B3_roundtrip_stream_mixed_exact`: `+33.65%`
+  - geometric mean: `+38.42%`
+
+Validation:
+
+- clean-mainline guardrails: passed
+- clean-mainline focused tests:
+  `test_pickle test_picklebuffer test_copy test_copyreg test_shelve
+  test_multiprocessing_spawn`, `2,047` tests, `129` skipped,
+  `SUCCESS` in `1 min 33 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,603` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 32 sec`
+- stacked focused tests:
+  same 9-file bundle, `2,047` tests, `129` skipped,
+  `SUCCESS` in `1 min 31 sec`
+- stacked full suite:
+  `49,892` tests, `2,600` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 29 sec`
+
+What we learned:
+
+- the top-25 `_pickle` wrapper lines were actionable, not just a proxy for
+  deeper container work: exact built-in `Pickler.dump()` and
+  `Unpickler.load()` were still paying measurable hook-resolution overhead
+- the winning shape is exact-type specialization, not broader control-flow
+  surgery: exact built-in `Pickler` skips `persistent_id` and
+  `reducer_override` lookup work when there is no override, and exact
+  built-in `Unpickler` skips `persistent_load` lookup work until a
+  persistent-id opcode actually appears
+- subclass and explicit instance-override semantics stay on the original path;
+  guardrails covered both exact-instance hook override and subclass override
+- the first baseline taken against a separately built binary overstated the
+  result; the accepted numbers came only from stricter same-worktree revert /
+  rebuild / benchmark / reapply / rebuild / benchmark cycles
