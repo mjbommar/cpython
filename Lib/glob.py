@@ -545,8 +545,7 @@ class _StringGlobber(_GlobberBase):
         # We must close the scandir() object before proceeding to
         # avoid exhausting file descriptors when globbing deep trees.
         with os.scandir(path) as scandir_it:
-            entries = list(scandir_it)
-        return ((entry, entry.name, entry.path) for entry in entries)
+            return [(entry, entry.name, entry.path) for entry in scandir_it]
 
     @staticmethod
     def stringify_path(path):
