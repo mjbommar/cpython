@@ -272,3 +272,41 @@ What we learned:
   changed private helper signatures and measured slightly slower overall
 - most remaining `get_code()` cost is real work: filesystem reads,
   `marshal.loads`, source hashing, and `compile()`
+
+## 2026-04-22 update: asyncio `Handle._run()` arity fast path
+
+Accepted and cherry-picked commit:
+
+- `4a4bbfb2c6e` / `47b2a77f184`
+  `perf: specialize asyncio Handle callback arity`
+
+Validation:
+
+- clean-mainline branch `exp-asyncio/handle-run-mainline` passed full
+  `test_asyncio`: `2,708` tests, `SUCCESS` in `1 min 31 sec`
+- clean-mainline branch passed `./python -m test -q -j8`:
+  `49,882` tests, `491/502` files, `SUCCESS` in `4 min 19 sec`
+- stacked branch passed full `test_asyncio` after the cherry-pick:
+  `2,708` tests, `SUCCESS` in `1 min 31 sec`
+
+Final asyncio handle panel result
+(`/tmp/asyncio-handle-baseline-v2.json` vs
+`/tmp/asyncio-handle-candidate-e5.json`):
+
+- `A1_direct_noargs`: `-35.22%`
+- `A2_direct_onearg`: `-29.30%`
+- `A3_direct_twoargs`: `-18.95%`
+- `A4_direct_mixed_70_20_10`: `-29.93%`
+- `A5_run_once_ready_noargs`: `-12.47%`
+- `A6_run_once_ready_onearg`: `-9.79%`
+- `A7_run_once_ready_mixed_70_20_10`: `-12.57%`
+- geometric mean: about `-21.75%`
+
+What we learned:
+
+- avoiding `*args` expansion in `Handle._run()` is a large direct win,
+  but only if common arities are handled together
+- a no-args-only branch regressed one-arg callbacks; the accepted shape
+  handles 0, 1, and 2 args before falling back to the original star call
+- local bindings in this method must be explicitly cleared to preserve
+  asyncio task/future refcycle behavior
