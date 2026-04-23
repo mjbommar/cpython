@@ -301,6 +301,49 @@ What we learned:
 - a more aggressive split-loop rewrite was tested and rejected because
   it did not beat the simpler version enough to justify the added code
   complexity
+
+## 2026-04-23 update: pure-Python JSON scanner literal fast path
+
+Accepted and cherry-picked commit:
+
+- `38baaf19aea` / `dc800fc1ecb`
+  `perf: speed up pure Python JSON scanner`
+
+Validation:
+
+- clean-mainline branch `exp-json/pure-scanner-mainline` passed
+  `./python -m test test_json`: `226` tests, `3` skipped,
+  `SUCCESS` in `4.1 sec`
+- clean-mainline branch passed `./python -m test -j0`:
+  `49,882` tests run, `2,623` skipped, `SUCCESS` in `4 min 35 sec`
+- stacked branch passed `./python -m test test_json`:
+  `226` tests, `3` skipped, `SUCCESS` in `4.1 sec`
+- stacked branch passed `./python -m test -j0`:
+  `49,892` tests run, `2,621` skipped, `SUCCESS` in `4 min 33 sec`
+
+Clean-mainline pure-scanner panel result
+(`json-pure-scanner-baseline*.json` vs `json-pure-scanner-candidate*.json`,
+two-run average):
+
+- `S1_scan_constants`: `+13.55%`
+- `S2_scan_numbers`: `-0.05%`
+- `S3_scan_array`: `+0.83%`
+- `S4_scan_object`: `+1.20%`
+- `S5_decode_line`: `-0.66%`
+- `S6_decode_nested`: `+1.98%`
+- geometric mean: about `+2.70%`
+
+What we learned:
+
+- the durable scanner win is in removing wasted regex work for special
+  constants, not in making the whole dispatch ladder more aggressive
+- the accepted patch binds `memo.clear()` once, uses `startswith()` for
+  the literal probes, skips the regex for `NaN` and `Infinity`, keeps
+  `-Infinity` after the regex so normal negative numbers stay flat, and
+  passes the matched slice directly to `parse_float()`
+- a broader first attempt that also short-circuited more token families
+  before the regex was rejected because it regressed normal
+  negative-number and line-decode paths
 - `G3_checked_hash_pyc_hit`: `-3.92%`
 - `G4_source_compile_no_write`: `+0.82%`
 - `G5_stale_timestamp_pyc`: `-2.13%`
