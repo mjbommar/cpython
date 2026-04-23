@@ -805,3 +805,123 @@ What we learned:
 - the interrupted cherry-pick turned out to be an empty replay of an already
   stacked commit, so the real remaining work was validation and control-plane
   cleanup, not another code promotion
+
+## 2026-04-23 update: multiprocessing `Connection._recv()` small-read fast path
+
+Accepted and cherry-picked commit:
+
+- `8fb4f02031e` / `77860e91ae4`
+  `multiprocessing: fast-path small Connection._recv reads`
+
+Clean-mainline focused result:
+
+- `recv_header4_onechunk`:
+  `663.1 -> 603.7 ns` (`+9.84%`)
+- `recv_header8_onechunk`:
+  `635.6 -> 598.8 ns` (`+6.15%`)
+- `recv_payload128_onechunk`:
+  `680.0 -> 594.3 ns` (`+14.42%`)
+- `recv_header4_twopart`:
+  `973.8 -> 986.9 ns` (`-1.33%`)
+- `recv_payload128_twopart`:
+  `1000.2 -> 977.7 ns` (`+2.30%`)
+- `recv_large_70k_twopart`:
+  `7311.4 -> 7202.2 ns` (`+1.52%`)
+- focused-harness geomean: about `+5.35%`
+
+Validation:
+
+- clean-mainline guardrails:
+  `check_connection_recv_semantics.py` passed
+- clean-mainline focused tests:
+  `test_multiprocessing_fork test_multiprocessing_spawn
+  test_multiprocessing_forkserver test_multiprocessing_main_handling`:
+  `1,391` tests, `199` skipped, `SUCCESS` in `1 min 17 sec`
+- clean-mainline focused tests:
+  `test_concurrent_futures.test_process_pool test_queue`:
+  `280` tests, `15` skipped, `SUCCESS` in `30.9 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 16 sec`
+- stacked guardrails:
+  `check_connection_recv_semantics.py` passed
+- stacked focused tests:
+  `test_multiprocessing_fork test_multiprocessing_spawn
+  test_multiprocessing_forkserver test_multiprocessing_main_handling`:
+  `1,391` tests, `199` skipped, `SUCCESS` in `1 min 17 sec`
+- stacked focused tests:
+  `test_concurrent_futures.test_process_pool test_queue`:
+  `280` tests, `15` skipped, `SUCCESS` in `30.2 sec`
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 17 sec`
+
+What we learned:
+
+- the leaf hotspot in `multiprocessing.connection.Connection._recv()` was
+  actionable because it fit the common-case split archetype rather than the
+  thin-wrapper anti-pattern: even small receives still paid a Python loop and
+  `BytesIO` setup tax
+- the initial fast path exposed a real semantic trap: `_recv()` callers rely
+  on the returned `BytesIO` cursor being positioned at EOF, so
+  `io.BytesIO(chunk)` alone was incorrect until the fast path restored the
+  cursor position with `seek(0, io.SEEK_END)`
+- the final win is modest but durable: the one-chunk path is meaningfully
+  faster, the fallback path stays close to flat, and the full clean and stacked
+  suites both remained green once validation moved from `PYTHONPATH` proof to a
+  fully built worktree interpreter
+
+## 2026-04-23 update: selectors poll-like select fast path
+
+Accepted and cherry-picked commit:
+
+- `6d8c89a2871` / `b8fc6a8c7fd`
+  `selectors: fast-path poll-like single ready events`
+
+Clean-mainline focused result:
+
+- imported-method `PollSelector.select()` harness:
+  - `P1_empty`: `+30.94%`
+  - `P2_one_read`: `+22.64%`
+  - `P3_one_write`: `+18.58%`
+  - `P4_one_readwrite`: `-0.08%`
+  - `P5_two_read`: `-2.93%`
+  - `P6_one_missing`: `+8.65%`
+  - focused-harness geomean: about `+12.31%`
+
+Validation:
+
+- clean-mainline focused tests:
+  `test_selectors test_socketserver`:
+  `test_selectors` passed; `test_socketserver` skipped because the
+  `network` resource was not enabled
+- clean-mainline focused tests:
+  `test_subprocess test.test_asyncio.test_subprocess`:
+  `SUCCESS` in `1 min 16 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,624` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 19 sec`
+- stacked focused tests:
+  `test_selectors test_socketserver`:
+  `test_selectors` passed; `test_socketserver` skipped because the
+  `network` resource was not enabled
+- stacked focused tests:
+  `test_subprocess test.test_asyncio.test_subprocess`:
+  `SUCCESS` in `1 min 17 sec`
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the current top-of-funnel signal was on `_PollLikeSelector.select`, not on
+  `EpollSelector.select`, and that distinction mattered: an older exact-mask
+  epoll experiment had already gone stale, while the poll-like empty/single
+  event structure still had durable headroom
+- the winning shape is a very small common-case split: return early on no
+  events, split out the single-ready-event case, and only add exact read/write
+  mask handling inside that one-event path
+- `PYTHONPATH`-only full-suite validation is not trustworthy for acceptance,
+  even for a pure-Python stdlib patch, because `test_inspect` surfaced the
+  usual mixed-origin artifact; the correct acceptance gate was a built clean
+  worktree, which stayed green and then stacked cleanly as well
