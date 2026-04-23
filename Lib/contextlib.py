@@ -110,9 +110,8 @@ class _GeneratorContextManagerBase:
         self.func, self.args, self.kwds = func, args, kwds
         # Issue 19330: ensure context manager instances have good docstrings
         doc = getattr(func, "__doc__", None)
-        if doc is None:
-            doc = type(self).__doc__
-        self.__doc__ = doc
+        if doc is not None:
+            self.__doc__ = doc
         # Unfortunately, this still doesn't provide good help output when
         # inspecting the created context manager instances, since pydoc
         # currently bypasses the instance docstring and shows the docstring
