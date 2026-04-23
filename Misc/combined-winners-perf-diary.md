@@ -310,3 +310,42 @@ What we learned:
   handles 0, 1, and 2 args before falling back to the original star call
 - local bindings in this method must be explicitly cleared to preserve
   asyncio task/future refcycle behavior
+
+## 2026-04-22 update: pathlib `PurePath.relative_to()`
+
+Accepted and cherry-picked commit:
+
+- `7f4aae53207` / `c3cfbeb4a07`
+  `perf: fast path PurePath.relative_to prefixes`
+
+Validation:
+
+- clean-mainline branch `exp-pathlib/relative-to-mainline` passed
+  `test_pathlib test_zipfile`: `1,752` tests, `SUCCESS` in `19.9 sec`
+- clean-mainline branch passed `./python -m test -q -j8`:
+  `49,882` tests, `491/502` files, `SUCCESS` in `4 min 14 sec`
+- stacked branch passed `test_pathlib test_zipfile` after the
+  cherry-pick
+
+Current pathlib panel result
+(`/tmp/pathlib-relative-baseline-current.json` vs
+`/tmp/pathlib-relative-candidate-current.json`):
+
+- `M1_posix_direct_prefix`: `-82.32%`
+- `M2_posix_string_prefix`: `-72.37%`
+- `M3_posix_walk_up`: `-1.77%`
+- `M4_posix_negative`: `-91.02%`
+- `M5_windows_direct_prefix_casefold`: `-60.44%`
+- `M6_windows_walk_up_casefold`: `-0.63%`
+- `R1_cpython_repo_positive`: `-74.70%`
+- `R2_cpython_repo_string_positive`: `-66.35%`
+- `R3_cpython_repo_walk_up`: `-2.23%`
+- geometric mean: about `-62.66%`
+
+What we learned:
+
+- the non-`walk_up` exact-type prefix case can avoid constructing and
+  comparing parent path objects entirely
+- the fast path must exclude subclasses that override equality
+- current `-j8` full-suite validation removed the older sequential
+  full-suite ambiguity around unrelated local failures
