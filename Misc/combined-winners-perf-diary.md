@@ -745,3 +745,63 @@ What we learned:
   real pure-Python hotspot, the prototype harness proved it, the clean branch
   validated it, and the stacked branch accepted it without needing broader
   subsystem surgery
+
+## 2026-04-23 update: subprocess POSIX-spawn setup fast path
+
+Accepted and cherry-picked commit:
+
+- `e01e5d63ae5` / `cc33c5b9547`
+  `perf: speed up subprocess posix spawn setup`
+
+Clean-mainline focused result:
+
+- `S1_posix_spawn_common`:
+  `0.046706s -> 0.025491s` (`+83.22%`)
+- `S2_posix_spawn_pipe_actions`:
+  `0.117136s -> 0.110570s` (`+5.94%`)
+- `S3_execute_child_common_str`:
+  `0.044770s -> 0.034505s` (`+29.75%`)
+- `S4_execute_child_common_bytes`:
+  `0.044604s -> 0.044669s` (`-0.15%`)
+- focused-harness geomean: about `+25.93%`
+
+Validation:
+
+- clean-mainline guardrails:
+  `guardrails.py` passed
+- clean-mainline focused tests:
+  `test_subprocess test_multiprocessing_spawn test_multiprocessing_fork
+  test_multiprocessing_forkserver test.test_asyncio.test_subprocess`:
+  `1,794` tests, `244` skipped, `SUCCESS` in `5 min`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 20 sec`
+- stacked focused tests:
+  `test_subprocess test.test_asyncio.test_subprocess`:
+  `442` tests, `45` skipped, `SUCCESS` in `1 min 21 sec`
+- stacked focused tests:
+  `test_multiprocessing_spawn test_multiprocessing_fork
+  test_multiprocessing_forkserver`:
+  `1,352` tests, `199` skipped, `SUCCESS` in `1 min 22 sec`
+- stacked guardrails:
+  `guardrails.py` passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `491/502` test files,
+  `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the broad regrtest profile signal around `popen_fork.py:Popen._launch` was
+  actionable: the common POSIX-spawn path still had measurable Python-side
+  setup overhead in `_posix_spawn()`, `_close_pipe_fds()`, and the executable
+  directory gate in `_execute_child()`
+- the winning shape is a bundle of very small common-path tightenings, not a
+  semantic rewrite: cache the restore-signals `setsigdef` list once, skip the
+  empty `_close_pipe_fds()` cleanup case, and avoid `os.path.dirname()` for
+  exact `str` / `bytes` executables
+- the bytes executable case is flat rather than meaningfully positive, but the
+  full family still wins comfortably because the common POSIX-spawn and exact
+  `str` paths dominate the measured panel
+- the interrupted cherry-pick turned out to be an empty replay of an already
+  stacked commit, so the real remaining work was validation and control-plane
+  cleanup, not another code promotion
