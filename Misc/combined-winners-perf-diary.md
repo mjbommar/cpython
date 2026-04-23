@@ -20,6 +20,7 @@ the wins stack cleanly enough to justify a broader prototype branch.
 - `exp-unicode/joinarray-fastpaths`
 - `exp-ceval/initialize-locals-fastpath`
 - `exp-importlib/file-dir-cache-mainline`
+- `exp-contextlib/doc-skip-mainline`
 
 ### Deliberately excluded
 
@@ -154,3 +155,40 @@ What we learned:
   mode checks matters
 - already-loaded imports do not benefit, as expected, because they
   return before `FileFinder`
+
+## 2026-04-22 update: contextlib doc assignment skip
+
+Accepted and cherry-picked commit:
+
+- `51a31b86447` / `fd70137e444`
+  `perf: skip redundant contextmanager doc assignment`
+
+Validation:
+
+- clean-mainline branch `exp-contextlib/doc-skip-mainline` passed
+  `./python -m test -q -j8`: `49,882` tests, `491/502` files,
+  `SUCCESS` in `4 min 15 sec`
+- stacked branch passed focused contextlib/doc tests after the
+  cherry-pick: `test_contextlib`, `test_pydoc`, and `test_inspect`
+
+Contextlib panel result
+(`mainline-baseline-docskip.json` vs `mainline-docskip.json`):
+
+- `C1_simple_with`: `-8.69%`
+- `C2_with_value`: `-8.13%`
+- `C3_swallow_value_error`: `-4.37%`
+- `C4_context_decorator`: `-5.88%`
+- `C5_docstring_cm`: `-1.22%`
+- geometric mean: about `-5.70%`
+
+What we learned:
+
+- the earlier contextlib local-binding ideas were noise; the accepted
+  win comes from avoiding one redundant instance-dict write per no-doc
+  `@contextmanager` construction
+- `cm.__doc__` remains the same through class lookup for no-doc
+  context managers, while custom function docstrings are still assigned
+  onto the instance
+- the only observable behavioral difference is that no-doc context
+  manager instances no longer carry a redundant `__doc__` key in
+  `cm.__dict__`
