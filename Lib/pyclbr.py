@@ -190,6 +190,19 @@ class _ModuleBrowser(ast.NodeVisitor):
         self.module = module
         self.inpackage = inpackage
         self.stack = []
+        self.deferred_imports = set()
+
+    def _scan_module(self, module_name):
+        try:
+            try:
+                _readmodule(module_name, self.path, self.inpackage)
+            except ImportError:
+                _readmodule(module_name, [])
+        except (ImportError, SyntaxError):
+            # If we can't find or parse the imported module,
+            # too bad -- don't die here.
+            return False
+        return True
 
     def visit_ClassDef(self, node):
         bases = []
@@ -202,6 +215,9 @@ class _ModuleBrowser(ast.NodeVisitor):
                 # Super class form is module.class:
                 # look in module for class.
                 *_, module, class_ = names
+                if module not in _modules and module in self.deferred_imports:
+                    self.deferred_imports.discard(module)
+                    self._scan_module(module)
                 if module in _modules:
                     bases.append(_modules[module].get(class_, name))
             else:
@@ -234,15 +250,12 @@ class _ModuleBrowser(ast.NodeVisitor):
             return
 
         for module in node.names:
-            try:
-                try:
-                    _readmodule(module.name, self.path, self.inpackage)
-                except ImportError:
-                    _readmodule(module.name, [])
-            except (ImportError, SyntaxError):
-                # If we can't find or parse the imported module,
-                # too bad -- don't die here.
+            # Defer the common "import mod" case until a later base-class
+            # lookup actually needs mod.Class resolution.
+            if module.asname is None and "." not in module.name:
+                self.deferred_imports.add(module.name)
                 continue
+            self._scan_module(module.name)
 
     def visit_ImportFrom(self, node):
         if node.col_offset != 0:
