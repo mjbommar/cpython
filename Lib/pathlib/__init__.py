@@ -485,19 +485,45 @@ class PurePath:
         """
         if not hasattr(other, 'with_segments'):
             other = self.with_segments(other)
-        parts = []
-        for path in chain([other], other.parents):
-            if path == self or path in self.parents:
+        if (
+            not walk_up
+            and type(self) is type(other)
+            and type(self).__eq__ is PurePath.__eq__
+            and self.parser is other.parser
+        ):
+            self_tail = self._tail
+            other_tail = other._tail
+            if self.parser is posixpath:
+                same_anchor = self.drive == other.drive and self.root == other.root
+                if same_anchor and other_tail == self_tail[:len(other_tail)]:
+                    parts = self_tail[len(other_tail):]
+                    return self._from_parsed_parts('', '', parts)
+            else:
+                same_anchor = (
+                    self.drive.lower() == other.drive.lower()
+                    and self.root.lower() == other.root.lower()
+                )
+                if same_anchor and len(other_tail) <= len(self_tail):
+                    for left, right in zip(other_tail, self_tail):
+                        if left.lower() != right.lower():
+                            break
+                    else:
+                        parts = self_tail[len(other_tail):]
+                        return self._from_parsed_parts('', '', parts)
+            if not same_anchor:
+                raise ValueError(f"{str(self)!r} and {str(other)!r} have different anchors")
+            raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+        self_parents = self.parents
+        for step, path in enumerate(chain((other,), other.parents)):
+            if path == self or path in self_parents:
                 break
             elif not walk_up:
                 raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
             elif path.name == '..':
                 raise ValueError(f"'..' segment in {str(other)!r} cannot be walked")
-            else:
-                parts.append('..')
         else:
             raise ValueError(f"{str(self)!r} and {str(other)!r} have different anchors")
-        parts.extend(self._tail[len(path._tail):])
+        parts = ['..'] * step + self._tail[len(path._tail):]
         return self._from_parsed_parts('', '', parts)
 
     def is_relative_to(self, other):
