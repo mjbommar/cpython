@@ -4744,25 +4744,37 @@ dump(PickleState *state, PicklerObject *self, PyObject *obj)
     int status = -1;
     PyObject *tmp;
 
-    /* Cache the persistent_id method. */
-    tmp = PyObject_GetAttr((PyObject *)self, &_Py_ID(persistent_id));
-    if (tmp == NULL) {
-        goto error;
-    }
-    if (PyCFunction_Check(tmp) &&
-        PyCFunction_GET_SELF(tmp) == (PyObject *)self &&
-        PyCFunction_GET_FUNCTION(tmp) == persistent_id)
+    if (Py_IS_TYPE((PyObject *)self, state->Pickler_Type) &&
+        self->persistent_id_attr == NULL)
     {
-        Py_CLEAR(tmp);
+        Py_CLEAR(self->persistent_id);
     }
-    Py_XSETREF(self->persistent_id, tmp);
+    else {
+        /* Cache the persistent_id method. */
+        tmp = PyObject_GetAttr((PyObject *)self, &_Py_ID(persistent_id));
+        if (tmp == NULL) {
+            goto error;
+        }
+        if (PyCFunction_Check(tmp) &&
+            PyCFunction_GET_SELF(tmp) == (PyObject *)self &&
+            PyCFunction_GET_FUNCTION(tmp) == persistent_id)
+        {
+            Py_CLEAR(tmp);
+        }
+        Py_XSETREF(self->persistent_id, tmp);
+    }
 
     /* Cache the reducer_override method, if it exists. */
-    if (PyObject_GetOptionalAttr((PyObject *)self, &_Py_ID(reducer_override),
-                             &tmp) < 0) {
-        goto error;
+    if (Py_IS_TYPE((PyObject *)self, state->Pickler_Type)) {
+        Py_CLEAR(self->reducer_override);
     }
-    Py_XSETREF(self->reducer_override, tmp);
+    else {
+        if (PyObject_GetOptionalAttr((PyObject *)self, &_Py_ID(reducer_override),
+                                 &tmp) < 0) {
+            goto error;
+        }
+        Py_XSETREF(self->reducer_override, tmp);
+    }
 
     if (self->proto >= 2) {
         char header[2];
@@ -6328,6 +6340,13 @@ load_persid(PickleState *st, UnpicklerObject *self)
         return -1;
     }
 
+    if (self->persistent_load == NULL) {
+        Py_DECREF(pid);
+        PyErr_SetString(st->UnpicklingError,
+                        "A load persistent id instruction was encountered, "
+                        "but no persistent_load function was specified.");
+        return -1;
+    }
     obj = PyObject_CallOneArg(self->persistent_load, pid);
     Py_DECREF(pid);
     if (obj == NULL)
@@ -6346,6 +6365,13 @@ load_binpersid(PickleState *st, UnpicklerObject *self)
     if (pid == NULL)
         return -1;
 
+    if (self->persistent_load == NULL) {
+        Py_DECREF(pid);
+        PyErr_SetString(st->UnpicklingError,
+                        "A load persistent id instruction was encountered, "
+                        "but no persistent_load function was specified.");
+        return -1;
+    }
     obj = PyObject_CallOneArg(self->persistent_load, pid);
     Py_DECREF(pid);
     if (obj == NULL)
@@ -7062,7 +7088,6 @@ static PyObject *
 load(PickleState *st, UnpicklerObject *self)
 {
     PyObject *value = NULL;
-    PyObject *tmp;
     char *s = NULL;
 
     self->num_marks = 0;
@@ -7071,13 +7096,6 @@ load(PickleState *st, UnpicklerObject *self)
     self->proto = 0;
     if (Py_SIZE(self->stack))
         Pdata_clear(self->stack, 0);
-
-    /* Cache the persistent_load method. */
-    tmp = PyObject_GetAttr((PyObject *)self, &_Py_ID(persistent_load));
-    if (tmp == NULL) {
-        goto error;
-    }
-    Py_XSETREF(self->persistent_load, tmp);
 
     /* Convenient macros for the dispatch while-switch loop just below. */
 #define OP(opcode, load_func) \
@@ -7240,6 +7258,7 @@ _pickle_Unpickler_load_impl(UnpicklerObject *self, PyTypeObject *cls)
 /*[clinic end generated code: output=cc88168f608e3007 input=f5d2f87e61d5f07f]*/
 {
     PickleState *st = _Pickle_GetStateByClass(cls);
+    PyObject *tmp;
 
     /* Check whether the Unpickler was initialized correctly. This prevents
        segfaulting if a subclass overridden __init__ with a function that does
@@ -7250,6 +7269,19 @@ _pickle_Unpickler_load_impl(UnpicklerObject *self, PyTypeObject *cls)
                      "Unpickler.__init__() was not called by %s.__init__()",
                      Py_TYPE(self)->tp_name);
         return NULL;
+    }
+    if (Py_IS_TYPE((PyObject *)self, st->Unpickler_Type) &&
+        self->persistent_load_attr == NULL)
+    {
+        Py_CLEAR(self->persistent_load);
+    }
+    else {
+        /* Cache the persistent_load method. */
+        tmp = PyObject_GetAttr((PyObject *)self, &_Py_ID(persistent_load));
+        if (tmp == NULL) {
+            return NULL;
+        }
+        Py_XSETREF(self->persistent_load, tmp);
     }
     BEGIN_USING_UNPICKLER(self, NULL);
     PyObject *res = load(st, self);
