@@ -50,7 +50,11 @@ UNBOUND = _crossinterp.UnboundItem.singleton('queue', __name__)
 
 
 def _serialize_unbound(unbound):
-    if unbound is UNBOUND:
+    # importlib.reload(_queues) can leave older create_queue aliases alive
+    # with a stale queue-specific UNBOUND singleton as the default argument.
+    # Normalize any queue-style UnboundItem back to the shared crossinterp
+    # sentinel before encoding it.
+    if unbound is UNBOUND or isinstance(unbound, _crossinterp.UnboundItem):
         unbound = _crossinterp.UNBOUND
     return _crossinterp.serialize_unbound(unbound)
 
