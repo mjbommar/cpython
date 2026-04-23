@@ -25,6 +25,7 @@ def py_make_scanner(context):
     object_pairs_hook = context.object_pairs_hook
     array_hook = context.array_hook
     memo = context.memo
+    memo_clear = memo.clear
 
     def _scan_once(string, idx):
         try:
@@ -39,26 +40,34 @@ def py_make_scanner(context):
                 _scan_once, object_hook, object_pairs_hook, memo)
         elif nextchar == '[':
             return parse_array((string, idx + 1), _scan_once, array_hook)
-        elif nextchar == 'n' and string[idx:idx + 4] == 'null':
-            return None, idx + 4
-        elif nextchar == 't' and string[idx:idx + 4] == 'true':
-            return True, idx + 4
-        elif nextchar == 'f' and string[idx:idx + 5] == 'false':
-            return False, idx + 5
+        elif nextchar == 'n':
+            if string.startswith('null', idx):
+                return None, idx + 4
+        elif nextchar == 't':
+            if string.startswith('true', idx):
+                return True, idx + 4
+        elif nextchar == 'f':
+            if string.startswith('false', idx):
+                return False, idx + 5
+        elif nextchar == 'N':
+            if string.startswith('NaN', idx):
+                return parse_constant('NaN'), idx + 3
+            raise StopIteration(idx)
+        elif nextchar == 'I':
+            if string.startswith('Infinity', idx):
+                return parse_constant('Infinity'), idx + 8
+            raise StopIteration(idx)
 
         m = match_number(string, idx)
         if m is not None:
             integer, frac, exp = m.groups()
+            end = m.end()
             if frac or exp:
-                res = parse_float(integer + (frac or '') + (exp or ''))
+                res = parse_float(string[idx:end])
             else:
                 res = parse_int(integer)
-            return res, m.end()
-        elif nextchar == 'N' and string[idx:idx + 3] == 'NaN':
-            return parse_constant('NaN'), idx + 3
-        elif nextchar == 'I' and string[idx:idx + 8] == 'Infinity':
-            return parse_constant('Infinity'), idx + 8
-        elif nextchar == '-' and string[idx:idx + 9] == '-Infinity':
+            return res, end
+        elif nextchar == '-' and string.startswith('-Infinity', idx):
             return parse_constant('-Infinity'), idx + 9
         else:
             raise StopIteration(idx)
@@ -67,7 +76,7 @@ def py_make_scanner(context):
         try:
             return _scan_once(string, idx)
         finally:
-            memo.clear()
+            memo_clear()
 
     return scan_once
 
