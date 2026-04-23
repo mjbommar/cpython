@@ -234,3 +234,41 @@ What we learned:
 - replacing `splitext(filename)[1] == ".py"` with
   `filename.endswith(".py")` needs an explicit `filename != ".py"`
   guard to preserve the historical leading-dot filename behavior
+
+## 2026-04-22 update: importlib `SourceLoader.get_code()`
+
+Accepted and cherry-picked commit:
+
+- `c154e3f1238` / `befb979dcf6`
+  `perf: delay bytecode memoryview creation`
+
+Validation:
+
+- clean-mainline branch `exp-importlib/get-code-mainline` passed
+  focused import tests: `test_importlib`, `test_import`, and
+  `test_zipimport`
+- clean-mainline branch passed `./python -m test -q -j8`:
+  `49,882` tests, `491/502` files, `SUCCESS` in `4 min 18 sec`
+- stacked branch passed the same focused import tests after the
+  cherry-pick
+
+Direct `get_code()` panel result
+(`/tmp/get-code-baseline-r3-main.json` vs
+`/tmp/get-code-candidate-e2-r2.json`):
+
+- `G1_timestamp_pyc_hit`: `-5.93%`
+- `G2_unchecked_hash_pyc_hit`: `-4.53%`
+- `G3_checked_hash_pyc_hit`: `-3.92%`
+- `G4_source_compile_no_write`: `+0.82%`
+- `G5_stale_timestamp_pyc`: `-2.13%`
+- `G6_bad_magic_pyc`: `-1.37%`
+- geometric mean: about `-2.87%`
+
+What we learned:
+
+- the accepted patch is intentionally tiny: delay
+  `memoryview(data)[16:]` until after pyc validation succeeds
+- a broader lazy-exception-details rewrite was rejected because it
+  changed private helper signatures and measured slightly slower overall
+- most remaining `get_code()` cost is real work: filesystem reads,
+  `marshal.loads`, source hashing, and `compile()`
