@@ -408,18 +408,27 @@ class Connection(_ConnectionBase):
             buf = buf[n:]
 
     def _recv(self, size, read=_read):
-        buf = io.BytesIO()
+        if size == 0:
+            return io.BytesIO()
+
         handle = self._handle
-        remaining = size
+        chunk = read(handle, min(BUFSIZE, size))
+        n = len(chunk)
+        if n == 0:
+            raise EOFError
+        if n == size:
+            buf = io.BytesIO(chunk)
+            buf.seek(0, io.SEEK_END)
+            return buf
+
+        buf = io.BytesIO()
+        buf.write(chunk)
+        remaining = size - n
         while remaining > 0:
-            to_read = min(BUFSIZE, remaining)
-            chunk = read(handle, to_read)
+            chunk = read(handle, min(BUFSIZE, remaining))
             n = len(chunk)
             if n == 0:
-                if remaining == size:
-                    raise EOFError
-                else:
-                    raise OSError("got end of file during message")
+                raise OSError("got end of file during message")
             buf.write(chunk)
             remaining -= n
         return buf
