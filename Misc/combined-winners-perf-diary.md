@@ -192,3 +192,45 @@ What we learned:
 - the only observable behavioral difference is that no-doc context
   manager instances no longer carry a redundant `__doc__` key in
   `cm.__dict__`
+
+## 2026-04-22 update: zipfile `PyZipFile.writepy()` validation
+
+Accepted stacked commits:
+
+- `be36223f1d0` / `711d9312b69`
+  `perf: speed up PyZipFile package traversal`
+- `e2fa4ef914a`
+  `perf: preserve PyZipFile dot-py edge case`
+
+Validation:
+
+- clean-mainline branch `exp-zipfile/writepy-mainline` passed
+  `./python -m test -q test_zipfile`: `379` tests, `3` skipped,
+  `SUCCESS` in `18.0 sec`
+- clean-mainline branch `exp-zipfile/writepy-mainline` passed
+  `./python -m test -q -j8`: `49,882` tests, `491/502` files,
+  `SUCCESS` in `4 min 16 sec`
+- stacked branch passed focused `test_zipfile` after the semantic guard
+  follow-up: `379` tests, `3` skipped, `SUCCESS` in `18.3 sec`
+
+Clean-mainline zipfile panel result
+(`/tmp/zipfile-clean-main-baseline-final.json` vs
+`/tmp/zipfile-clean-main-candidate-final.json`):
+
+- `Z1_flat_package_tiny`: `-6.07%`
+- `Z2_nested_package_tiny`: `-3.44%`
+- `Z3_nested_package_filtered_even`: `-7.89%`
+- `Z4_plain_directory_tiny`: `+0.17%`
+- `Z5_single_large_module`: `+4.08%`
+- geometric mean: about `-2.73%`
+
+What we learned:
+
+- the durable win is recursive package traversal, where `os.scandir()`
+  avoids repeated path joins and directory stats
+- non-package directory traversal should stay on the original simpler
+  path because the broader `scandir()` rewrite was noisier and less
+  consistently helpful
+- replacing `splitext(filename)[1] == ".py"` with
+  `filename.endswith(".py")` needs an explicit `filename != ".py"`
+  guard to preserve the historical leading-dot filename behavior
