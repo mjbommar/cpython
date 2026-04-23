@@ -71,19 +71,17 @@ def _run_code(code, run_globals, init_globals=None,
     if mod_spec is None:
         loader = None
         fname = script_name
-        cached = None
     else:
         loader = mod_spec.loader
         fname = mod_spec.origin
-        cached = mod_spec.cached
         if pkg_name is None:
             pkg_name = mod_spec.parent
-    run_globals.update(__name__ = mod_name,
-                       __file__ = fname,
-                       __doc__ = None,
-                       __loader__ = loader,
-                       __package__ = pkg_name,
-                       __spec__ = mod_spec)
+    run_globals["__name__"] = mod_name
+    run_globals["__file__"] = fname
+    run_globals["__doc__"] = None
+    run_globals["__loader__"] = loader
+    run_globals["__package__"] = pkg_name
+    run_globals["__spec__"] = mod_spec
     exec(code, run_globals)
     return run_globals
 
