@@ -1,0 +1,115 @@
+{
+  "A1_simple_parse_known_args": {
+    "best_ns": 11207.6,
+    "label": "simple_parse_known_args",
+    "loops": 4000,
+    "mean_ns": 11437.2,
+    "repeat": 7,
+    "samples_ns": [
+      11536.0,
+      11366.1,
+      11851.3,
+      11290.3,
+      11207.6,
+      11483.4,
+      11325.7
+    ]
+  },
+  "A2_simple_parse_args": {
+    "best_ns": 11433.2,
+    "label": "simple_parse_args",
+    "loops": 4000,
+    "mean_ns": 11588.9,
+    "repeat": 7,
+    "samples_ns": [
+      11433.2,
+      11771.9,
+      11449.2,
+      11592.4,
+      11506.4,
+      11569.8,
+      11799.4
+    ]
+  },
+  "A3_defaults_namespace": {
+    "best_ns": 6560.3,
+    "label": "defaults_namespace",
+    "loops": 4000,
+    "mean_ns": 6974.0,
+    "repeat": 7,
+    "samples_ns": [
+      6958.5,
+      6560.3,
+      6708.8,
+      6801.9,
+      6797.3,
+      7133.4,
+      7858.0
+    ]
+  },
+  "A4_option_heavy": {
+    "best_ns": 27344.6,
+    "label": "option_heavy",
+    "loops": 4000,
+    "mean_ns": 27836.6,
+    "repeat": 7,
+    "samples_ns": [
+      27855.1,
+      27344.6,
+      28579.5,
+      28087.2,
+      27507.0,
+      27700.9,
+      27782.2
+    ]
+  },
+  "A5_intermixed": {
+    "best_ns": 28115.6,
+    "label": "intermixed",
+    "loops": 4000,
+    "mean_ns": 28580.3,
+    "repeat": 7,
+    "samples_ns": [
+      28309.2,
+      29938.8,
+      28603.5,
+      28115.6,
+      28169.0,
+      28367.3,
+      28558.7
+    ]
+  },
+  "A6_mutex_control": {
+    "best_ns": 14665.7,
+    "label": "mutex_control",
+    "loops": 4000,
+    "mean_ns": 14959.3,
+    "repeat": 7,
+    "samples_ns": [
+      14861.0,
+      14729.3,
+      14694.2,
+      14678.0,
+      14665.7,
+      14845.6,
+      16241.4
+    ]
+  },
+  "A7_fromfile_control": {
+    "best_ns": 37354.4,
+    "label": "fromfile_control",
+    "loops": 500,
+    "mean_ns": 38203.4,
+    "repeat": 7,
+    "samples_ns": [
+      39139.6,
+      38982.6,
+      37354.4,
+      37754.1,
+      38534.2,
+      38108.5,
+      37550.6
+    ]
+  },
+  "variant": "no_mutex_fast_path"
+}

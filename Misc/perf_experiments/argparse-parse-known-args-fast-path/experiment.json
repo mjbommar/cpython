@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/argparse-parse-known-args-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/argparse-parse-known-args-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/argparse-parse-known-args-fast-path/guardrails",
+    "root": "Misc/perf_experiments/argparse-parse-known-args-fast-path"
+  },
+  "base_commit": "168e223bf51e795a854f3b39dc7f53c97494131f",
+  "branch": "exp-argparse/parse-known-mainline",
+  "created_at": "2026-04-24T14:07:27+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "argparse",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh broad discovery still shows argparse parsing as a real pure-Python cluster after the gettext win. The likely leverage is the common no-intermixed, no-subparser, simple positional/optional path inside _parse_known_args2/_parse_known_args rather than public wrapper setup.",
+  "notes": [
+    "2026-04-24T14:13:32+00:00 Runtime no-mutex/no-fromfile helper proof: about 1.051950x geomean, but clean source proof only about 1.013823x and mixed.",
+    "2026-04-24T14:13:32+00:00 Rejected before focused/full validation; the source patch did not clear the acceptance bar."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "argparse-parse-known-args-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/argparse.py:2097 _parse_known_args2",
+    "Lib/argparse.py:2135 _parse_known_args"
+  ],
+  "title": "argparse parse-known-args fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
+  }
+}

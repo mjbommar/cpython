@@ -1,0 +1,115 @@
+{
+  "A1_simple_parse_known_args": {
+    "best_ns": 13536.7,
+    "label": "simple_parse_known_args",
+    "loops": 4000,
+    "mean_ns": 13819.6,
+    "repeat": 7,
+    "samples_ns": [
+      14534.5,
+      13823.4,
+      13836.0,
+      13683.5,
+      13636.0,
+      13687.0,
+      13536.7
+    ]
+  },
+  "A2_simple_parse_args": {
+    "best_ns": 13789.1,
+    "label": "simple_parse_args",
+    "loops": 4000,
+    "mean_ns": 13935.2,
+    "repeat": 7,
+    "samples_ns": [
+      13861.4,
+      13838.2,
+      13789.1,
+      13816.4,
+      14124.7,
+      13861.2,
+      14255.5
+    ]
+  },
+  "A3_defaults_namespace": {
+    "best_ns": 8574.1,
+    "label": "defaults_namespace",
+    "loops": 4000,
+    "mean_ns": 9030.8,
+    "repeat": 7,
+    "samples_ns": [
+      9556.8,
+      9381.1,
+      9312.8,
+      8857.9,
+      8957.7,
+      8574.1,
+      8574.9
+    ]
+  },
+  "A4_option_heavy": {
+    "best_ns": 32457.9,
+    "label": "option_heavy",
+    "loops": 4000,
+    "mean_ns": 32948.1,
+    "repeat": 7,
+    "samples_ns": [
+      32611.2,
+      33231.7,
+      32831.5,
+      32514.1,
+      32457.9,
+      33709.6,
+      33280.7
+    ]
+  },
+  "A5_intermixed": {
+    "best_ns": 32719.8,
+    "label": "intermixed",
+    "loops": 4000,
+    "mean_ns": 33158.7,
+    "repeat": 7,
+    "samples_ns": [
+      33326.1,
+      32817.1,
+      32781.4,
+      32719.8,
+      32810.2,
+      33485.6,
+      34170.5
+    ]
+  },
+  "A6_mutex_control": {
+    "best_ns": 16953.6,
+    "label": "mutex_control",
+    "loops": 4000,
+    "mean_ns": 17105.4,
+    "repeat": 7,
+    "samples_ns": [
+      17169.8,
+      17012.7,
+      17041.5,
+      16968.7,
+      16953.6,
+      17123.9,
+      17467.9
+    ]
+  },
+  "A7_fromfile_control": {
+    "best_ns": 41621.5,
+    "label": "fromfile_control",
+    "loops": 500,
+    "mean_ns": 42643.6,
+    "repeat": 7,
+    "samples_ns": [
+      42916.2,
+      42355.0,
+      42894.3,
+      43899.2,
+      42774.9,
+      42044.0,
+      41621.5
+    ]
+  },
+  "variant": "baseline"
+}
