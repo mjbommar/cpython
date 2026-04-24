@@ -1,0 +1,50 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/compile-ast-compile-structural-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/compile-ast-compile-structural-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/compile-ast-compile-structural-fast-path/guardrails",
+    "root": "Misc/perf_experiments/compile-ast-compile-structural-fast-path"
+  },
+  "base_commit": "0cdb89807fbb8afb2df333f8bc98eaef5babe3a6",
+  "branch": "exp-compile/ast-structural-mainline",
+  "created_at": "2026-04-24T20:42:16+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [
+      "Misc/perf_experiments/reports/stacked-discovery-candidates-2026-04-24.md"
+    ],
+    "usage_scan": "done"
+  },
+  "family": "compile",
+  "hypothesis": "Control-flow lifting plus common-case split: the real remaining compile opportunity is likely below _PyAST_Compile() in compiler_mod() / optimize-and-assemble work, not another entry/setup tweak. First step is phase attribution to find a lower structural common path worth proving.",
+  "notes": [
+    "2026-04-24T20:42:21+00:00 Archetype: control-flow lifting plus common-case split. This family intentionally excludes the already-rejected lazy c_stack setup idea. The next gate is compile-phase attribution: separate new_compiler/compiler_mod/optimize-and-assemble style costs so the family targets a structural lower-layer win rather than another thin setup tweak.",
+    "2026-04-24T20:54:50+00:00 Phase attribution completed with the measurement-only compile.c probe. Across the focused corpus, setup/new_compiler is about 22-29% of total, preprocess only about 1.9-2.7%, and compiler_mod about 66-73%. The real split is compiler_codegen() for function/class/nested-heavy cases versus _PyCompile_OptimizeAndAssemble() for flat-module/list-comprehension cases. Inside optasm, code_flags/add_return are negligible and the meaningful headroom is in optimize_and_assemble_code_unit(), especially cfg-to-instruction lowering and assembly. Do not reopen setup/preprocess micro-tweaks in this family."
+  ],
+  "phase": "benchmarks",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "compile-ast-compile-structural-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Python/compile.c:1523 _PyAST_Compile",
+    "Python/compile.c:1504 _PyCompile_OptimizeAndAssemble"
+  ],
+  "title": "compile ast structural fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

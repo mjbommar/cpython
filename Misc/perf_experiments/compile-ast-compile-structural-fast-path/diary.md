@@ -1,0 +1,162 @@
+        # compile ast structural fast path
+
+        Branch: `exp-compile/ast-structural-mainline`
+        Base commit: `0cdb89807fbb8afb2df333f8bc98eaef5babe3a6`
+        Manifest: `Misc/perf_experiments/compile-ast-compile-structural-fast-path/experiment.json`
+
+        ## Goal
+
+        Control-flow lifting plus common-case split: the real remaining compile opportunity is likely below _PyAST_Compile() in compiler_mod() / optimize-and-assemble work, not another entry/setup tweak. First step is phase attribution to find a lower structural common path worth proving.
+
+        ## Targets
+
+        - Python/compile.c:1523 _PyAST_Compile
+- Python/compile.c:1504 _PyCompile_OptimizeAndAssemble
+
+        ## Success Criteria
+
+        - Guardrails pass before any performance claim is trusted.
+- A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.
+- Focused stdlib tests pass before promotion.
+- The full suite passes before the experiment is merged into the stacked winner branch.
+
+        ## Input Evidence
+
+        - Profiles:
+          - `Misc/perf_experiments/reports/stacked-discovery-candidates-2026-04-24.md`
+          - broader top-25 review still points at:
+            - `Python/compile.c:1523 _PyAST_Compile`
+        - Usage scan:
+          - archetype: `control-flow lifting` plus `common-case split`
+          - explicit exclusion:
+            - do not retry the already-rejected lazy `c_stack` allocation
+              tweak from `compile-lazy-compiler-stack-fast-path`
+          - current thesis:
+            - `_PyAST_Compile()` is still a high-value choke point, but the
+              remaining win is likely lower in `compiler_mod()` /
+              `_PyCompile_OptimizeAndAssemble()` / assembly work rather than in
+              entry setup
+          - next gate:
+            - attribute compile time by phase before any prototype branch
+            - only open code experiments if a lower structural phase shows
+              meaningful headroom
+        - Initial benchmark corpus:
+          - `benchmarks/bench_compile_phase_attribution.py`
+          - results:
+            - `benchmarks/results/runtime-phase-attribution.json`
+        - Guardrails:
+          - `guardrails/check_compile_phase_attribution_semantics.py`
+          - result:
+            - `compile phase attribution semantics: ok`
+
+        ## Candidate Ledger
+
+        ### E1
+
+        Status: completed attribution pass.
+
+        Thesis:
+
+        - first prove where compile time is actually going inside the C
+          pipeline before choosing a structural fast path
+
+        Result:
+
+        - measurement-only instrumentation was added on the clean proof branch
+          behind `PYTHON_COMPILE_PHASE_STATS`, restricted to
+          `[perf-compile]...` filenames, and used only for this family's
+          benchmark driver
+        - focused attribution benchmark:
+          - `benchmarks/bench_compile_phase_attribution.py`
+          - `180` instrumented compiles per case
+        - phase attribution summary:
+          - `A1_module_assign` total `10,292.7 ns`
+            - setup `22.08%`
+            - symtable `18.18%`
+            - codegen `18.70%`
+            - optasm `47.55%`
+            - inside optasm:
+              - `code_unit` `43.32%`
+              - `cfg_opt` `11.20%`
+              - `cfg_to_instr` `9.91%`
+              - `assemble` `17.38%`
+          - `A2_module_many_assign` total `229,190.2 ns`
+            - setup `25.69%`
+            - symtable `23.10%`
+            - codegen `37.36%`
+            - optasm `32.67%`
+            - inside optasm:
+              - `code_unit` `32.22%`
+              - `cfg_from_instr` `4.15%`
+              - `cfg_opt` `5.04%`
+              - `cfg_to_instr` `14.74%`
+              - `assemble` `7.45%`
+          - `A3_function_module` total `20,588.3 ns`
+            - setup `28.51%`
+            - symtable `23.81%`
+            - codegen `46.93%`
+            - optasm `18.52%`
+          - `A4_class_module` total `37,287.1 ns`
+            - setup `22.31%`
+            - symtable `19.68%`
+            - codegen `60.99%`
+            - optasm `12.10%`
+          - `A5_nested_functions` total `32,516.7 ns`
+            - setup `24.93%`
+            - symtable `22.43%`
+            - codegen `59.72%`
+            - optasm `10.72%`
+          - `A6_list_comprehension` total `26,592.3 ns`
+            - setup `22.33%`
+            - symtable `19.43%`
+            - codegen `16.48%`
+            - optasm `55.22%`
+            - inside optasm:
+              - `code_unit` `53.10%`
+              - `cfg_from_instr` `4.06%`
+              - `cfg_opt` `14.01%`
+              - `cfg_to_instr` `22.54%`
+              - `assemble` `11.51%`
+        - cross-case takeaway:
+          - preprocess is small everywhere (`~1.9%` to `2.7%`)
+          - setup is real but only about a quarter of total compile time
+          - the real remaining compile split is:
+            - `compiler_codegen()` for function/class/nested-heavy cases
+            - `_PyCompile_OptimizeAndAssemble()` for flat-module and
+              comprehension-heavy cases
+          - inside `optimize_and_assemble_code_unit()`, the meaningful headroom
+            is in the code-unit body, especially
+            `_PyCfg_OptimizedCfgToInstructionSequence()` and assembly
+          - `compute_code_flags()` and `_PyCodegen_AddReturnAtEnd()` are
+            effectively noise (`<= 0.45%`)
+
+        Decision:
+
+        - Keep the family active, but explicitly stop considering setup /
+          preprocess micro-tweaks for this line of work.
+        - For this compile-family branch, the next promising target is the
+          lower `optimize_and_assemble_code_unit()` path, not another
+          `_PyAST_Compile()` entry/setup change.
+        - The function/class/nested-heavy `compiler_codegen()` dominance is
+          real, but that likely belongs in a separate future codegen family if
+          we choose to chase it.
+
+        ## Validation
+
+        - Focused tests:
+        - Full suite:
+        - Ecosystem / third-party:
+
+        ## Acceptance Decision
+
+        - Decision:
+        - Accepted commit:
+        - Stacked winner commit:
+
+        ## Notes
+
+        - Keep rejected ideas here too so the branch remains useful research.
+        - This family exists specifically to avoid reopening entry/setup
+          compiler tweaks that already failed.
+        - The measurement-only proof patch lives only on the clean experiment
+          worktree branch and has not been promoted anywhere.
