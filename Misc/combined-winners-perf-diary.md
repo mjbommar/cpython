@@ -1205,3 +1205,57 @@ What we learned:
   initial `_is_magic(key)` guard was too weak, and `test_unittest` caught it
   immediately. The accepted shape uses `_is_magic(key.partition(".")[0])`,
   which keeps the fast path conservative and correct
+
+## 2026-04-24 update: re parser/compiler branch rewrite fast path
+
+Accepted and cherry-picked commit:
+
+- `01f9cfcb833` / `5850e18e621`
+  `re: speed up _parse_sub branch rewrites`
+
+Clean-mainline focused result:
+
+- `bench_re_parser_compiler.py` source proof:
+  - focused-harness geomean: about `+2.50%`
+  - `R6_branch_prefix`: `+9.67%`
+  - `R11_branch_repeat`: `+6.24%`
+  - `R12_charset_branch`: `+4.15%`
+  - `R11_re_tests_compile_corpus`: `+2.21%`
+  - `R10_stdlib_compile_corpus`: `+0.70%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_re_parser_compiler_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_re`: passed
+- clean-mainline focused tests:
+  `test_argparse test_glob test_pathlib`: passed
+- clean-mainline focused tests:
+  `test_email test_traceback test_pydoc`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 19 sec`
+- stacked guardrail:
+  `check_re_parser_compiler_semantics.py`: `ok`
+- stacked focused tests:
+  `test_re`: passed
+- stacked focused tests:
+  `test_argparse test_glob test_pathlib`: passed
+- stacked focused tests:
+  `test_email test_traceback test_pydoc`: passed
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the durable `re` win was not in named-group bookkeeping or the public cache
+  wrapper. The better leverage point was the internal `_parse_sub()` branch
+  rewrite logic on branch-heavy patterns
+- direct parser/compiler attribution mattered here. The early `groupdict`
+  ideas looked plausible in runtime prototypes, but collapsed at source proof
+- the accepted change is intentionally small: keep the existing rewrite logic,
+  but operate on `item.data` directly instead of paying repeated
+  `SubPattern.__getitem__`, `__len__`, and `__delitem__` overhead in the hot
+  rewrite path
