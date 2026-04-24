@@ -3931,6 +3931,65 @@ error:
 int
 _PyCfg_ToInstructionSequence(cfg_builder *g, _PyInstructionSequence *seq)
 {
+    if (seq->s_used == 0 && seq->s_instrs == NULL && seq->s_labelmap == NULL) {
+        int total_labels = 0;
+        int total_instrs = 0;
+        for (basicblock *b = g->g_entryblock; b != NULL; b = b->b_next) {
+            b->b_label = (jump_target_label){total_labels++};
+            total_instrs += b->b_iused;
+        }
+
+        if (total_instrs > 0) {
+            seq->s_instrs = PyMem_Calloc(total_instrs, sizeof(*seq->s_instrs));
+            if (seq->s_instrs == NULL) {
+                PyErr_NoMemory();
+                return ERROR;
+            }
+            seq->s_allocated = total_instrs;
+        }
+        if (total_labels > 0) {
+            seq->s_labelmap = PyMem_Malloc(total_labels * sizeof(*seq->s_labelmap));
+            if (seq->s_labelmap == NULL) {
+                PyMem_Free(seq->s_instrs);
+                seq->s_instrs = NULL;
+                seq->s_allocated = 0;
+                PyErr_NoMemory();
+                return ERROR;
+            }
+            seq->s_labelmap_size = total_labels;
+            seq->s_next_free_label = total_labels;
+        }
+
+        for (basicblock *b = g->g_entryblock; b != NULL; b = b->b_next) {
+            seq->s_labelmap[b->b_label.id] = seq->s_used;
+            for (int i = 0; i < b->b_iused; i++) {
+                cfg_instr *instr = &b->b_instr[i];
+                if (HAS_TARGET(instr->i_opcode)) {
+                    /* Set oparg to the label id (it will later be mapped to an offset) */
+                    instr->i_oparg = instr->i_target->b_label.id;
+                }
+                _PyInstruction *out = &seq->s_instrs[seq->s_used++];
+                out->i_opcode = instr->i_opcode;
+                out->i_oparg = instr->i_oparg;
+                out->i_loc = instr->i_loc;
+
+                _PyExceptHandlerInfo *hi = &out->i_except_handler_info;
+                if (instr->i_except != NULL) {
+                    hi->h_label = instr->i_except->b_label.id;
+                    hi->h_startdepth = instr->i_except->b_startdepth;
+                    hi->h_preserve_lasti = instr->i_except->b_preserve_lasti;
+                }
+                else {
+                    hi->h_label = -1;
+                }
+            }
+        }
+        if (_PyInstructionSequence_ApplyLabelMap(seq) < 0) {
+            return ERROR;
+        }
+        return SUCCESS;
+    }
+
     int lbl = 0;
     for (basicblock *b = g->g_entryblock; b != NULL; b = b->b_next) {
         b->b_label = (jump_target_label){lbl};
