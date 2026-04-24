@@ -1,0 +1,55 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/re-parser-compiler-common-case-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/re-parser-compiler-common-case-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/re-parser-compiler-common-case-fast-path/guardrails",
+    "root": "Misc/perf_experiments/re-parser-compiler-common-case-fast-path"
+  },
+  "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
+  "branch": "exp-re/parser-compiler-mainline",
+  "created_at": "2026-04-24T11:42:41+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [
+      "/tmp/stacked-discovery-2026-04-24.pstats"
+    ],
+    "usage_scan": "done"
+  },
+  "family": "re",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh stacked-branch discovery on a broad stdlib slice still shows the pure-Python regex compile pipeline as a real cluster: re._compiler.compile, re._parser.parse, _parse_sub, and _parse. The likely leverage is not in the public wrapper cache, but in the compile path for normal string patterns with no debug flags, no custom parser state, and no named-group bookkeeping. Delaying uncommon bookkeeping such as named-group index construction and tightening the no-extra-state parse path may reduce regex compile overhead without changing match semantics.",
+  "notes": [
+    "2026-04-24T11:42:48+00:00 2026-04-24  Fresh stacked-branch curated discovery profile (test_dataclasses, test_dbm_sqlite3, test_tempfile, test_traceback, test_argparse, test_shutil, test_pathlib, test_re, test_pickle, test_random) shows a real regex compile cluster: re._compile 1.527s cum, re._compiler.compile 1.255s, re._parser.parse 0.723s, re._parser._parse_sub 0.669s, re._parser._parse 0.609s. This is stronger and broader than the remaining stale regrtest leaf residue and points to parser/compiler work rather than wrapper caching.",
+    "2026-04-24T12:29:05+00:00 E1 compile-only groupindex fast path reached +2.71% on runtime proof but collapsed to +0.34% on source proof; rejected.",
+    "2026-04-24T12:29:05+00:00 E2 lazy groupdict State initialization reached only +0.64% geomean on the official harness; rejected.",
+    "2026-04-24T12:29:05+00:00 E3 _parse_sub branch rewrite data-path fast path reached +1.98% geomean on runtime proof and +2.50% on clean source proof, then passed focused and full-suite validation.",
+    "2026-04-24T12:35:03+00:00 2026-04-24 Stacked branch passed guardrail, focused tests, and full suite: 49,892 run, 2,621 skipped, SUCCESS in 4 min 18 sec."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "01f9cfcb833",
+    "stacked_commit": "5850e18e621",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "re-parser-compiler-common-case-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/re/_compiler.py:757 compile",
+    "Lib/re/_parser.py:962 parse",
+    "Lib/re/_parser.py:452 _parse_sub",
+    "Lib/re/_parser.py:511 _parse"
+  ],
+  "title": "re parser compiler common-case fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/traceback-format-frame-summary-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/traceback-format-frame-summary-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/traceback-format-frame-summary-fast-path/guardrails",
+    "root": "Misc/perf_experiments/traceback-format-frame-summary-fast-path"
+  },
+  "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
+  "branch": "exp-traceback/frame-summary-mainline",
+  "created_at": "2026-04-24T12:38:37+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "pending",
+    "guardrails": "pending",
+    "profiles": [
+      "/tmp/stacked-discovery-2026-04-24.pstats"
+    ],
+    "usage_scan": "done"
+  },
+  "family": "traceback",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh stacked discovery still shows traceback formatting as a real pure-Python cluster: StackSummary.format(), StackSummary.format_frame_summary(), and traceback.format(). Most formatted frames are on the common no-colorize, no-locals path, and many miss the full caret-anchor machinery. Splitting that common path away from the heavy caret/color/locals logic may reduce traceback formatting overhead without changing rendered output.",
+  "notes": [
+    "2026-04-24T12:39:01+00:00 2026-04-24 Fresh stacked discovery shows traceback.py as a real pure-Python cluster: traceback.format() about 2.00s cumulative, StackSummary.format() about 1.83s, format_frame_summary() about 1.79s on the curated broad stdlib slice. Chosen over argparse because argparse traffic here is likely one-shot CLI/test-local, and over gettext because gettext looks closer to a cached wrapper chain around translation/find."
+  ],
+  "phase": "usage-scan",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "traceback-format-frame-summary-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/traceback.py:546 StackSummary.format_frame_summary",
+    "Lib/traceback.py:763 StackSummary.format",
+    "Lib/traceback.py:1577 TracebackException.format"
+  ],
+  "title": "traceback format frame summary fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

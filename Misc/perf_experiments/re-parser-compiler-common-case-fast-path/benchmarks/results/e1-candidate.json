@@ -1,0 +1,159 @@
+{
+  "benchmarks": {
+    "R10_stdlib_compile_corpus": {
+      "best_ns": 339076.8,
+      "label": "stdlib compile corpus",
+      "loops": 150,
+      "mean_ns": 341938.8,
+      "repeat": 5,
+      "samples_ns": [
+        343644.4,
+        339076.8,
+        345384.4,
+        341463.4,
+        340124.8
+      ]
+    },
+    "R11_re_tests_compile_corpus": {
+      "best_ns": 321519.3,
+      "label": "re_tests benchmark compile corpus",
+      "loops": 150,
+      "mean_ns": 327892.4,
+      "repeat": 5,
+      "samples_ns": [
+        343521.5,
+        321519.3,
+        324879.9,
+        321935.8,
+        327605.5
+      ]
+    },
+    "R1_literal": {
+      "best_ns": 7378.3,
+      "label": "R1_literal",
+      "loops": 3000,
+      "mean_ns": 7489.1,
+      "repeat": 5,
+      "samples_ns": [
+        7739.4,
+        7480.7,
+        7418.1,
+        7378.3,
+        7429.0
+      ]
+    },
+    "R2_literal_bytes": {
+      "best_ns": 7639.4,
+      "label": "R2_literal_bytes",
+      "loops": 3000,
+      "mean_ns": 7811.6,
+      "repeat": 5,
+      "samples_ns": [
+        7858.4,
+        7878.9,
+        8009.9,
+        7671.5,
+        7639.4
+      ]
+    },
+    "R3_charclass": {
+      "best_ns": 46076.6,
+      "label": "R3_charclass",
+      "loops": 3000,
+      "mean_ns": 47314.7,
+      "repeat": 5,
+      "samples_ns": [
+        48976.7,
+        48656.8,
+        46076.6,
+        46169.4,
+        46693.9
+      ]
+    },
+    "R4_captures": {
+      "best_ns": 41109.6,
+      "label": "R4_captures",
+      "loops": 3000,
+      "mean_ns": 41860.8,
+      "repeat": 5,
+      "samples_ns": [
+        41440.0,
+        41738.2,
+        42512.9,
+        42503.1,
+        41109.6
+      ]
+    },
+    "R5_named_groups": {
+      "best_ns": 49457.7,
+      "label": "R5_named_groups",
+      "loops": 1500,
+      "mean_ns": 49901.8,
+      "repeat": 5,
+      "samples_ns": [
+        49653.6,
+        49948.1,
+        50753.0,
+        49457.7,
+        49696.4
+      ]
+    },
+    "R6_branch_prefix": {
+      "best_ns": 39524.0,
+      "label": "R6_branch_prefix",
+      "loops": 3000,
+      "mean_ns": 40126.1,
+      "repeat": 5,
+      "samples_ns": [
+        39524.0,
+        39625.3,
+        40133.0,
+        41421.9,
+        39926.5
+      ]
+    },
+    "R7_inline_flags": {
+      "best_ns": 30933.3,
+      "label": "R7_inline_flags",
+      "loops": 3000,
+      "mean_ns": 31381.1,
+      "repeat": 5,
+      "samples_ns": [
+        31008.5,
+        30933.3,
+        31758.2,
+        31634.4,
+        31571.1
+      ]
+    },
+    "R8_lookaround": {
+      "best_ns": 38246.6,
+      "label": "R8_lookaround",
+      "loops": 1500,
+      "mean_ns": 38881.7,
+      "repeat": 5,
+      "samples_ns": [
+        38567.8,
+        38311.6,
+        38832.1,
+        38246.6,
+        40450.2
+      ]
+    },
+    "R9_backref": {
+      "best_ns": 31674.0,
+      "label": "R9_backref",
+      "loops": 1000,
+      "mean_ns": 33140.2,
+      "repeat": 5,
+      "samples_ns": [
+        36103.2,
+        33891.8,
+        31887.4,
+        32144.7,
+        31674.0
+      ]
+    }
+  },
+  "variant": "groupindex_fastpath"
+}

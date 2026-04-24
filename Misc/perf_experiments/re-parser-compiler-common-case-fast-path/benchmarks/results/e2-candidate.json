@@ -1,0 +1,159 @@
+{
+  "benchmarks": {
+    "R10_stdlib_compile_corpus": {
+      "best_ns": 341966.9,
+      "label": "stdlib compile corpus",
+      "loops": 150,
+      "mean_ns": 355718.8,
+      "repeat": 5,
+      "samples_ns": [
+        344649.0,
+        341966.9,
+        346697.3,
+        384478.5,
+        360802.4
+      ]
+    },
+    "R11_re_tests_compile_corpus": {
+      "best_ns": 323923.6,
+      "label": "re_tests benchmark compile corpus",
+      "loops": 150,
+      "mean_ns": 332221.8,
+      "repeat": 5,
+      "samples_ns": [
+        331877.1,
+        327522.0,
+        349862.9,
+        327923.4,
+        323923.6
+      ]
+    },
+    "R1_literal": {
+      "best_ns": 7861.5,
+      "label": "R1_literal",
+      "loops": 3000,
+      "mean_ns": 8025.6,
+      "repeat": 5,
+      "samples_ns": [
+        8228.4,
+        8035.9,
+        8119.4,
+        7861.5,
+        7883.0
+      ]
+    },
+    "R2_literal_bytes": {
+      "best_ns": 7929.7,
+      "label": "R2_literal_bytes",
+      "loops": 3000,
+      "mean_ns": 8127.4,
+      "repeat": 5,
+      "samples_ns": [
+        8330.1,
+        8225.5,
+        8032.3,
+        8119.4,
+        7929.7
+      ]
+    },
+    "R3_charclass": {
+      "best_ns": 46456.4,
+      "label": "R3_charclass",
+      "loops": 3000,
+      "mean_ns": 47396.4,
+      "repeat": 5,
+      "samples_ns": [
+        47627.2,
+        46456.4,
+        47511.1,
+        48634.1,
+        46753.1
+      ]
+    },
+    "R4_captures": {
+      "best_ns": 41010.2,
+      "label": "R4_captures",
+      "loops": 3000,
+      "mean_ns": 41468.5,
+      "repeat": 5,
+      "samples_ns": [
+        41010.2,
+        41193.9,
+        41896.6,
+        42116.6,
+        41125.2
+      ]
+    },
+    "R5_named_groups": {
+      "best_ns": 49061.2,
+      "label": "R5_named_groups",
+      "loops": 1500,
+      "mean_ns": 50327.0,
+      "repeat": 5,
+      "samples_ns": [
+        49873.1,
+        53531.8,
+        49784.8,
+        49384.4,
+        49061.2
+      ]
+    },
+    "R6_branch_prefix": {
+      "best_ns": 39474.4,
+      "label": "R6_branch_prefix",
+      "loops": 3000,
+      "mean_ns": 39786.6,
+      "repeat": 5,
+      "samples_ns": [
+        39474.4,
+        39570.7,
+        39767.9,
+        40604.8,
+        39515.0
+      ]
+    },
+    "R7_inline_flags": {
+      "best_ns": 31615.2,
+      "label": "R7_inline_flags",
+      "loops": 3000,
+      "mean_ns": 32189.9,
+      "repeat": 5,
+      "samples_ns": [
+        31710.7,
+        33937.2,
+        31984.0,
+        31615.2,
+        31702.6
+      ]
+    },
+    "R8_lookaround": {
+      "best_ns": 38562.9,
+      "label": "R8_lookaround",
+      "loops": 1500,
+      "mean_ns": 39005.9,
+      "repeat": 5,
+      "samples_ns": [
+        38562.9,
+        38736.7,
+        38708.4,
+        39564.4,
+        39457.2
+      ]
+    },
+    "R9_backref": {
+      "best_ns": 31412.4,
+      "label": "R9_backref",
+      "loops": 1000,
+      "mean_ns": 31932.0,
+      "repeat": 5,
+      "samples_ns": [
+        32876.0,
+        31862.7,
+        31764.5,
+        31412.4,
+        31744.5
+      ]
+    }
+  },
+  "variant": "lazy_groupdict"
+}
