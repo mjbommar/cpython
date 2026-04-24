@@ -1109,6 +1109,42 @@ class _Pickler:
         # slice per batch so concurrent mutation (e.g. via persistent_id)
         # does not break indexing; matches the tolerance of the generic
         # _batch_appends path that goes through batched().
+        if type(self) is _Pickler:
+            n = len(obj)
+            if n > 0 and type(obj[0]) is int:
+                for item in obj[1:]:
+                    if type(item) is not int:
+                        break
+                else:
+                    save_long = self.save_long
+                    write = self.write
+                    batch_size = self._BATCHSIZE
+                    idx = 0
+                    while True:
+                        remaining = n - idx
+                        if remaining <= 0:
+                            return
+                        if remaining == 1:
+                            try:
+                                save_long(obj[idx])
+                            except BaseException as exc:
+                                exc.add_note(f'when serializing {_T(obj)} item {idx}')
+                                raise
+                            write(APPEND)
+                            return
+                        batch = remaining if remaining < batch_size else batch_size
+                        snapshot = obj[idx:idx + batch]
+                        write(MARK)
+                        i = idx
+                        for x in snapshot:
+                            try:
+                                save_long(x)
+                            except BaseException as exc:
+                                exc.add_note(f'when serializing {_T(obj)} item {i}')
+                                raise
+                            i += 1
+                        write(APPENDS)
+                        idx = i
         save = self.save
         write = self.write
         batch_size = self._BATCHSIZE
