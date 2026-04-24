@@ -1,0 +1,128 @@
+{
+  "P1_compile_exec_small": {
+    "best_ns": 17580.8,
+    "label": "compile exec small",
+    "loops": 20000,
+    "mean_ns": 17840.3,
+    "repeat": 9,
+    "samples_ns": [
+      17580.8,
+      17611.4,
+      17877.6,
+      18207.9,
+      18002.7,
+      18052.1,
+      17630.6,
+      17932.9,
+      17666.5
+    ]
+  },
+  "P2_compile_eval_small": {
+    "best_ns": 10391.4,
+    "label": "compile eval small",
+    "loops": 20000,
+    "mean_ns": 10552.5,
+    "repeat": 9,
+    "samples_ns": [
+      10538.7,
+      10527.3,
+      10890.2,
+      10527.5,
+      10405.7,
+      10403.8,
+      10448.5,
+      10839.5,
+      10391.4
+    ]
+  },
+  "P3_compile_function_module": {
+    "best_ns": 60595.1,
+    "label": "compile function module",
+    "loops": 20000,
+    "mean_ns": 61108.5,
+    "repeat": 9,
+    "samples_ns": [
+      60935.8,
+      61857.4,
+      60972.1,
+      61206.5,
+      60595.1,
+      61057.2,
+      61594.2,
+      61025.3,
+      60732.5
+    ]
+  },
+  "P4_ast_parse_function_module": {
+    "best_ns": 42059.1,
+    "label": "ast.parse function module",
+    "loops": 20000,
+    "mean_ns": 42293.6,
+    "repeat": 9,
+    "samples_ns": [
+      42238.0,
+      42348.9,
+      42447.1,
+      42155.5,
+      42237.3,
+      42059.1,
+      42542.4,
+      42360.9,
+      42253.4
+    ]
+  },
+  "P5_ast_parse_type_comments": {
+    "best_ns": 14023.9,
+    "label": "ast.parse type comments",
+    "loops": 20000,
+    "mean_ns": 14300.8,
+    "repeat": 9,
+    "samples_ns": [
+      14498.6,
+      14068.0,
+      14023.9,
+      14577.4,
+      14584.1,
+      14136.9,
+      14161.4,
+      14525.5,
+      14131.8
+    ]
+  },
+  "P6_symtable_function_module": {
+    "best_ns": 42085.4,
+    "label": "symtable function module",
+    "loops": 20000,
+    "mean_ns": 42363.1,
+    "repeat": 9,
+    "samples_ns": [
+      42253.5,
+      42243.5,
+      42188.8,
+      42522.3,
+      42085.4,
+      42525.1,
+      42404.6,
+      42535.5,
+      42509.0
+    ]
+  },
+  "P7_codeop_incomplete": {
+    "best_ns": 28316.1,
+    "label": "codeop incomplete",
+    "loops": 20000,
+    "mean_ns": 28605.2,
+    "repeat": 9,
+    "samples_ns": [
+      28531.2,
+      28810.3,
+      28533.7,
+      28977.5,
+      28350.0,
+      28812.3,
+      28596.3,
+      28316.1,
+      28519.6
+    ]
+  }
+}

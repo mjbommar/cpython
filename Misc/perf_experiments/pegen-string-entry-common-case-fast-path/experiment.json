@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pegen-string-entry-common-case-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pegen-string-entry-common-case-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pegen-string-entry-common-case-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pegen-string-entry-common-case-fast-path"
+  },
+  "base_commit": "386bd50f59126b6c0237b9399f6cd9c6792a06e3",
+  "branch": "exp-pegen/string-entry-mainline",
+  "created_at": "2026-04-24T18:08:35+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pegen",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. _PyPegen_run_parser_from_string() is the string-source parser entry used by compile(), eval(), exec(), ast.parse(), and symtable. The dominant path appears to be module==NULL with no parser-affecting flags, where tokenizer choice, parser flags, and feature-version selection are all fixed. A split for that exact shape may reduce front-end setup cost without changing parser semantics.",
+  "notes": [
+    "2026-04-24T18:08:35+00:00 2026-04-24 Usage scan: _PyPegen_run_parser_from_string() is reached through _PyParser_ASTFromString() from _Py_CompileStringObjectWithModule(), PyRun_StringFlags(), compile(), ast.parse(), and symtable. The likely common case is string input with module==NULL and no parser-affecting flags; special cases are PyCF_ONLY_AST, PyCF_IGNORE_COOKIE, type comments, incomplete-input, and explicit module names.",
+    "2026-04-24T18:15:26+00:00 2026-04-24 E1 rejected after same-worktree source proof. Candidate: split _PyPegen_run_parser_from_string() on module==NULL and cf_flags==0, hardcoding _PyTokenizer_FromString, parser_flags=0, feature_version=PY_MINOR_VERSION. Results: P1 -0.04%, P2 -0.61%, P3 +1.32%, P4 -0.71%, P5 +1.95%, P6 -0.09%, P7 +0.85%; geomean +0.38%."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "pegen-string-entry-common-case-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Parser/pegen.c:_PyPegen_run_parser_from_string",
+    "Parser/peg_api.c:_PyParser_ASTFromString"
+  ],
+  "title": "pegen string entry common-case fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
