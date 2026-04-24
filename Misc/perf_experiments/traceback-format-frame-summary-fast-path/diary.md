@@ -42,9 +42,29 @@
           - the likely leverage point is the common no-colorize, no-locals,
             limited-caret path inside `format_frame_summary()`
         - Initial benchmark corpus:
-          - pending
+          - `benchmarks/bench_traceback_format.py`
+          - baseline artifact:
+            `benchmarks/results/runtime-baseline.json`
+          - cases:
+            - `T1_frame_simple`
+            - `T2_frame_locals`
+            - `T3_frame_caret`
+            - `T4_stack_simple`
+            - `T5_stack_recursive`
+            - `T6_te_simple`
+            - `T7_te_caret`
+            - `T8_te_locals`
+            - `T9_format_exception_simple`
+            - `T10_format_exception_caret`
+          - first baseline highlights:
+            - `T1_frame_simple`: about `57.4 us`
+            - `T3_frame_caret`: about `85.6 us`
+            - `T4_stack_simple`: about `126.0 us`
+            - `T6_te_simple`: about `141.7 us`
+            - `T10_format_exception_caret`: about `224.9 us`
         - Guardrails:
-          - pending
+          - `guardrails/check_traceback_format_semantics.py`
+          - result: `traceback format guardrails: ok`
 
         ## Candidate Ledger
 
@@ -78,7 +98,8 @@
 
         ## Notes
 
-        - Current phase: `usage-scan`
-        - Next gate: define focused benchmark corpus and guardrails before any
-          source branch exists.
+        - Current phase: `benchmarks`
+        - Next gate: enumerate candidate shapes inside
+          `StackSummary.format_frame_summary()` and prove them first as local
+          runtime substitutions before opening a clean source branch.
         - Keep rejected ideas here too so the branch remains useful research.

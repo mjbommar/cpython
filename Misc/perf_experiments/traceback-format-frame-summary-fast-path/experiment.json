@@ -10,8 +10,8 @@
   "created_at": "2026-04-24T12:38:37+00:00",
   "decision": "pending",
   "evidence": {
-    "benchmarks": "pending",
-    "guardrails": "pending",
+    "benchmarks": "done",
+    "guardrails": "done",
     "profiles": [
       "/tmp/stacked-discovery-2026-04-24.pstats"
     ],
@@ -20,9 +20,10 @@
   "family": "traceback",
   "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh stacked discovery still shows traceback formatting as a real pure-Python cluster: StackSummary.format(), StackSummary.format_frame_summary(), and traceback.format(). Most formatted frames are on the common no-colorize, no-locals path, and many miss the full caret-anchor machinery. Splitting that common path away from the heavy caret/color/locals logic may reduce traceback formatting overhead without changing rendered output.",
   "notes": [
-    "2026-04-24T12:39:01+00:00 2026-04-24 Fresh stacked discovery shows traceback.py as a real pure-Python cluster: traceback.format() about 2.00s cumulative, StackSummary.format() about 1.83s, format_frame_summary() about 1.79s on the curated broad stdlib slice. Chosen over argparse because argparse traffic here is likely one-shot CLI/test-local, and over gettext because gettext looks closer to a cached wrapper chain around translation/find."
+    "2026-04-24T12:39:01+00:00 2026-04-24 Fresh stacked discovery shows traceback.py as a real pure-Python cluster: traceback.format() about 2.00s cumulative, StackSummary.format() about 1.83s, format_frame_summary() about 1.79s on the curated broad stdlib slice. Chosen over argparse because argparse traffic here is likely one-shot CLI/test-local, and over gettext because gettext looks closer to a cached wrapper chain around translation/find.",
+    "2026-04-24T12:47:54+00:00 2026-04-24 Defined focused traceback benchmark corpus and guardrail. Baseline artifact: benchmarks/results/runtime-baseline.json. Common-path baseline shapes: frame simple about 57.4 us, frame caret about 85.6 us, stack simple about 126.0 us, TracebackException.format simple about 141.7 us, format_exception caret about 224.9 us."
   ],
-  "phase": "usage-scan",
+  "phase": "benchmarks",
   "promotion": {
     "accepted_commit": null,
     "stacked_commit": null,
