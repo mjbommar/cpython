@@ -1150,3 +1150,58 @@ What we learned:
 - the first source-level patch shape was too mixed even though the monkeypatch
   prototype looked strong. Requiring a rebuilt source proof before acceptance
   prevented us from promoting the wrong shape
+
+## 2026-04-24 update: unittest.mock magic init fast path
+
+Accepted and cherry-picked commit:
+
+- `da38b7e8ff1` / `2a5fb9ed710`
+  `mock: skip eager magic setup for normal init`
+
+Clean-mainline focused result:
+
+- `bench_mock_magic_init.py` source proof:
+  - focused-harness geomean: about `+27.15%`
+  - `M1_magicmock_default`: `+15.70%`
+  - `M2_magicmock_named`: `+11.62%`
+  - `M3_magicmock_spec_list`: `+406.60%`
+  - `M4_magicmock_magic_kw_str`: `+0.06%`
+  - `M5_magicmock_magic_kw_iter`: `+1.12%`
+  - `M5b_magicmock_magic_kw_prefix`: `+3.21%`
+  - `M6_noncallable_default`: `+13.11%`
+  - `M7_noncallable_magic_kw_len`: `-0.48%`
+  - `M8_asyncmock_default`: `+12.93%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_mock_magic_init_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_unittest`: `SUCCESS` in `4.6 sec`
+- clean-mainline focused tests:
+  `test_asyncio test_inspect`: `SUCCESS` in `34.5 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,624` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 19 sec`
+- stacked guardrail:
+  `check_mock_magic_init_semantics.py`: `ok`
+- stacked focused tests:
+  `test_unittest`: `SUCCESS` in `6.1 sec`
+- stacked focused tests:
+  `test_asyncio test_inspect`: `SUCCESS` in `35.2 sec`
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 17 sec`
+
+What we learned:
+
+- the real `unittest.mock` signal was in the object-construction setup path,
+  not in broad call dispatch. This was a good fit for a `common-case split`
+  with a very cheap guard
+- the durable win came from skipping the first `_mock_set_magics()` pass for
+  the normal no-magic-kwargs case, while keeping the second pass and all slow
+  paths intact
+- the semantic trap was dotted magic kwargs like `__str__.return_value`; the
+  initial `_is_magic(key)` guard was too weak, and `test_unittest` caught it
+  immediately. The accepted shape uses `_is_magic(key.partition(".")[0])`,
+  which keeps the fast path conservative and correct
