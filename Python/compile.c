@@ -23,6 +23,7 @@
 #include "pycore_runtime.h"       // _Py_ID()
 #include "pycore_setobject.h"     // _PySet_NextEntry()
 #include "pycore_stats.h"
+#include "pycore_time.h"          // PyTime_PerfCounterRaw()
 #include "pycore_tuple.h"         // _PyTuple_FromPair
 #include "pycore_unicodeobject.h" // _PyUnicode_EqualToASCIIString()
 
@@ -49,6 +50,40 @@ typedef _PyInstructionSequence instr_sequence;
 typedef struct _PyCfgBuilder cfg_builder;
 typedef _PyCompile_FBlockInfo fblockinfo;
 typedef enum _PyCompile_FBlockType fblocktype;
+
+static int
+compile_phase_stats_enabled(PyObject *filename)
+{
+    char *env = Py_GETENV("PYTHON_COMPILE_PHASE_STATS");
+    if (env == NULL || *env == '\0' || !PyUnicode_Check(filename)) {
+        return 0;
+    }
+
+    Py_ssize_t size = 0;
+    const char *text = PyUnicode_AsUTF8AndSize(filename, &size);
+    if (text == NULL) {
+        PyErr_Clear();
+        return 0;
+    }
+
+    static const char prefix[] = "[perf-compile]";
+    return size >= (Py_ssize_t)(sizeof(prefix) - 1)
+        && memcmp(text, prefix, sizeof(prefix) - 1) == 0;
+}
+
+static inline PyTime_t
+compile_phase_now(void)
+{
+    PyTime_t t = 0;
+    (void)PyTime_PerfCounterRaw(&t);
+    return t;
+}
+
+static inline PyTime_t
+compile_phase_elapsed(PyTime_t start)
+{
+    return compile_phase_now() - start;
+}
 
 /* The following items change on entry and exit of code blocks.
    They must be saved and restored when returning to a block.
@@ -104,6 +139,21 @@ typedef struct _PyCompiler {
     bool c_save_nested_seqs;     /* if true, construct recursive instruction sequences
                                   * (including instructions for nested code objects)
                                   */
+    int c_perf_enabled;
+    PyTime_t c_perf_setup_ns;
+    PyTime_t c_perf_preprocess_ns;
+    PyTime_t c_perf_symtable_ns;
+    PyTime_t c_perf_compiler_mod_ns;
+    PyTime_t c_perf_codegen_ns;
+    PyTime_t c_perf_optasm_ns;
+    PyTime_t c_perf_code_flags_ns;
+    PyTime_t c_perf_add_return_ns;
+    PyTime_t c_perf_code_unit_ns;
+    PyTime_t c_perf_consts_ns;
+    PyTime_t c_perf_cfg_from_instr_ns;
+    PyTime_t c_perf_cfg_opt_ns;
+    PyTime_t c_perf_cfg_to_instr_ns;
+    PyTime_t c_perf_assemble_ns;
     int c_disable_warning;
     PyObject *c_module;
 } compiler;
@@ -114,6 +164,11 @@ compiler_setup(compiler *c, mod_ty mod, PyObject *filename,
                PyObject *module)
 {
     PyCompilerFlags local_flags = _PyCompilerFlags_INIT;
+    PyTime_t setup_start = 0;
+
+    if (c->c_perf_enabled) {
+        setup_start = compile_phase_now();
+    }
 
     c->c_const_cache = PyDict_New();
     if (!c->c_const_cache) {
@@ -140,17 +195,42 @@ compiler_setup(compiler *c, mod_ty mod, PyObject *filename,
     c->c_optimize = (optimize == -1) ? _Py_GetConfig()->optimization_level : optimize;
     c->c_save_nested_seqs = false;
 
+    PyTime_t preprocess_start = 0;
+    if (c->c_perf_enabled) {
+        preprocess_start = compile_phase_now();
+    }
     if (!_PyAST_Preprocess(mod, arena, filename, c->c_optimize, merged,
                            0, 1, module))
     {
+        if (c->c_perf_enabled) {
+            c->c_perf_preprocess_ns = compile_phase_elapsed(preprocess_start);
+            c->c_perf_setup_ns = compile_phase_elapsed(setup_start);
+        }
         return ERROR;
     }
+    if (c->c_perf_enabled) {
+        c->c_perf_preprocess_ns = compile_phase_elapsed(preprocess_start);
+    }
+
+    PyTime_t symtable_start = 0;
+    if (c->c_perf_enabled) {
+        symtable_start = compile_phase_now();
+    }
     c->c_st = _PySymtable_Build(mod, filename, &c->c_future);
+    if (c->c_perf_enabled) {
+        c->c_perf_symtable_ns = compile_phase_elapsed(symtable_start);
+    }
     if (c->c_st == NULL) {
         if (!PyErr_Occurred()) {
             PyErr_SetString(PyExc_SystemError, "no symtable");
         }
+        if (c->c_perf_enabled) {
+            c->c_perf_setup_ns = compile_phase_elapsed(setup_start);
+        }
         return ERROR;
+    }
+    if (c->c_perf_enabled) {
+        c->c_perf_setup_ns = compile_phase_elapsed(setup_start);
     }
     return SUCCESS;
 }
@@ -176,6 +256,7 @@ new_compiler(mod_ty mod, PyObject *filename, PyCompilerFlags *pflags,
     if (c == NULL) {
         return NULL;
     }
+    c->c_perf_enabled = compile_phase_stats_enabled(filename);
     if (compiler_setup(c, mod, filename, pflags, optimize, arena, module) < 0) {
         compiler_free(c);
         return NULL;
@@ -893,10 +974,30 @@ compiler_mod(compiler *c, mod_ty mod)
 {
     PyCodeObject *co = NULL;
     int addNone = mod->kind != Expression_kind;
+    PyTime_t compiler_mod_start = 0;
+
+    if (c->c_perf_enabled) {
+        compiler_mod_start = compile_phase_now();
+    }
+
+    PyTime_t codegen_start = 0;
+    if (c->c_perf_enabled) {
+        codegen_start = compile_phase_now();
+    }
     if (compiler_codegen(c, mod) < 0) {
+        if (c->c_perf_enabled) {
+            c->c_perf_codegen_ns = compile_phase_elapsed(codegen_start);
+            c->c_perf_compiler_mod_ns = compile_phase_elapsed(compiler_mod_start);
+        }
         goto finally;
     }
+    if (c->c_perf_enabled) {
+        c->c_perf_codegen_ns = compile_phase_elapsed(codegen_start);
+    }
     co = _PyCompile_OptimizeAndAssemble(c, addNone);
+    if (c->c_perf_enabled) {
+        c->c_perf_compiler_mod_ns = compile_phase_elapsed(compiler_mod_start);
+    }
 finally:
     _PyCompile_ExitScope(c);
     return co;
@@ -1454,29 +1555,62 @@ compute_code_flags(compiler *c)
 }
 
 static PyCodeObject *
-optimize_and_assemble_code_unit(struct compiler_unit *u, PyObject *const_cache,
-                                int code_flags, PyObject *filename)
+optimize_and_assemble_code_unit(compiler *c, struct compiler_unit *u,
+                                PyObject *const_cache, int code_flags,
+                                PyObject *filename)
 {
     cfg_builder *g = NULL;
     instr_sequence optimized_instrs;
     memset(&optimized_instrs, 0, sizeof(instr_sequence));
 
     PyCodeObject *co = NULL;
+    PyTime_t code_unit_start = 0;
+    PyTime_t phase_start = 0;
+    if (c->c_perf_enabled) {
+        code_unit_start = compile_phase_now();
+        phase_start = compile_phase_now();
+    }
     PyObject *consts = consts_dict_keys_inorder(u->u_metadata.u_consts);
+    if (c->c_perf_enabled) {
+        c->c_perf_consts_ns = compile_phase_elapsed(phase_start);
+    }
     if (consts == NULL) {
+        if (c->c_perf_enabled) {
+            c->c_perf_code_unit_ns = compile_phase_elapsed(code_unit_start);
+        }
         goto error;
     }
+    if (c->c_perf_enabled) {
+        phase_start = compile_phase_now();
+    }
     g = _PyCfg_FromInstructionSequence(u->u_instr_sequence);
+    if (c->c_perf_enabled) {
+        c->c_perf_cfg_from_instr_ns = compile_phase_elapsed(phase_start);
+    }
     if (g == NULL) {
+        if (c->c_perf_enabled) {
+            c->c_perf_code_unit_ns = compile_phase_elapsed(code_unit_start);
+        }
         goto error;
     }
     int nlocals = (int)PyDict_GET_SIZE(u->u_metadata.u_varnames);
     int nparams = (int)PyList_GET_SIZE(u->u_ste->ste_varnames);
     assert(u->u_metadata.u_firstlineno);
 
+    if (c->c_perf_enabled) {
+        phase_start = compile_phase_now();
+    }
     if (_PyCfg_OptimizeCodeUnit(g, consts, const_cache, nlocals,
                                 nparams, u->u_metadata.u_firstlineno) < 0) {
+        if (c->c_perf_enabled) {
+            c->c_perf_cfg_opt_ns = compile_phase_elapsed(phase_start);
+            c->c_perf_code_unit_ns = compile_phase_elapsed(code_unit_start);
+        }
         goto error;
+    }
+    if (c->c_perf_enabled) {
+        c->c_perf_cfg_opt_ns = compile_phase_elapsed(phase_start);
+        phase_start = compile_phase_now();
     }
 
     int stackdepth;
@@ -1484,13 +1618,25 @@ optimize_and_assemble_code_unit(struct compiler_unit *u, PyObject *const_cache,
     if (_PyCfg_OptimizedCfgToInstructionSequence(g, &u->u_metadata,
                                                  &stackdepth, &nlocalsplus,
                                                  &optimized_instrs) < 0) {
+        if (c->c_perf_enabled) {
+            c->c_perf_cfg_to_instr_ns = compile_phase_elapsed(phase_start);
+            c->c_perf_code_unit_ns = compile_phase_elapsed(code_unit_start);
+        }
         goto error;
+    }
+    if (c->c_perf_enabled) {
+        c->c_perf_cfg_to_instr_ns = compile_phase_elapsed(phase_start);
+        phase_start = compile_phase_now();
     }
 
     /** Assembly **/
     co = _PyAssemble_MakeCodeObject(&u->u_metadata, const_cache, consts,
                                     stackdepth, &optimized_instrs, nlocalsplus,
                                     code_flags, filename);
+    if (c->c_perf_enabled) {
+        c->c_perf_assemble_ns = compile_phase_elapsed(phase_start);
+        c->c_perf_code_unit_ns = compile_phase_elapsed(code_unit_start);
+    }
 
 error:
     Py_XDECREF(consts);
@@ -1506,17 +1652,44 @@ _PyCompile_OptimizeAndAssemble(compiler *c, int addNone)
     struct compiler_unit *u = c->u;
     PyObject *const_cache = c->c_const_cache;
     PyObject *filename = c->c_filename;
+    PyTime_t optasm_start = 0;
+    PyTime_t phase_start = 0;
+
+    if (c->c_perf_enabled) {
+        optasm_start = compile_phase_now();
+        phase_start = compile_phase_now();
+    }
 
     int code_flags = compute_code_flags(c);
+    if (c->c_perf_enabled) {
+        c->c_perf_code_flags_ns = compile_phase_elapsed(phase_start);
+    }
     if (code_flags < 0) {
+        if (c->c_perf_enabled) {
+            c->c_perf_optasm_ns = compile_phase_elapsed(optasm_start);
+        }
         return NULL;
     }
 
+    if (c->c_perf_enabled) {
+        phase_start = compile_phase_now();
+    }
     if (_PyCodegen_AddReturnAtEnd(c, addNone) < 0) {
+        if (c->c_perf_enabled) {
+            c->c_perf_add_return_ns = compile_phase_elapsed(phase_start);
+            c->c_perf_optasm_ns = compile_phase_elapsed(optasm_start);
+        }
         return NULL;
     }
+    if (c->c_perf_enabled) {
+        c->c_perf_add_return_ns = compile_phase_elapsed(phase_start);
+    }
 
-    return optimize_and_assemble_code_unit(u, const_cache, code_flags, filename);
+    PyCodeObject *co = optimize_and_assemble_code_unit(c, u, const_cache, code_flags, filename);
+    if (c->c_perf_enabled) {
+        c->c_perf_optasm_ns = compile_phase_elapsed(optasm_start);
+    }
+    return co;
 }
 
 PyCodeObject *
@@ -1524,13 +1697,101 @@ _PyAST_Compile(mod_ty mod, PyObject *filename, PyCompilerFlags *pflags,
                int optimize, PyArena *arena, PyObject *module)
 {
     assert(!PyErr_Occurred());
+    int perf_enabled = compile_phase_stats_enabled(filename);
+    PyTime_t total_start = 0;
+    if (perf_enabled) {
+        total_start = compile_phase_now();
+    }
+
     compiler *c = new_compiler(mod, filename, pflags, optimize, arena, module);
+    PyTime_t new_compiler_ns = 0;
+    if (perf_enabled) {
+        new_compiler_ns = compile_phase_elapsed(total_start);
+    }
     if (c == NULL) {
         return NULL;
     }
 
     PyCodeObject *co = compiler_mod(c, mod);
+    PyObject *perf_filename = NULL;
+    PyTime_t setup_ns = 0;
+    PyTime_t preprocess_ns = 0;
+    PyTime_t symtable_ns = 0;
+    PyTime_t compiler_mod_ns = 0;
+    PyTime_t codegen_ns = 0;
+    PyTime_t optasm_ns = 0;
+    PyTime_t code_flags_ns = 0;
+    PyTime_t add_return_ns = 0;
+    PyTime_t code_unit_ns = 0;
+    PyTime_t consts_ns = 0;
+    PyTime_t cfg_from_instr_ns = 0;
+    PyTime_t cfg_opt_ns = 0;
+    PyTime_t cfg_to_instr_ns = 0;
+    PyTime_t assemble_ns = 0;
+    if (c->c_perf_enabled) {
+        perf_filename = Py_NewRef(c->c_filename);
+        setup_ns = c->c_perf_setup_ns;
+        preprocess_ns = c->c_perf_preprocess_ns;
+        symtable_ns = c->c_perf_symtable_ns;
+        compiler_mod_ns = c->c_perf_compiler_mod_ns;
+        codegen_ns = c->c_perf_codegen_ns;
+        optasm_ns = c->c_perf_optasm_ns;
+        code_flags_ns = c->c_perf_code_flags_ns;
+        add_return_ns = c->c_perf_add_return_ns;
+        code_unit_ns = c->c_perf_code_unit_ns;
+        consts_ns = c->c_perf_consts_ns;
+        cfg_from_instr_ns = c->c_perf_cfg_from_instr_ns;
+        cfg_opt_ns = c->c_perf_cfg_opt_ns;
+        cfg_to_instr_ns = c->c_perf_cfg_to_instr_ns;
+        assemble_ns = c->c_perf_assemble_ns;
+    }
+
+    PyTime_t free_start = 0;
+    if (c->c_perf_enabled) {
+        free_start = compile_phase_now();
+    }
     compiler_free(c);
+    PyTime_t free_ns = 0;
+    PyTime_t total_ns = 0;
+    if (perf_enabled) {
+        free_ns = compile_phase_elapsed(free_start);
+        total_ns = compile_phase_elapsed(total_start);
+    }
+    if (perf_filename != NULL) {
+        const char *perf_filename_text = PyUnicode_AsUTF8(perf_filename);
+        if (perf_filename_text == NULL) {
+            PyErr_Clear();
+        }
+        else {
+            fprintf(stderr,
+                    "compile-phase\tfilename=%s\t"
+                    "total_ns=%lld\tnew_compiler_ns=%lld\tsetup_ns=%lld\t"
+                    "preprocess_ns=%lld\tsymtable_ns=%lld\tcompiler_mod_ns=%lld\t"
+                    "codegen_ns=%lld\toptasm_ns=%lld\tcode_flags_ns=%lld\t"
+                    "add_return_ns=%lld\tcode_unit_ns=%lld\tconsts_ns=%lld\t"
+                    "cfg_from_instr_ns=%lld\tcfg_opt_ns=%lld\tcfg_to_instr_ns=%lld\t"
+                    "assemble_ns=%lld\tfree_ns=%lld\n",
+                    perf_filename_text,
+                    (long long)total_ns,
+                    (long long)new_compiler_ns,
+                    (long long)setup_ns,
+                    (long long)preprocess_ns,
+                    (long long)symtable_ns,
+                    (long long)compiler_mod_ns,
+                    (long long)codegen_ns,
+                    (long long)optasm_ns,
+                    (long long)code_flags_ns,
+                    (long long)add_return_ns,
+                    (long long)code_unit_ns,
+                    (long long)consts_ns,
+                    (long long)cfg_from_instr_ns,
+                    (long long)cfg_opt_ns,
+                    (long long)cfg_to_instr_ns,
+                    (long long)assemble_ns,
+                    (long long)free_ns);
+        }
+        Py_DECREF(perf_filename);
+    }
     assert(co || PyErr_Occurred());
     return co;
 }
