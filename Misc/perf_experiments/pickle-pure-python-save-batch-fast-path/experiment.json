@@ -1,0 +1,51 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickle-pure-python-save-batch-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickle-pure-python-save-batch-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickle-pure-python-save-batch-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickle-pure-python-save-batch-fast-path"
+  },
+  "base_commit": "01b070756168ca23ae0af051b2fda562d40c3361",
+  "branch": "exp-pickle/save-mainline",
+  "created_at": "2026-04-24T16:08:33+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickle",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh ranked review still leaves pure-Python pickle save-side hotspots in Pickler.save(), save_list(), and _batch_appends(). The likely leverage is in exact-list/common-batch paths, not another broad reducer-dispatch rewrite.",
+  "notes": [
+    "2026-04-24T16:09:02+00:00 2026-04-24 Usage scan: stacked discovery profile /tmp/stacked-discovery-2026-04-24.pstats still shows save-side pure-Python pickle cost after prior winners: save() cumtime 5.501s, save_list() 4.043s, save_tuple() 3.559s, save_dict() 1.699s, memoize() 1.084s, _batch_appends() 0.412s.",
+    "2026-04-24T16:16:20+00:00 2026-04-24 Verified stacked baseline already includes the older pure-Python pickle save-side winner set from exp-pickle/4-pure-python-exact-containers: exact list/dict batching, atomic save fast path, memoize inline, and bytes fast path. This family is explicitly incremental on top of that stacked baseline.",
+    "2026-04-24T16:37:04+00:00 2026-04-24 Clean source proof: exact _Pickler homogeneous exact-int list specialization in _batch_appends_exact measured 1.175447x geomean (+17.54%) on reduced same-worktree source A/B; focused tests test_pickle/test_picklebuffer/test_pickletools, test_copy/test_copyreg, and test_shelve passed; full suite passed in 4 min 22 sec (49,892 run, 2,620 skipped).",
+    "2026-04-24T16:42:37+00:00 2026-04-24 Stacked validation: cherry-picked b76535a0ca8 as f9d0024b371 into cpython-combined-winners; guardrail passed; focused tests test_pickle/test_picklebuffer/test_pickletools and test_copy/test_copyreg/test_shelve passed; full suite passed in 4 min 19 sec (49,892 run, 2,621 skipped)."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "b76535a0ca8",
+    "stacked_commit": "f9d0024b371",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "pickle-pure-python-save-batch-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickle.py:562 Pickler.save",
+    "Lib/pickle.py:1024 save_list",
+    "Lib/pickle.py:1037 _batch_appends"
+  ],
+  "title": "pickle pure-Python save batch fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

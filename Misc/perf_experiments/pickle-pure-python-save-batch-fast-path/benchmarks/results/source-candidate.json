@@ -1,0 +1,101 @@
+{
+  "S1_list_of_ints_10k_dump": {
+    "best_ns": 3363278.4,
+    "label": "list_of_ints_10k_dump",
+    "loops": 80,
+    "mean_ns": 3405407.5,
+    "repeat": 5,
+    "samples_ns": [
+      3411554.7,
+      3429945.7,
+      3368670.6,
+      3453587.9,
+      3363278.4
+    ]
+  },
+  "S2_list_of_strs_1k_dump": {
+    "best_ns": 1018046.4,
+    "label": "list_of_strs_1k_dump",
+    "loops": 200,
+    "mean_ns": 1028427.1,
+    "repeat": 5,
+    "samples_ns": [
+      1020388.3,
+      1018046.4,
+      1053023.0,
+      1021974.5,
+      1028703.1
+    ]
+  },
+  "S3_nested_list_of_dicts_dump": {
+    "best_ns": 2646244.3,
+    "label": "nested_list_of_dicts_dump",
+    "loops": 400,
+    "mean_ns": 2651966.2,
+    "repeat": 5,
+    "samples_ns": [
+      2660549.3,
+      2646244.3,
+      2654024.5,
+      2650962.0,
+      2648050.9
+    ]
+  },
+  "S4_deep_list_dump": {
+    "best_ns": 2046484.9,
+    "label": "deep_list_dump",
+    "loops": 400,
+    "mean_ns": 2053790.2,
+    "repeat": 5,
+    "samples_ns": [
+      2063887.5,
+      2054404.3,
+      2054168.2,
+      2046484.9,
+      2050006.3
+    ]
+  },
+  "S5_mixed_scalar_list_dump": {
+    "best_ns": 843764.5,
+    "label": "mixed_scalar_list_dump",
+    "loops": 400,
+    "mean_ns": 859559.6,
+    "repeat": 5,
+    "samples_ns": [
+      865006.0,
+      870804.4,
+      843764.5,
+      856044.1,
+      862179.2
+    ]
+  },
+  "S6_bool_list_dump": {
+    "best_ns": 1371033.1,
+    "label": "bool_list_dump",
+    "loops": 1200,
+    "mean_ns": 1377107.6,
+    "repeat": 5,
+    "samples_ns": [
+      1380759.4,
+      1377726.7,
+      1379873.5,
+      1376145.4,
+      1371033.1
+    ]
+  },
+  "S7_small_int_run_dump": {
+    "best_ns": 27364.2,
+    "label": "small_int_run_dump",
+    "loops": 1200,
+    "mean_ns": 28473.8,
+    "repeat": 5,
+    "samples_ns": [
+      27364.2,
+      27445.6,
+      27888.6,
+      28413.3,
+      31257.4
+    ]
+  },
+  "variant": "baseline"
+}
