@@ -1,0 +1,130 @@
+{
+  "I1_compile_bytecode_tiny": {
+    "best_ns": 1376.7,
+    "label": "_compile_bytecode tiny",
+    "loops": 15000,
+    "mean_ns": 1465.4,
+    "repeat": 7,
+    "samples_ns": [
+      1376.7,
+      1500.3,
+      1414.9,
+      1407.8,
+      1399.2,
+      1444.6,
+      1714.3
+    ]
+  },
+  "I2_compile_bytecode_nested": {
+    "best_ns": 2379.5,
+    "label": "_compile_bytecode nested",
+    "loops": 15000,
+    "mean_ns": 2422.7,
+    "repeat": 7,
+    "samples_ns": [
+      2565.7,
+      2407.8,
+      2379.5,
+      2402.3,
+      2386.3,
+      2430.6,
+      2386.9
+    ]
+  },
+  "I3_compile_bytecode_many_consts": {
+    "best_ns": 4343.5,
+    "label": "_compile_bytecode many consts",
+    "loops": 15000,
+    "mean_ns": 4366.9,
+    "repeat": 7,
+    "samples_ns": [
+      4350.5,
+      4353.2,
+      4357.7,
+      4423.3,
+      4361.9,
+      4377.9,
+      4343.5
+    ]
+  },
+  "I4_compile_bytecode_class_methods": {
+    "best_ns": 3843.0,
+    "label": "_compile_bytecode class methods",
+    "loops": 15000,
+    "mean_ns": 3948.3,
+    "repeat": 7,
+    "samples_ns": [
+      3867.8,
+      3843.0,
+      3942.6,
+      3911.7,
+      4213.8,
+      3988.1,
+      3871.1
+    ]
+  },
+  "M1_load_tiny": {
+    "best_ns": 846.5,
+    "label": "marshal.loads tiny",
+    "loops": 15000,
+    "mean_ns": 892.6,
+    "repeat": 7,
+    "samples_ns": [
+      867.8,
+      862.1,
+      856.6,
+      846.5,
+      972.4,
+      978.9,
+      863.8
+    ]
+  },
+  "M2_load_nested": {
+    "best_ns": 1877.7,
+    "label": "marshal.loads nested",
+    "loops": 15000,
+    "mean_ns": 1995.7,
+    "repeat": 7,
+    "samples_ns": [
+      1877.7,
+      1915.1,
+      2057.4,
+      2154.7,
+      2085.4,
+      1974.5,
+      1904.8
+    ]
+  },
+  "M3_load_many_consts": {
+    "best_ns": 3763.0,
+    "label": "marshal.loads many consts",
+    "loops": 15000,
+    "mean_ns": 3790.0,
+    "repeat": 7,
+    "samples_ns": [
+      3819.6,
+      3779.6,
+      3763.0,
+      3801.9,
+      3770.9,
+      3783.0,
+      3811.8
+    ]
+  },
+  "M4_load_class_methods": {
+    "best_ns": 3386.3,
+    "label": "marshal.loads class methods",
+    "loops": 15000,
+    "mean_ns": 3403.1,
+    "repeat": 7,
+    "samples_ns": [
+      3408.3,
+      3394.3,
+      3405.2,
+      3402.1,
+      3418.3,
+      3386.3,
+      3407.6
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/marshal-code-object-load-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/marshal-code-object-load-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/marshal-code-object-load-fast-path/guardrails",
+    "root": "Misc/perf_experiments/marshal-code-object-load-fast-path"
+  },
+  "base_commit": "b9f0f6309ec1ef08f3a73f7f01eeb12d824ceb23",
+  "branch": "exp-marshal/load-mainline",
+  "created_at": "2026-04-24T15:18:43+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "marshal",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. After the importlib winners, the remaining pyc path still relies on marshal.loads for code-object decode. The likely leverage is a narrower fast path around code-object-heavy loads used by importlib rather than generic marshal rewrites.",
+  "notes": [
+    "2026-04-24T15:20:56+00:00 2026-04-24 Usage scan: importlib._bootstrap_external._compile_bytecode and zipimport both sit directly on marshal.loads code-object decode, so this family is scoped to pyc/code-object loads rather than generic marshal traffic.",
+    "2026-04-24T15:20:56+00:00 2026-04-24 Built focused marshal/importlib code-object load corpus and baseline. Means: M1 892.6 ns, M2 1995.7 ns, M3 3790.0 ns, M4 3403.1 ns, I1 1465.4 ns, I2 2422.7 ns, I3 4366.9 ns, I4 3948.3 ns. Guardrail passed."
+  ],
+  "phase": "benchmarks",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "marshal-code-object-load-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Python/marshal.c:1881 PyMarshal_ReadObjectFromString",
+    "Lib/importlib/_bootstrap_external.py:500 _compile_bytecode"
+  ],
+  "title": "marshal code-object load fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
