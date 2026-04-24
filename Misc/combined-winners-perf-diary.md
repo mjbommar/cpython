@@ -1688,3 +1688,51 @@ What we learned:
 - the root `main` tree did not contain `_batch_appends_exact()`, so the
   correct clean-branch base for this family was the prior pickle save branch,
   not bare `main`
+
+## 2026-04-24 update: flowgraph instruction-sequence preallocation
+
+Accepted and cherry-picked commit:
+
+- `2d319755662` / `3978a15ff66`
+  `flowgraph: preallocate instruction sequence conversion`
+
+Clean-mainline focused result:
+
+- `bench_compile_ast_structural.py` same-worktree source proof:
+  - focused-harness geomean: about `+3.94%`
+  - `C1_module_assign`: `+5.61%`
+  - `C2_module_many_assign`: `+2.44%`
+  - `C3_function_module`: `+4.73%`
+  - `C4_class_module`: `+5.63%`
+  - `C5_nested_functions`: `+2.19%`
+  - `C6_list_comprehension`: `+3.08%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_compile_ast_structural_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_compile test_ast`: passed
+- clean-mainline focused tests:
+  `test_symtable test_dis`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `SUCCESS` in `4 min 20 sec`
+- stacked guardrail:
+  `check_compile_ast_structural_semantics.py`: `ok`
+- stacked focused tests:
+  `test_compile test_ast`: passed
+- stacked focused tests:
+  `test_symtable test_dis`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the remaining leverage in this compile family was not in `_PyAST_Compile()`
+  setup, but lower in the `optimize_and_assemble_code_unit()` pipeline,
+  specifically the empty-sequence path inside `_PyCfg_ToInstructionSequence()`
+- exact preallocation plus direct fill was the right shape here because it
+  removed repeated growth checks and helper dispatch from the hottest lowering
+  loop without widening the compiler surface
+- the measurement-only compile phase probe stayed off the stacked branch; only
+  the real flowgraph winner was promoted
