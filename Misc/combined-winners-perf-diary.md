@@ -1428,3 +1428,58 @@ What we learned:
 - the final winner is small but real: a narrow internal-helper substitution
   that improves both direct `marshal.loads()` code-object cases and importlib
   `_compile_bytecode()` without destabilizing the stacked branch
+
+## 2026-04-24 update: pickle exact-int batch append fast path
+
+Accepted and cherry-picked commit:
+
+- `b76535a0ca8` / `f9d0024b371`
+  `pickle: specialize exact-int list batch appends`
+
+Clean-mainline focused result:
+
+- `bench_pickle_pure_save_batch.py` reduced same-worktree source proof:
+  - focused-harness geomean: about `+17.54%`
+  - `S1_list_of_ints_10k_dump`: `+43.65%`
+  - `S2_list_of_strs_1k_dump`: `+1.18%`
+  - `S3_nested_list_of_dicts_dump`: `+1.64%`
+  - `S4_deep_list_dump`: `+36.20%`
+  - `S5_mixed_scalar_list_dump`: `-3.71%`
+  - `S6_bool_list_dump`: `-1.42%`
+  - `S7_small_int_run_dump`: `+62.34%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_pickle_pure_save_batch_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- clean-mainline focused tests:
+  `test_copy test_copyreg`: passed
+- clean-mainline focused tests:
+  `test_shelve`: passed
+- clean-mainline full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 22 sec`
+- stacked guardrail:
+  `check_pickle_pure_save_batch_semantics.py`: `ok`
+- stacked focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- stacked focused tests:
+  `test_copy test_copyreg test_shelve`: passed
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 19 sec`
+
+What we learned:
+
+- the older pure-Python pickle save-side winner set was already in the stacked
+  branch, so the only worthwhile incremental move here was a narrower
+  specialization inside the existing exact-list batching path rather than
+  another broad rewrite of `save()` or `save_list()`
+- specializing only exact `_Pickler` on homogeneous exact-`int` lists is the
+  right safety boundary because it bypasses `save()` dispatch without skipping
+  any user override hooks on subclasses
+- preserving the existing per-batch snapshot behavior kept the current
+  concurrent-mutation tolerance while still capturing most of the win from
+  direct `save_long()` dispatch
