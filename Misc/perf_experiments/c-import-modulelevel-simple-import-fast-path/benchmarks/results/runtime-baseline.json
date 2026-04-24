@@ -1,0 +1,146 @@
+{
+  "I1_plain_math": {
+    "best_ns": 109.9,
+    "label": "import math",
+    "loops": 400000,
+    "mean_ns": 111.6,
+    "repeat": 9,
+    "samples_ns": [
+      110.6,
+      113.8,
+      109.9,
+      111.4,
+      115.1,
+      111.6,
+      111.5,
+      110.5,
+      110.1
+    ]
+  },
+  "I2_plain_json": {
+    "best_ns": 117.6,
+    "label": "import json",
+    "loops": 400000,
+    "mean_ns": 120.8,
+    "repeat": 9,
+    "samples_ns": [
+      118.9,
+      117.9,
+      117.6,
+      121.2,
+      132.7,
+      120.3,
+      118.6,
+      121.6,
+      118.2
+    ]
+  },
+  "I3_dotted_email": {
+    "best_ns": 223.5,
+    "label": "import email.parser",
+    "loops": 400000,
+    "mean_ns": 228.2,
+    "repeat": 9,
+    "samples_ns": [
+      223.7,
+      223.6,
+      234.9,
+      233.2,
+      224.7,
+      223.5,
+      224.8,
+      223.8,
+      241.2
+    ]
+  },
+  "I4_dotted_xml": {
+    "best_ns": 220.3,
+    "label": "import xml.etree.ElementTree",
+    "loops": 400000,
+    "mean_ns": 222.9,
+    "repeat": 9,
+    "samples_ns": [
+      222.0,
+      220.9,
+      220.4,
+      222.1,
+      223.4,
+      222.8,
+      233.0,
+      220.3,
+      221.5
+    ]
+  },
+  "I5_from_email": {
+    "best_ns": 377.8,
+    "label": "from email import parser",
+    "loops": 400000,
+    "mean_ns": 383.9,
+    "repeat": 9,
+    "samples_ns": [
+      389.5,
+      390.5,
+      378.6,
+      379.5,
+      377.8,
+      380.4,
+      380.0,
+      398.7,
+      380.2
+    ]
+  },
+  "I6_from_xml": {
+    "best_ns": 374.4,
+    "label": "from xml.etree import ElementTree",
+    "loops": 400000,
+    "mean_ns": 377.8,
+    "repeat": 9,
+    "samples_ns": [
+      376.2,
+      375.4,
+      375.6,
+      376.1,
+      375.6,
+      396.4,
+      374.7,
+      375.4,
+      374.4
+    ]
+  },
+  "I7_builtin_default": {
+    "best_ns": 105.8,
+    "label": "__import__('math')",
+    "loops": 400000,
+    "mean_ns": 107.1,
+    "repeat": 9,
+    "samples_ns": [
+      106.5,
+      107.2,
+      106.7,
+      105.8,
+      106.3,
+      108.9,
+      108.2,
+      106.4,
+      108.1
+    ]
+  },
+  "I8_builtin_empty_tuple": {
+    "best_ns": 314.5,
+    "label": "__import__('math', globals(), locals(), (), 0)",
+    "loops": 400000,
+    "mean_ns": 322.6,
+    "repeat": 9,
+    "samples_ns": [
+      343.5,
+      320.5,
+      315.8,
+      316.5,
+      314.5,
+      323.6,
+      316.3,
+      322.1,
+      330.7
+    ]
+  }
+}

@@ -73,40 +73,95 @@ loads used by the import system, not to broad generic marshal rewrites.
 
 ### E1
 
-Status: pending.
+Status: accepted on the clean branch.
 
 Thesis:
 
-Pending code inspection in `Python/marshal.c`.
+`PyMarshal_ReadObjectFromString()` itself is only a tiny wrapper, but the
+reference-list bookkeeping under `r_ref_reserve()` and `r_ref()` sits directly
+on the code-object load path. The candidate is a narrow helper specialization:
+replace generic `PyList_Append()` calls with `_PyList_AppendTakeRef()` and make
+the ownership transfer explicit with `Py_NewRef(...)`.
 
 Result:
 
-Not yet attempted.
+- Clean source patch:
+  - add `pycore_list.h`
+  - `r_ref_reserve()`: append `Py_NewRef(Py_None)` via
+    `_PyList_AppendTakeRef()`
+  - `r_ref()`: append `Py_NewRef(o)` via `_PyList_AppendTakeRef()`
+- Clean source baseline:
+  - `M1_load_tiny`: about `954.2 ns`
+  - `M2_load_nested`: about `2042.0 ns`
+  - `M3_load_many_consts`: about `3881.6 ns`
+  - `M4_load_class_methods`: about `3583.9 ns`
+  - `I1_compile_bytecode_tiny`: about `1301.3 ns`
+  - `I2_compile_bytecode_nested`: about `2539.9 ns`
+  - `I3_compile_bytecode_many_consts`: about `4454.5 ns`
+  - `I4_compile_bytecode_class_methods`: about `3986.1 ns`
+- Clean source candidate:
+  - `M1_load_tiny`: about `874.7 ns` (`+9.09%`)
+  - `M2_load_nested`: about `1971.0 ns` (`+3.60%`)
+  - `M3_load_many_consts`: about `3897.1 ns` (`-0.40%`)
+  - `M4_load_class_methods`: about `3502.1 ns` (`+2.34%`)
+  - `I1_compile_bytecode_tiny`: about `1273.5 ns` (`+2.18%`)
+  - `I2_compile_bytecode_nested`: about `2387.0 ns` (`+6.41%`)
+  - `I3_compile_bytecode_many_consts`: about `4416.3 ns` (`+0.86%`)
+  - `I4_compile_bytecode_class_methods`: about `3824.0 ns` (`+4.24%`)
+- Geomean:
+  - about `+3.50%`
+- Guardrail:
+  - passed on the clean worktree
+
+Implementation note:
+
+The first proof attempt used `_PyList_AppendTakeRef(..., o)` directly in
+`r_ref()`. That was wrong: `r_ref()` still returns `o` to the caller, so the
+list append must consume a *new* reference, not the caller's ownership. That
+mistake caused memory corruption during the freeze regeneration build step
+(`malloc(): unaligned tcache chunk detected`). The corrected variant uses
+`Py_NewRef(o)` and rebuilt cleanly.
 
 Decision:
 
-Not yet attempted.
+Accepted on the clean branch.
 
 ## Validation
 
 - Guardrails:
   - runtime guardrail: passed
+  - clean source guardrail: passed
+  - stacked guardrail: passed
 - Focused tests:
-  - not run
+  - `test_marshal test_importlib test_zipimport`: passed
+  - `test_pkgutil test_pstats test_modulefinder`: passed
+  - stacked `test_marshal test_importlib test_zipimport`: passed
+  - stacked `test_pkgutil test_pstats test_modulefinder`: passed
 - Full suite:
-  - not run
+  - clean branch full suite passed:
+    - `49,882` run
+    - `2,623` skipped
+    - `SUCCESS` in `4 min 21 sec`
+  - stacked branch full suite passed:
+    - `49,892` run
+    - `2,620` skipped
+    - `SUCCESS` in `4 min 18 sec`
 - Ecosystem / third-party:
   - not run
 
 ## Acceptance Decision
 
-- Decision: pending
-- Accepted commit:
-- Stacked winner commit:
+- Decision: accepted and stacked
+- Accepted commit: `24902c5e383`
+- Stacked winner commit: `dfe1cfe4679`
 
 ## Notes
 
-- Current phase: `benchmarks`
-- The next gate is candidate enumeration inside `marshal.c`, likely around
-  code-object-heavy read paths rather than the tiny `PyMarshal_ReadObjectFromString()`
-  wrapper itself.
+- Native `perf` attribution was blocked on this machine by
+  `perf_event_paranoid=4`, so this family relied on static source inspection,
+  targeted code-object load benches, and source-proof measurement rather than
+  sampled C-level profiles.
+- Current phase: `stacked`
+- The stacked branch reproduced the clean validation shape without any new
+  failures, which is the important result for this family: the reference-list
+  helper specialization composes cleanly with the existing winner stack.

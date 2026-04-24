@@ -1,0 +1,50 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/c-import-modulelevel-simple-import-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/c-import-modulelevel-simple-import-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/c-import-modulelevel-simple-import-fast-path/guardrails",
+    "root": "Misc/perf_experiments/c-import-modulelevel-simple-import-fast-path"
+  },
+  "base_commit": "2d21eb5651e76845536b5c6385d6236dee32c0b1",
+  "branch": "exp-import/c-modulelevel-mainline",
+  "created_at": "2026-04-24T17:45:35+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "import",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. PyImport_ImportModuleLevelObject() still carries generic fromlist/dotted-name post-processing even after the dominant absolute no-fromlist no-dot import path has already produced the module. A narrow early return for that shape may reduce repeated import-statement overhead on both cache-hit and cached-submodule paths without changing import semantics.",
+  "notes": [
+    "2026-04-24T17:51:02+00:00 2026-04-24 Usage scan via AST census over Lib/ (excluding tests): 2,302 import aliases total, 2,171 plain no-dot aliases (94.31%), 131 dotted aliases (5.69%); 1,695 from-import nodes total, 1,202 absolute (70.91%), 493 relative (29.09%).",
+    "2026-04-24T17:51:02+00:00 2026-04-24 Guardrail passed: plain import, dotted import, from-import, builtin __import__ default/empty-tuple cases, and a custom falsey fromlist object all preserved expected semantics.",
+    "2026-04-24T17:51:02+00:00 2026-04-24 Baseline cached-import corpus recorded. Means: I1 import math 111.6 ns, I2 import json 120.8 ns, I3 import email.parser 228.2 ns, I4 import xml.etree.ElementTree 222.9 ns, I5 from email import parser 383.9 ns, I6 from xml.etree import ElementTree 377.8 ns, I7 __import__('math') 107.1 ns, I8 __import__('math', ..., (), 0) 322.6 ns.",
+    "2026-04-24T17:54:39+00:00 2026-04-24 E1 rejected after same-worktree source proof. Candidate: early return in PyImport_ImportModuleLevelObject() for level==0 plus NULL/None/exact-empty-tuple fromlist when name has no dot. Same-worktree source A/B: I1 +2.80%, I2 -2.79%, I3 -2.08%, I4 -2.55%, I5 +0.15%, I6 +0.67%, I7 +0.75%, I8 +2.44%; geomean -0.10%."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "c-import-modulelevel-simple-import-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Python/import.c:PyImport_ImportModuleLevelObject",
+    "Python/import.c:import_find_and_load"
+  ],
+  "title": "C import module-level simple import fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "files": 682,
+  "from_absolute_nodes": 1202,
+  "from_absolute_share": 0.7091,
+  "from_aliases": 2804,
+  "from_dotted_module_nodes": 324,
+  "from_nodes": 1695,
+  "from_plain_module_nodes": 1173,
+  "from_relative_nodes": 493,
+  "from_relative_share": 0.2909,
+  "from_star_aliases": 84,
+  "import_aliases": 2302,
+  "import_dotted_aliases": 131,
+  "import_dotted_share": 0.0569,
+  "import_nodes": 2231,
+  "import_plain_aliases": 2171,
+  "import_plain_share": 0.9431,
+  "parse_skipped": 7
+}
