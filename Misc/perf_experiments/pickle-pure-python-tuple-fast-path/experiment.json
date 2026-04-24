@@ -1,0 +1,50 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickle-pure-python-tuple-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickle-pure-python-tuple-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickle-pure-python-tuple-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickle-pure-python-tuple-fast-path"
+  },
+  "base_commit": "fbfae49a64ac80563cc9eabef3d93fad3c44ac8f",
+  "branch": "exp-pickle/tuple-mainline",
+  "created_at": "2026-04-24T16:46:27+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickle",
+  "hypothesis": "Archetype: exact-type gate plus common-case split. After the exact-list and exact-int batch winners, pure-Python pickle save-side cost still clusters in save_tuple(). The likely leverage is a narrower exact _Pickler / exact tuple common path that avoids generic per-element save() dispatch or redundant recursion bookkeeping for homogeneous atomic tuples while preserving recursive-tuple behavior.",
+  "notes": [
+    "2026-04-24T16:48:04+00:00 2026-04-24 Usage scan: stacked discovery profile /tmp/stacked-discovery-2026-04-24.pstats still shows pure-Python pickle save_tuple() at about 3.559s cumulative after the exact-list and exact-int batch winners. The old diary already deferred memoize-skip for atomic tuples because it changes byte output, so this family is explicitly scoped to byte-stable exact _Pickler / exact-int tuple specialization instead.",
+    "2026-04-24T16:49:28+00:00 2026-04-24 Runtime proof on stacked baseline: exact _Pickler homogeneous exact-int tuple specialization measured 1.191156x geomean (+19.12%) on the focused reduced harness; strongest cases were T1 tuple_of_ints_10k +48.84%, T3 nested_tuple +21.17%, T5 small_int_tuple +65.38%, T6 int_pair_tuple +15.37%.",
+    "2026-04-24T16:58:04+00:00 2026-04-24 Clean source proof: exact _Pickler homogeneous exact-int tuple specialization in save_tuple measured 1.194431x geomean (+19.44%) on reduced same-worktree source A/B; focused tests test_pickle/test_picklebuffer/test_pickletools and test_copy/test_copyreg/test_shelve passed; full suite passed in 4 min 21 sec (49,892 run, 2,623 skipped).",
+    "2026-04-24T17:14:54+00:00 2026-04-24 Stacked validation: cherry-picked a521002acec as 383516c4dfe into cpython-combined-winners; guardrail passed; focused tests test_pickle/test_picklebuffer/test_pickletools and test_copy/test_copyreg/test_shelve passed; full suite passed in 4 min 19 sec (49,892 run, 2,621 skipped)."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "a521002acec",
+    "stacked_commit": "383516c4dfe",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "pickle-pure-python-tuple-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickle.py:1028 save_tuple",
+    "Lib/pickle.py:581 save"
+  ],
+  "title": "pickle pure-Python tuple fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

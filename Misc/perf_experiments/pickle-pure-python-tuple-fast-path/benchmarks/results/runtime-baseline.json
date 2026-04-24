@@ -1,0 +1,101 @@
+{
+  "T1_tuple_of_ints_10k_dump": {
+    "best_ns": 4844123.9,
+    "label": "tuple_of_ints_10k_dump",
+    "loops": 80,
+    "mean_ns": 4915720.4,
+    "repeat": 5,
+    "samples_ns": [
+      4869995.2,
+      4923212.0,
+      4947965.2,
+      4844123.9,
+      4993305.9
+    ]
+  },
+  "T2_tuple_of_strs_1k_dump": {
+    "best_ns": 1030997.1,
+    "label": "tuple_of_strs_1k_dump",
+    "loops": 200,
+    "mean_ns": 1047151.4,
+    "repeat": 5,
+    "samples_ns": [
+      1038471.7,
+      1030997.1,
+      1052711.1,
+      1038010.0,
+      1075566.9
+    ]
+  },
+  "T3_nested_tuple_dump": {
+    "best_ns": 2690265.3,
+    "label": "nested_tuple_dump",
+    "loops": 400,
+    "mean_ns": 2703634.3,
+    "repeat": 5,
+    "samples_ns": [
+      2690265.3,
+      2693063.3,
+      2727296.4,
+      2706077.3,
+      2701469.2
+    ]
+  },
+  "T4_mixed_scalar_tuple_dump": {
+    "best_ns": 823059.1,
+    "label": "mixed_scalar_tuple_dump",
+    "loops": 400,
+    "mean_ns": 834627.1,
+    "repeat": 5,
+    "samples_ns": [
+      829225.4,
+      847453.6,
+      824471.7,
+      823059.1,
+      848925.9
+    ]
+  },
+  "T5_small_int_tuple_dump": {
+    "best_ns": 46852.6,
+    "label": "small_int_tuple_dump",
+    "loops": 1200,
+    "mean_ns": 47102.7,
+    "repeat": 5,
+    "samples_ns": [
+      47270.5,
+      47006.3,
+      47251.1,
+      46852.6,
+      47133.2
+    ]
+  },
+  "T6_int_pair_tuple_dump": {
+    "best_ns": 2217084.5,
+    "label": "int_pair_tuple_dump",
+    "loops": 400,
+    "mean_ns": 2233377.3,
+    "repeat": 5,
+    "samples_ns": [
+      2237230.5,
+      2241280.7,
+      2236413.1,
+      2234877.6,
+      2217084.5
+    ]
+  },
+  "T7_tuple_of_dicts_dump": {
+    "best_ns": 2654532.8,
+    "label": "tuple_of_dicts_dump",
+    "loops": 200,
+    "mean_ns": 2683479.7,
+    "repeat": 5,
+    "samples_ns": [
+      2690367.4,
+      2689340.9,
+      2654532.8,
+      2719808.3,
+      2663349.3
+    ]
+  },
+  "variant": "baseline"
+}
