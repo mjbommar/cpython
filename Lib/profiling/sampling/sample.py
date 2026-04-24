@@ -88,69 +88,125 @@ class SampleProfiler:
         num_samples = 0
         errors = 0
         interrupted = False
-        running_time_sec = 0
-        start_time = next_time = time.perf_counter()
+        running_time_sec = 0.0
+        perf_counter = time.perf_counter
+        sleep = time.sleep
+        start_time = next_time = perf_counter()
         last_sample_time = start_time
-        realtime_update_interval = 1.0  # Update every second
-        last_realtime_update = start_time
-        try:
-            while duration_sec is None or running_time_sec < duration_sec:
-                # Check if live collector wants to stop
-                if hasattr(collector, 'running') and not collector.running:
-                    break
+        unwinder = self.unwinder
+        collect = collector.collect
+        collect_failed_sample = collector.collect_failed_sample
+        sample_intervals = self.sample_intervals
+        has_running = hasattr(collector, 'running')
+        if async_aware == "all":
+            get_stack_trace = unwinder.get_all_awaited_by
+        elif async_aware == "running":
+            get_stack_trace = unwinder.get_async_stack_trace
+        else:
+            get_stack_trace = unwinder.get_stack_trace
 
-                current_time = time.perf_counter()
-                if next_time > current_time:
-                    sleep_time = (next_time - current_time) * 0.9
-                    if sleep_time > 0.0001:
-                        time.sleep(sleep_time)
-                elif next_time < current_time:
-                    try:
-                        with _pause_threads(self.unwinder, self.blocking):
-                            if async_aware == "all":
-                                stack_frames = self.unwinder.get_all_awaited_by()
-                            elif async_aware == "running":
-                                stack_frames = self.unwinder.get_async_stack_trace()
-                            else:
-                                stack_frames = self.unwinder.get_stack_trace()
-                            collector.collect(stack_frames)
-                    except ProcessLookupError as e:
-                        running_time_sec = current_time - start_time
-                        break
-                    except (RuntimeError, UnicodeDecodeError, MemoryError, OSError):
-                        collector.collect_failed_sample()
-                        errors += 1
-                    except Exception as e:
-                        if not _is_process_running(self.pid):
+        if (
+            not self.blocking
+            and not self.realtime_stats
+            and not has_running
+            and not async_aware
+        ):
+            total_samples = self.total_samples
+            try:
+                while duration_sec is None or running_time_sec < duration_sec:
+                    current_time = perf_counter()
+                    if next_time > current_time:
+                        sleep_time = (next_time - current_time) * 0.9
+                        if sleep_time > 0.0001:
+                            sleep(sleep_time)
+                    elif next_time < current_time:
+                        try:
+                            collect(get_stack_trace())
+                        except ProcessLookupError:
+                            running_time_sec = current_time - start_time
                             break
-                        raise e from None
+                        except (RuntimeError, UnicodeDecodeError, MemoryError, OSError):
+                            collect_failed_sample()
+                            errors += 1
+                        except Exception as e:
+                            if not _is_process_running(self.pid):
+                                break
+                            raise e from None
 
-                    # Track actual sampling intervals for real-time stats
-                    if num_samples > 0:
-                        actual_interval = current_time - last_sample_time
-                        self.sample_intervals.append(
-                            1.0 / actual_interval
-                        )  # Convert to Hz
-                        self.total_samples += 1
+                        if num_samples > 0:
+                            actual_interval = current_time - last_sample_time
+                            sample_intervals.append(
+                                1.0 / actual_interval
+                            )  # Convert to Hz
+                            total_samples += 1
 
-                        # Print real-time statistics if enabled
-                        if (
-                            self.realtime_stats
-                            and (current_time - last_realtime_update)
-                            >= realtime_update_interval
-                        ):
-                            self._print_realtime_stats()
-                            last_realtime_update = current_time
+                        last_sample_time = current_time
+                        num_samples += 1
+                        next_time += sample_interval_sec
 
-                    last_sample_time = current_time
-                    num_samples += 1
-                    next_time += sample_interval_sec
+                    running_time_sec = perf_counter() - start_time
+            except KeyboardInterrupt:
+                interrupted = True
+                running_time_sec = perf_counter() - start_time
+                print("Interrupted by user.")
 
-                running_time_sec = time.perf_counter() - start_time
-        except KeyboardInterrupt:
-            interrupted = True
-            running_time_sec = time.perf_counter() - start_time
-            print("Interrupted by user.")
+            self.total_samples = total_samples
+        else:
+            realtime_stats = self.realtime_stats
+            print_realtime_stats = self._print_realtime_stats
+            realtime_update_interval = 1.0  # Update every second
+            last_realtime_update = start_time
+            try:
+                while duration_sec is None or running_time_sec < duration_sec:
+                    # Check if live collector wants to stop
+                    if has_running and not collector.running:
+                        break
+
+                    current_time = perf_counter()
+                    if next_time > current_time:
+                        sleep_time = (next_time - current_time) * 0.9
+                        if sleep_time > 0.0001:
+                            sleep(sleep_time)
+                    elif next_time < current_time:
+                        try:
+                            with _pause_threads(unwinder, self.blocking):
+                                collect(get_stack_trace())
+                        except ProcessLookupError:
+                            running_time_sec = current_time - start_time
+                            break
+                        except (RuntimeError, UnicodeDecodeError, MemoryError, OSError):
+                            collect_failed_sample()
+                            errors += 1
+                        except Exception as e:
+                            if not _is_process_running(self.pid):
+                                break
+                            raise e from None
+
+                        # Track actual sampling intervals for real-time stats
+                        if num_samples > 0:
+                            actual_interval = current_time - last_sample_time
+                            sample_intervals.append(
+                                1.0 / actual_interval
+                            )  # Convert to Hz
+                            self.total_samples += 1
+
+                            if (
+                                realtime_stats
+                                and (current_time - last_realtime_update)
+                                >= realtime_update_interval
+                            ):
+                                print_realtime_stats()
+                                last_realtime_update = current_time
+
+                        last_sample_time = current_time
+                        num_samples += 1
+                        next_time += sample_interval_sec
+
+                    running_time_sec = perf_counter() - start_time
+            except KeyboardInterrupt:
+                interrupted = True
+                running_time_sec = perf_counter() - start_time
+                print("Interrupted by user.")
 
         # Clear real-time stats line if it was being displayed
         if self.realtime_stats and len(self.sample_intervals) > 0:
