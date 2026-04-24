@@ -1,0 +1,131 @@
+{
+  "G1_glob_recursive_all": {
+    "best_ns": 625137.4,
+    "label": "glob_recursive_all",
+    "loops": 250,
+    "mean_ns": 635890.1,
+    "repeat": 7,
+    "samples_ns": [
+      627646.6,
+      641091.1,
+      651962.5,
+      627525.0,
+      625772.0,
+      625137.4,
+      652096.0
+    ]
+  },
+  "G2_glob_recursive_py": {
+    "best_ns": 607696.7,
+    "label": "glob_recursive_py",
+    "loops": 250,
+    "mean_ns": 626308.6,
+    "repeat": 7,
+    "samples_ns": [
+      631518.0,
+      644802.1,
+      615334.3,
+      624106.2,
+      612130.9,
+      648572.2,
+      607696.7
+    ]
+  },
+  "G3_pathlib_rglob_all": {
+    "best_ns": 497329.9,
+    "label": "pathlib_rglob_all",
+    "loops": 250,
+    "mean_ns": 504553.4,
+    "repeat": 7,
+    "samples_ns": [
+      506673.0,
+      523579.6,
+      498787.2,
+      497329.9,
+      503248.3,
+      502878.2,
+      499377.7
+    ]
+  },
+  "G4_pathlib_glob_recursive_all": {
+    "best_ns": 496089.6,
+    "label": "pathlib_glob_recursive_all",
+    "loops": 250,
+    "mean_ns": 509068.4,
+    "repeat": 7,
+    "samples_ns": [
+      505371.2,
+      522380.9,
+      515446.9,
+      509510.3,
+      504924.0,
+      496089.6,
+      509756.1
+    ]
+  },
+  "G5_pathlib_glob_recursive_py": {
+    "best_ns": 491987.6,
+    "label": "pathlib_glob_recursive_py",
+    "loops": 250,
+    "mean_ns": 504904.2,
+    "repeat": 7,
+    "samples_ns": [
+      504652.2,
+      508652.4,
+      527039.6,
+      513236.9,
+      491987.6,
+      492399.1,
+      496361.8
+    ]
+  },
+  "G6_glob_wildcard_all": {
+    "best_ns": 27213.2,
+    "label": "glob_wildcard_all",
+    "loops": 500,
+    "mean_ns": 28057.4,
+    "repeat": 7,
+    "samples_ns": [
+      27517.2,
+      28195.2,
+      27334.9,
+      27833.1,
+      27213.2,
+      27476.7,
+      30831.7
+    ]
+  },
+  "G7_glob_wildcard_py": {
+    "best_ns": 25838.0,
+    "label": "glob_wildcard_py",
+    "loops": 500,
+    "mean_ns": 27136.2,
+    "repeat": 7,
+    "samples_ns": [
+      27947.3,
+      27225.8,
+      28341.3,
+      27638.0,
+      26824.1,
+      26138.6,
+      25838.0
+    ]
+  },
+  "G8_pathlib_glob_wildcard_all": {
+    "best_ns": 24083.7,
+    "label": "pathlib_glob_wildcard_all",
+    "loops": 500,
+    "mean_ns": 24639.4,
+    "repeat": 7,
+    "samples_ns": [
+      25010.6,
+      25379.7,
+      24536.9,
+      24083.7,
+      24669.7,
+      24183.7,
+      24611.5
+    ]
+  },
+  "variant": "baseline"
+}

@@ -1,0 +1,54 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/glob-scandir-data-shape-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/glob-scandir-data-shape-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/glob-scandir-data-shape-fast-path/guardrails",
+    "root": "Misc/perf_experiments/glob-scandir-data-shape-fast-path"
+  },
+  "base_commit": "87ee575bbd162f4f68b6ea5534b510734ea73ef2",
+  "branch": "exp-glob/scandir-shape-mainline",
+  "created_at": "2026-04-24T18:23:47+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "glob",
+  "hypothesis": "Archetype: allocator / accumulator refactor plus common-case split. _StringGlobber.scandir() currently closes os.scandir() and then re-wraps each DirEntry in a generator of (entry, name, path) tuples, forcing per-entry tuple allocation and eager path fetches. A string-specific selector path that iterates raw DirEntry lists and computes name/path only when needed may preserve semantics while removing churn from recursive and wildcard globbing.",
+  "notes": [
+    "2026-04-24T18:42:50+00:00 Profile + code review confirmed the reopen is materially different from the rejected recursive-selector family: this one targets _StringGlobber scandir data shape and selector tuple churn.",
+    "2026-04-24T18:42:50+00:00 Runtime proof: recursive_only measured about 1.016479x geomean; both_selectors measured about 1.039401x geomean with recursive/pathlib cases strongest.",
+    "2026-04-24T18:42:50+00:00 Same-worktree source proof on exp-glob/scandir-shape-mainline averaged about 1.022725x geomean across two baseline/candidate pairs.",
+    "2026-04-24T18:42:50+00:00 Focused validation passed on the clean branch: test_glob and test_pathlib.",
+    "2026-04-24T18:42:50+00:00 Clean full suite passed: 49,882 run, 2,623 skipped, SUCCESS in 4 min 20 sec.",
+    "2026-04-24T18:42:50+00:00 Stacked cherry-pick conflicted with existing glob tuple-list winner a0a9f825350; resolved by keeping tuple-list scandir() behavior and adding raw-entry selector specialization underneath it.",
+    "2026-04-24T18:42:50+00:00 Stacked validation passed: test_glob, test_pathlib, and full suite 49,892 run, 2,620 skipped, SUCCESS in 4 min 20 sec."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "2a873925d43",
+    "stacked_commit": "4537fd42930",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "glob-scandir-data-shape-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/glob.py:445 _GlobberBase.wildcard_selector",
+    "Lib/glob.py:486 _GlobberBase.recursive_selector",
+    "Lib/glob.py:543 _StringGlobber.scandir"
+  ],
+  "title": "glob scandir data shape fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}
