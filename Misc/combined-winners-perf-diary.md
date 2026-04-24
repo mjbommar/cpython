@@ -1635,3 +1635,56 @@ What we learned:
 - this winner composed on top of an existing stacked glob improvement
   (`a0a9f825350`, tuple-list `scandir()`), so the stacked merge needed to keep
   both layers rather than treating them as alternatives
+
+## 2026-04-24 update: pickle exact atomic list batch follow-up
+
+Accepted and cherry-picked commit:
+
+- `5d226b57ffc` / `62ad98219a6`
+  `pickle: specialize exact atomic list batches`
+
+Clean-mainline focused result:
+
+- `bench_pickle_pure_save_atomic_followup.py` same-worktree source proof:
+  - focused-harness geomean: about `+17.34%`
+  - `S1_list_of_ints_10k_dump`: `-1.14%`
+  - `S2_list_of_strs_1k_dump`: `+31.59%`
+  - `S3_list_of_bytes_1k_dump`: `+37.56%`
+  - `S4_nested_list_of_dicts_dump`: `+1.05%`
+  - `S5_deep_list_dump`: `+0.22%`
+  - `S6_mixed_scalar_list_dump`: `-1.17%`
+  - `S7_bool_list_dump`: `+98.08%`
+  - `S8_small_int_run_dump`: `+1.28%`
+
+Validation:
+
+- runtime guardrail:
+  `check_pickle_pure_save_atomic_followup_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- clean-mainline focused tests:
+  `test_copy test_copyreg`: passed
+- clean-mainline focused tests:
+  `test_shelve`: passed
+- clean-mainline full suite:
+  `49,892` tests, `2,623` skipped, `SUCCESS` in `4 min 22 sec`
+- stacked focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- stacked focused tests:
+  `test_copy test_copyreg`: passed
+- stacked focused tests:
+  `test_shelve`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the earlier exact-`int` list batch win left real incremental leverage in
+  other homogeneous atomic types; `bool`, `str`, and `bytes` were all strong
+  enough that the combined specialization was much better than any one-type
+  landing alone
+- this was not a `save()` dispatcher rewrite; it stayed inside the existing
+  exact `_Pickler` binary-list fast path, which kept the review surface small
+- the root `main` tree did not contain `_batch_appends_exact()`, so the
+  correct clean-branch base for this family was the prior pickle save branch,
+  not bare `main`
