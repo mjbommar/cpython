@@ -2217,8 +2217,10 @@ del name2i, code2i, i, d
 # introspection here is dicey.
 
 code2op = {}
+_byte2op = [None] * 256
 for d in opcodes:
     code2op[d.code] = d
+    _byte2op[ord(d.code)] = d
 del d
 
 def assure_pickle_consistency(verbose=False):
@@ -2269,33 +2271,81 @@ def _genops(data, yield_end_pos=False):
     if isinstance(data, bytes_types):
         data = io.BytesIO(data)
 
+    read = data.read
     if hasattr(data, "tell"):
         getpos = data.tell
-    else:
-        getpos = lambda: None
+        if yield_end_pos:
+            while True:
+                pos = getpos()
+                code = read(1)
+                if code == b"":
+                    raise ValueError("pickle exhausted before seeing STOP")
+                opcode = _byte2op[code[0]]
+                if opcode is None:
+                    raise ValueError("at position %s, opcode %r unknown" % (
+                                     pos, code))
+                if opcode.arg is None:
+                    arg = None
+                else:
+                    arg = opcode.arg.reader(data)
+                yield opcode, arg, pos, getpos()
+                if code[0] == ord('.'):
+                    assert opcode.name == 'STOP'
+                    break
+        else:
+            while True:
+                pos = getpos()
+                code = read(1)
+                if code == b"":
+                    raise ValueError("pickle exhausted before seeing STOP")
+                opcode = _byte2op[code[0]]
+                if opcode is None:
+                    raise ValueError("at position %s, opcode %r unknown" % (
+                                     pos, code))
+                if opcode.arg is None:
+                    arg = None
+                else:
+                    arg = opcode.arg.reader(data)
+                yield opcode, arg, pos
+                if code[0] == ord('.'):
+                    assert opcode.name == 'STOP'
+                    break
+        return
 
-    while True:
-        pos = getpos()
-        code = data.read(1)
-        opcode = code2op.get(code.decode("latin-1"))
-        if opcode is None:
+    if yield_end_pos:
+        while True:
+            code = read(1)
             if code == b"":
                 raise ValueError("pickle exhausted before seeing STOP")
-            else:
+            opcode = _byte2op[code[0]]
+            if opcode is None:
                 raise ValueError("at position %s, opcode %r unknown" % (
-                                 "<unknown>" if pos is None else pos,
-                                 code))
-        if opcode.arg is None:
-            arg = None
-        else:
-            arg = opcode.arg.reader(data)
-        if yield_end_pos:
-            yield opcode, arg, pos, getpos()
-        else:
-            yield opcode, arg, pos
-        if code == b'.':
-            assert opcode.name == 'STOP'
-            break
+                                 "<unknown>", code))
+            if opcode.arg is None:
+                arg = None
+            else:
+                arg = opcode.arg.reader(data)
+            yield opcode, arg, None, None
+            if code[0] == ord('.'):
+                assert opcode.name == 'STOP'
+                break
+    else:
+        while True:
+            code = read(1)
+            if code == b"":
+                raise ValueError("pickle exhausted before seeing STOP")
+            opcode = _byte2op[code[0]]
+            if opcode is None:
+                raise ValueError("at position %s, opcode %r unknown" % (
+                                 "<unknown>", code))
+            if opcode.arg is None:
+                arg = None
+            else:
+                arg = opcode.arg.reader(data)
+            yield opcode, arg, None
+            if code[0] == ord('.'):
+                assert opcode.name == 'STOP'
+                break
 
 def genops(pickle):
     """Generate all the opcodes in a pickle.
