@@ -1,0 +1,131 @@
+{
+  "S1_list_of_ints_10k_dump": {
+    "best_ns": 3252825.7,
+    "label": "list_of_ints_10k_dump",
+    "loops": 200,
+    "mean_ns": 3278958.2,
+    "repeat": 7,
+    "samples_ns": [
+      3252825.7,
+      3320079.7,
+      3273569.5,
+      3284387.7,
+      3285823.2,
+      3253209.1,
+      3282812.5
+    ]
+  },
+  "S2_list_of_strs_1k_dump": {
+    "best_ns": 786726.3,
+    "label": "list_of_strs_1k_dump",
+    "loops": 600,
+    "mean_ns": 795288.4,
+    "repeat": 7,
+    "samples_ns": [
+      802138.1,
+      790251.4,
+      793192.7,
+      789454.3,
+      786726.3,
+      801217.4,
+      804038.6
+    ]
+  },
+  "S3_list_of_bytes_1k_dump": {
+    "best_ns": 756806.8,
+    "label": "list_of_bytes_1k_dump",
+    "loops": 600,
+    "mean_ns": 767234.6,
+    "repeat": 7,
+    "samples_ns": [
+      774143.6,
+      756806.8,
+      768548.3,
+      765887.0,
+      772278.3,
+      762899.7,
+      770078.2
+    ]
+  },
+  "S4_nested_list_of_dicts_dump": {
+    "best_ns": 2647951.3,
+    "label": "nested_list_of_dicts_dump",
+    "loops": 1200,
+    "mean_ns": 2659106.6,
+    "repeat": 7,
+    "samples_ns": [
+      2647951.3,
+      2659289.1,
+      2663687.2,
+      2660690.2,
+      2662757.8,
+      2661777.5,
+      2657593.1
+    ]
+  },
+  "S5_deep_list_dump": {
+    "best_ns": 2057930.9,
+    "label": "deep_list_dump",
+    "loops": 1200,
+    "mean_ns": 2065175.4,
+    "repeat": 7,
+    "samples_ns": [
+      2058814.4,
+      2071332.4,
+      2065940.0,
+      2076938.3,
+      2057930.9,
+      2064720.4,
+      2060551.2
+    ]
+  },
+  "S6_mixed_scalar_list_dump": {
+    "best_ns": 837578.4,
+    "label": "mixed_scalar_list_dump",
+    "loops": 1200,
+    "mean_ns": 839921.0,
+    "repeat": 7,
+    "samples_ns": [
+      839548.1,
+      837578.4,
+      839094.1,
+      837780.3,
+      843107.8,
+      840188.7,
+      842150.0
+    ]
+  },
+  "S7_bool_list_dump": {
+    "best_ns": 686750.5,
+    "label": "bool_list_dump",
+    "loops": 3000,
+    "mean_ns": 689329.7,
+    "repeat": 7,
+    "samples_ns": [
+      687942.7,
+      691153.0,
+      686750.5,
+      693446.8,
+      686758.6,
+      689113.5,
+      690142.8
+    ]
+  },
+  "S8_small_int_run_dump": {
+    "best_ns": 27090.9,
+    "label": "small_int_run_dump",
+    "loops": 3000,
+    "mean_ns": 27289.8,
+    "repeat": 7,
+    "samples_ns": [
+      27481.3,
+      27203.2,
+      27090.9,
+      27635.5,
+      27107.3,
+      27292.1,
+      27218.2
+    ]
+  },
+  "variant": "baseline"
+}

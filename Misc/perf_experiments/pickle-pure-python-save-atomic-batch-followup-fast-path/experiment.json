@@ -1,0 +1,54 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickle-pure-python-save-atomic-batch-followup-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickle-pure-python-save-atomic-batch-followup-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickle-pure-python-save-atomic-batch-followup-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickle-pure-python-save-atomic-batch-followup-fast-path"
+  },
+  "base_commit": "b76535a0ca8",
+  "branch": "exp-pickle/save-atomic-followup-mainline",
+  "created_at": "2026-04-24T18:48:38+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickle",
+  "hypothesis": "Archetype: exact-type gate plus common-case split. The existing exact-list binary path in exp-pickle/save-mainline now specializes homogeneous exact-int lists, but save_list() remains a high cumulative hotspot and untouched homogeneous exact-bool and exact-str list shapes still pay per-item save() dispatch. A narrow extension inside _batch_appends_exact() may preserve semantics while removing more save-side dispatcher cost.",
+  "notes": [
+    "2026-04-24T19:15:20+00:00 Incremental family based on exp-pickle/save-mainline b76535a0ca8 because the root main tree does not carry _batch_appends_exact().",
+    "2026-04-24T19:15:20+00:00 Runtime screen on the existing pickle-save baseline showed combined exact atomic lists as the clear winner: about 1.188663x geomean on the short screen, with bool +97.55%, str +31.67%, and bytes +36.91%.",
+    "2026-04-24T19:15:20+00:00 Clean source proof on exp-pickle/save-atomic-followup-mainline measured 1.173370x geomean (+17.34%) on the focused harness.",
+    "2026-04-24T19:15:20+00:00 Focused clean-branch tests passed: test_pickle/test_picklebuffer/test_pickletools, test_copy/test_copyreg, and test_shelve.",
+    "2026-04-24T19:15:20+00:00 Clean full suite passed: 49,892 run, 2,623 skipped, SUCCESS in 4 min 22 sec.",
+    "2026-04-24T19:15:20+00:00 Stacked focused tests passed with the same pickle/copy/shelve bundle.",
+    "2026-04-24T19:15:20+00:00 Stacked full suite passed: 49,892 run, 2,620 skipped, SUCCESS in 4 min 18 sec."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "5d226b57ffc",
+    "stacked_commit": "62ad98219a6",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "pickle-pure-python-save-atomic-batch-followup-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickle.py:1099 save_list",
+    "Lib/pickle.py:1107 _batch_appends_exact",
+    "Lib/pickle.py:562 Pickler.save"
+  ],
+  "title": "pickle pure-Python save atomic batch follow-up fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

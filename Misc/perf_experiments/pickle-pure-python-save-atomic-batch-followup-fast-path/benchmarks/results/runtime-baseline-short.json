@@ -1,0 +1,115 @@
+{
+  "S1_list_of_ints_10k_dump": {
+    "best_ns": 3260778.4,
+    "label": "list_of_ints_10k_dump",
+    "loops": 80,
+    "mean_ns": 3309342.9,
+    "repeat": 5,
+    "samples_ns": [
+      3260778.4,
+      3377105.3,
+      3291702.5,
+      3317319.6,
+      3299808.6
+    ]
+  },
+  "S2_list_of_strs_1k_dump": {
+    "best_ns": 1026707.1,
+    "label": "list_of_strs_1k_dump",
+    "loops": 200,
+    "mean_ns": 1042570.6,
+    "repeat": 5,
+    "samples_ns": [
+      1087124.9,
+      1026707.1,
+      1027688.7,
+      1027718.7,
+      1043613.5
+    ]
+  },
+  "S3_list_of_bytes_1k_dump": {
+    "best_ns": 1021056.7,
+    "label": "list_of_bytes_1k_dump",
+    "loops": 200,
+    "mean_ns": 1033656.4,
+    "repeat": 5,
+    "samples_ns": [
+      1065290.7,
+      1021056.7,
+      1026187.7,
+      1032848.0,
+      1022898.6
+    ]
+  },
+  "S4_nested_list_of_dicts_dump": {
+    "best_ns": 2692998.4,
+    "label": "nested_list_of_dicts_dump",
+    "loops": 400,
+    "mean_ns": 2703037.2,
+    "repeat": 5,
+    "samples_ns": [
+      2703328.5,
+      2700019.5,
+      2712163.2,
+      2706676.5,
+      2692998.4
+    ]
+  },
+  "S5_deep_list_dump": {
+    "best_ns": 2038913.3,
+    "label": "deep_list_dump",
+    "loops": 400,
+    "mean_ns": 2070636.3,
+    "repeat": 5,
+    "samples_ns": [
+      2038913.3,
+      2069166.0,
+      2066790.6,
+      2092718.0,
+      2085593.5
+    ]
+  },
+  "S6_mixed_scalar_list_dump": {
+    "best_ns": 858643.3,
+    "label": "mixed_scalar_list_dump",
+    "loops": 400,
+    "mean_ns": 867923.1,
+    "repeat": 5,
+    "samples_ns": [
+      862946.3,
+      874809.8,
+      858643.3,
+      866241.9,
+      876974.2
+    ]
+  },
+  "S7_bool_list_dump": {
+    "best_ns": 1357118.2,
+    "label": "bool_list_dump",
+    "loops": 1200,
+    "mean_ns": 1364061.3,
+    "repeat": 5,
+    "samples_ns": [
+      1370696.2,
+      1370371.9,
+      1361905.4,
+      1357118.2,
+      1360214.9
+    ]
+  },
+  "S8_small_int_run_dump": {
+    "best_ns": 31543.9,
+    "label": "small_int_run_dump",
+    "loops": 1200,
+    "mean_ns": 31838.3,
+    "repeat": 5,
+    "samples_ns": [
+      31782.8,
+      31729.7,
+      31543.9,
+      31689.9,
+      32445.2
+    ]
+  },
+  "variant": "baseline"
+}
