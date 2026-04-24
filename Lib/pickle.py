@@ -1034,6 +1034,35 @@ class _Pickler:
             return
 
         n = len(obj)
+        if type(self) is _Pickler and type(obj[0]) is int:
+            for item in obj[1:]:
+                if type(item) is not int:
+                    break
+            else:
+                save_long = self.save_long
+                if n <= 3 and self.proto >= 2:
+                    for i, element in enumerate(obj):
+                        try:
+                            save_long(element)
+                        except BaseException as exc:
+                            exc.add_note(f'when serializing {_T(obj)} item {i}')
+                            raise
+                    self.write(_tuplesize2code[n])
+                    self.memoize(obj)
+                    return
+
+                write = self.write
+                write(MARK)
+                for i, element in enumerate(obj):
+                    try:
+                        save_long(element)
+                    except BaseException as exc:
+                        exc.add_note(f'when serializing {_T(obj)} item {i}')
+                        raise
+                write(TUPLE)
+                self.memoize(obj)
+                return
+
         save = self.save
         memo = self.memo
         if n <= 3 and self.proto >= 2:
