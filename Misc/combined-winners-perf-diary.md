@@ -1374,3 +1374,57 @@ What we learned:
 - returning a copy from the cache keeps the historical mutable-list contract,
   which made this a safe small semantics-preserving win rather than a behavior
   change disguised as a perf patch
+
+## 2026-04-24 update: marshal reference-list append fast path
+
+Accepted and cherry-picked commit:
+
+- `24902c5e383` / `dfe1cfe4679`
+  `marshal: speed up reference list appends`
+
+Clean-mainline focused result:
+
+- `bench_marshal_code_load.py` source proof:
+  - focused-harness geomean: about `+3.50%`
+  - `M1_load_tiny`: `+9.09%`
+  - `M2_load_nested`: `+3.60%`
+  - `M3_load_many_consts`: `-0.40%`
+  - `M4_load_class_methods`: `+2.34%`
+  - `I1_compile_bytecode_tiny`: `+2.18%`
+  - `I2_compile_bytecode_nested`: `+6.41%`
+  - `I3_compile_bytecode_many_consts`: `+0.86%`
+  - `I4_compile_bytecode_class_methods`: `+4.24%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_marshal_code_load_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_marshal test_importlib test_zipimport`: passed
+- clean-mainline focused tests:
+  `test_pkgutil test_pstats test_modulefinder`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 21 sec`
+- stacked guardrail:
+  `check_marshal_code_load_semantics.py`: `ok`
+- stacked focused tests:
+  `test_marshal test_importlib test_zipimport`: passed
+- stacked focused tests:
+  `test_pkgutil test_pstats test_modulefinder`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the remaining `.pyc` win in this area was not in the tiny
+  `PyMarshal_ReadObjectFromString()` wrapper itself; it was in the repeated
+  reference-list append path beneath code-object decoding
+- using `_PyList_AppendTakeRef()` was only valid once ownership was made
+  explicit with `Py_NewRef(...)`; the first direct-steal attempt in `r_ref()`
+  corrupted the build, which was a useful reminder that helper specialization
+  must preserve caller ownership contracts exactly
+- the final winner is small but real: a narrow internal-helper substitution
+  that improves both direct `marshal.loads()` code-object cases and importlib
+  `_compile_bytecode()` without destabilizing the stacked branch
