@@ -1535,3 +1535,55 @@ What we learned:
 - this tuple win composes cleanly with the earlier exact-int list batch win,
   which suggests the remaining pure-Python pickle save-side leverage is still
   in exact-type container fast paths rather than broad dispatcher rewrites
+
+## 2026-04-24 update: pickletools `_genops()` byte lookup fast path
+
+Accepted and cherry-picked commit:
+
+- `f8738c1dcd8` / `e9be1a19d06`
+  `pickletools: speed up _genops opcode lookup`
+
+Clean-mainline focused result:
+
+- `bench_pickletools_genops.py` same-worktree source proof:
+  - focused-harness geomean: about `+9.48%`
+  - `G1_genops_small_list`: `+14.77%`
+  - `G2_genops_int_tuple`: `+13.53%`
+  - `G3_genops_nested_dict`: `+7.88%`
+  - `G4_genops_end_frame_heavy`: `+10.57%`
+  - `G5_genops_no_tell_proto2`: `+16.30%`
+  - `G6_optimize_frame_heavy`: `+4.12%`
+  - `G7_dis_nested_dict`: `+0.21%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_pickletools_genops_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_pickletools`: passed
+- clean-mainline focused tests:
+  `test_pickle test_picklebuffer`: passed
+- clean-mainline full suite:
+  `49,892` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 22 sec`
+- stacked guardrail:
+  `check_pickletools_genops_semantics.py`: `ok`
+- stacked focused tests:
+  `test_pickletools`: passed
+- stacked focused tests:
+  `test_pickle test_picklebuffer`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 18 sec`
+
+What we learned:
+
+- the real waste in `pickletools._genops()` was the repeated one-byte
+  `latin-1` decode plus text-key dict lookup, not the downstream reader logic
+- splitting the hot path by `tell()` availability and `yield_end_pos` was worth
+  doing because it removes a branch from the common loop without changing the
+  generator contract
+- the first source patch accidentally widened the module export surface via a
+  public `byte2op` name; `test_pickletools` caught that immediately, which is a
+  good reminder that tiny module-level helper changes still need contract
+  validation, not just perf numbers
