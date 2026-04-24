@@ -2179,7 +2179,12 @@ def _set_return_value(mock, method, name):
 
 class MagicMixin(Base):
     def __init__(self, /, *args, **kw):
-        self._mock_set_magics()  # make magic work for kwargs in init
+        # Only preinstall magic descriptors when init kwargs target them.
+        if kw:
+            for key in kw:
+                if _is_magic(key.partition(".")[0]):
+                    self._mock_set_magics()
+                    break
         _safe_super(MagicMixin, self).__init__(*args, **kw)
         self._mock_set_magics()  # fix magic broken by upper level init
 
