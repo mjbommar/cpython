@@ -67,6 +67,7 @@ _default_localedir = os.path.join(sys.base_prefix, 'share', 'locale')
 # http://git.savannah.gnu.org/cgit/gettext.git/tree/gettext-runtime/intl/plural.y
 
 _token_pattern = None
+_expand_lang_cache = {}
 
 def _tokenize(plural):
     global _token_pattern
@@ -230,6 +231,10 @@ def c2py(plural):
 
 
 def _expand_lang(loc):
+    cache_key = loc
+    cached = _expand_lang_cache.get(cache_key)
+    if cached is not None:
+        return cached.copy()
     import locale
     loc = locale.normalize(loc)
     COMPONENT_CODESET   = 1 << 0
@@ -268,7 +273,8 @@ def _expand_lang(loc):
             if i & COMPONENT_MODIFIER:  val += modifier
             ret.append(val)
     ret.reverse()
-    return ret
+    _expand_lang_cache[cache_key] = ret
+    return ret.copy()
 
 
 class NullTranslations:
