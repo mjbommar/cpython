@@ -1,0 +1,47 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/vectorcall-noargs-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/vectorcall-noargs-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/vectorcall-noargs-fast-path/guardrails",
+    "root": "Misc/perf_experiments/vectorcall-noargs-fast-path"
+  },
+  "base_commit": "f1f80a20bbee28c77732c717631c01e2caf700bc",
+  "branch": "exp-call/vector-noargs-mainline",
+  "created_at": "2026-04-24T19:44:01+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "call",
+  "hypothesis": "Archetype: common-case split. _PyFunction_Vectorcall() and _PyEval_Vector() currently pay small but unconditional setup costs even for the common zero-argument, no-keyword Python-function call path. A dedicated noargs fast path may remove stack-copy and branch overhead from the hottest pure-Python call boundary without changing frame semantics.",
+  "notes": [
+    "2026-04-24T19:48:35+00:00 Source-proof rejection: initialize_locals() early return for true noarg/no-kw/no-varargs functions measured 1.022349x (+2.23%) on the first pass, but a reverted same-worktree baseline drifted by 1.017662x and the avg-baseline vs candidate result collapsed to 1.013487x (+1.35%) with similar movement in the one-arg control. Too noisy and too weak to promote."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "skipped"
+  },
+  "schema_version": 1,
+  "slug": "vectorcall-noargs-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Objects/call.c:402 _PyFunction_Vectorcall",
+    "Python/ceval.c:2082 _PyEval_Vector"
+  ],
+  "title": "vectorcall noargs fast path",
+  "validation": {
+    "ecosystem": "skipped",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
+  }
+}
