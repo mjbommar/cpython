@@ -10,6 +10,7 @@
 #include "pycore_call.h"             // _PyObject_CallNoArgs()
 #include "pycore_code.h"             // _PyCode_New()
 #include "pycore_hashtable.h"        // _Py_hashtable_t
+#include "pycore_list.h"             // _PyList_AppendTakeRef()
 #include "pycore_long.h"             // _PyLong_IsZero()
 #include "pycore_object.h"           // _PyObject_IsUniquelyReferenced
 #include "pycore_pystate.h"          // _PyInterpreterState_GET()
@@ -1126,7 +1127,7 @@ r_ref_reserve(int flag, RFILE *p)
             PyErr_SetString(PyExc_ValueError, "bad marshal data (index list too large)");
             return -1;
         }
-        if (PyList_Append(p->refs, Py_None) < 0)
+        if (_PyList_AppendTakeRef((PyListObject *)p->refs, Py_NewRef(Py_None)) < 0)
             return -1;
         return idx;
     } else
@@ -1177,8 +1178,7 @@ r_ref(PyObject *o, int flag, RFILE *p)
     assert(flag & FLAG_REF);
     if (o == NULL)
         return NULL;
-    if (PyList_Append(p->refs, o) < 0) {
-        Py_DECREF(o); /* release the new object */
+    if (_PyList_AppendTakeRef((PyListObject *)p->refs, Py_NewRef(o)) < 0) {
         return NULL;
     }
     return o;
