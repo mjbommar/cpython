@@ -1,0 +1,83 @@
+{
+  "G1_glob_recursive_all": {
+    "best_ns": 710534.3,
+    "label": "glob_recursive_all",
+    "loops": 250,
+    "mean_ns": 730579.3,
+    "repeat": 7,
+    "samples_ns": [
+      750488.8,
+      722635.0,
+      727019.8,
+      729567.8,
+      710534.3,
+      737026.6,
+      736783.0
+    ]
+  },
+  "G2_glob_recursive_py": {
+    "best_ns": 699508.9,
+    "label": "glob_recursive_py",
+    "loops": 250,
+    "mean_ns": 706082.4,
+    "repeat": 7,
+    "samples_ns": [
+      706016.1,
+      699508.9,
+      705778.1,
+      703913.2,
+      723894.7,
+      700539.0,
+      702926.6
+    ]
+  },
+  "G3_pathlib_rglob_all": {
+    "best_ns": 562096.4,
+    "label": "pathlib_rglob_all",
+    "loops": 250,
+    "mean_ns": 581494.2,
+    "repeat": 7,
+    "samples_ns": [
+      570826.0,
+      573576.3,
+      567886.4,
+      637945.8,
+      593693.9,
+      564434.7,
+      562096.4
+    ]
+  },
+  "G4_pathlib_glob_recursive_all": {
+    "best_ns": 560535.1,
+    "label": "pathlib_glob_recursive_all",
+    "loops": 250,
+    "mean_ns": 565346.9,
+    "repeat": 7,
+    "samples_ns": [
+      562137.4,
+      563195.9,
+      562703.8,
+      581875.2,
+      565934.4,
+      561046.8,
+      560535.1
+    ]
+  },
+  "G5_pathlib_glob_recursive_py": {
+    "best_ns": 560916.9,
+    "label": "pathlib_glob_recursive_py",
+    "loops": 250,
+    "mean_ns": 571330.2,
+    "repeat": 7,
+    "samples_ns": [
+      560916.9,
+      563460.9,
+      561627.9,
+      597580.9,
+      569704.3,
+      568056.7,
+      577964.0
+    ]
+  },
+  "variant": "inline_step"
+}

@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickle-pure-python-load-read-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickle-pure-python-load-read-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickle-pure-python-load-read-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickle-pure-python-load-read-fast-path"
+  },
+  "base_commit": "5a37cb8a24363a730302031721baeb264aff1a49",
+  "branch": "exp-pickle/load-read-mainline",
+  "created_at": "2026-04-24T14:28:40+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickle",
+  "hypothesis": "Archetype: common-case split plus allocator/accumulator care. Fresh stacked discovery shows pure-Python pickle load/read still hot after the old save-side winner. The smallest safe first shape is to fast-path unframed small reads in _Unframer.read(), because most opcode reads are tiny and currently still pay the _chunked_file_read helper.",
+  "notes": [
+    "2026-04-24T14:31:57+00:00 Stacked discovery shows remaining pure-Python pickle load/read cluster: load about 9.656s cumulative, read about 4.001s, _chunked_file_read about 1.660s.",
+    "2026-04-24T14:31:57+00:00 E1 runtime small-read fast path only reached about 1.001781x geomean and regressed the common small/nested/string payloads, so it is rejected as a source candidate."
+  ],
+  "phase": "benchmarks",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "pickle-pure-python-load-read-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickle.py:288 read",
+    "Lib/pickle.py:314 _chunked_file_read",
+    "Lib/pickle.py:1478 load"
+  ],
+  "title": "pickle pure-Python load/read fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

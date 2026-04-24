@@ -1,0 +1,83 @@
+{
+  "P1_load_small_list": {
+    "best_ns": 42753.7,
+    "label": "load_small_list",
+    "loops": 1200,
+    "mean_ns": 43774.2,
+    "repeat": 7,
+    "samples_ns": [
+      43696.6,
+      43570.9,
+      43504.1,
+      43031.7,
+      42753.7,
+      43941.6,
+      45920.7
+    ]
+  },
+  "P2_load_nested": {
+    "best_ns": 562571.1,
+    "label": "load_nested",
+    "loops": 1200,
+    "mean_ns": 569306.8,
+    "repeat": 7,
+    "samples_ns": [
+      567969.6,
+      582467.1,
+      566839.2,
+      562791.7,
+      570779.0,
+      571729.7,
+      562571.1
+    ]
+  },
+  "P3_load_strings": {
+    "best_ns": 933753.1,
+    "label": "load_strings",
+    "loops": 1200,
+    "mean_ns": 940963.6,
+    "repeat": 7,
+    "samples_ns": [
+      940183.2,
+      951563.6,
+      938895.6,
+      940602.8,
+      939136.4,
+      942610.3,
+      933753.1
+    ]
+  },
+  "P4_load_stream_multi": {
+    "best_ns": 1383649.7,
+    "label": "load_stream_multi",
+    "loops": 300,
+    "mean_ns": 1401983.9,
+    "repeat": 7,
+    "samples_ns": [
+      1447806.2,
+      1383649.7,
+      1397639.4,
+      1399639.3,
+      1386021.6,
+      1414907.2,
+      1384224.0
+    ]
+  },
+  "P5_load_large_bytes": {
+    "best_ns": 266834.6,
+    "label": "load_large_bytes",
+    "loops": 250,
+    "mean_ns": 273626.9,
+    "repeat": 7,
+    "samples_ns": [
+      266834.6,
+      267088.7,
+      271148.4,
+      267101.0,
+      279344.1,
+      294043.6,
+      269827.8
+    ]
+  },
+  "variant": "baseline"
+}

@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/glob-recursive-selector-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/glob-recursive-selector-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/glob-recursive-selector-fast-path/guardrails",
+    "root": "Misc/perf_experiments/glob-recursive-selector-fast-path"
+  },
+  "base_commit": "5a37cb8a24363a730302031721baeb264aff1a49",
+  "branch": "exp-glob/recursive-selector-mainline",
+  "created_at": "2026-04-24T14:22:35+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "glob",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh stacked discovery shows a real recursive glob cluster in Lib/glob.py and adjacent pathlib usage. The smallest safe first shape is to defer stringify_path(entry_path) until match is actually needed inside select_recursive_step(), because the dominant recursive '**' path often has match is None and currently pays stringify work anyway.",
+  "notes": [
+    "2026-04-24T14:27:09+00:00 Recursive glob discovery showed select_recursive/select_recursive_step/scandir as a real cluster, but E1 lazy stringify proved only about 1.009267x geomean and E2 inline-step regressed about 0.995341x geomean.",
+    "2026-04-24T14:27:09+00:00 Rejected before source work; next reopen should target scandir tuple/data-shape costs rather than more closure surgery."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "glob-recursive-selector-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/glob.py:486 select_recursive",
+    "Lib/glob.py:495 select_recursive_step",
+    "Lib/glob.py:543 scandir"
+  ],
+  "title": "glob recursive selector fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
+  }
+}
