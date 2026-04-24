@@ -2429,17 +2429,48 @@ def _signature_from_callable(obj, *,
     callable objects.
     """
 
-    _get_signature_of = functools.partial(_signature_from_callable,
-                                follow_wrapper_chains=follow_wrapper_chains,
-                                skip_bound_arg=skip_bound_arg,
-                                globals=globals,
-                                locals=locals,
-                                sigcls=sigcls,
-                                eval_str=eval_str,
-                                annotation_format=annotation_format)
-
     if not callable(obj):
         raise TypeError('{!r} is not a callable object'.format(obj))
+
+    if not isinstance(obj, types.MethodType):
+        try:
+            sig = obj.__signature__
+        except AttributeError:
+            sig = _sentinel
+        else:
+            if sig is not None:
+                if not isinstance(sig, Signature):
+                    raise TypeError(
+                        'unexpected object {!r} in __signature__ '
+                        'attribute'.format(sig))
+                return sig
+
+        if ((sig is _sentinel or sig is None)
+                and (not follow_wrapper_chains or not hasattr(obj, "__wrapped__"))
+                and not hasattr(obj, "__partialmethod__")):
+            if isfunction(obj) or _signature_is_functionlike(obj):
+                return _signature_from_function(sigcls, obj,
+                                                skip_bound_arg=skip_bound_arg,
+                                                globals=globals, locals=locals,
+                                                eval_str=eval_str,
+                                                annotation_format=annotation_format)
+
+            if (_signature_is_builtin(obj)
+                    and getattr(obj, "__text_signature__", None)):
+                return _signature_from_builtin(sigcls, obj,
+                                               skip_bound_arg=skip_bound_arg)
+
+    def _get_signature_of(obj):
+        return _signature_from_callable(
+            obj,
+            follow_wrapper_chains=follow_wrapper_chains,
+            skip_bound_arg=skip_bound_arg,
+            globals=globals,
+            locals=locals,
+            sigcls=sigcls,
+            eval_str=eval_str,
+            annotation_format=annotation_format,
+        )
 
     if isinstance(obj, types.MethodType):
         # In this case we skip the first parameter of the underlying
