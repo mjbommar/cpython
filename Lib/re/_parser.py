@@ -472,17 +472,18 @@ def _parse_sub(source, state, verbose, nested):
     while True:
         prefix = None
         for item in items:
-            if not item:
+            item_data = item.data
+            if not item_data:
                 break
             if prefix is None:
-                prefix = item[0]
-            elif item[0] != prefix:
+                prefix = item_data[0]
+            elif item_data[0] != prefix:
                 break
         else:
             # all subitems start with a common "prefix".
             # move it out of the branch
             for item in items:
-                del item[0]
+                del item.data[0]
             subpattern.append(prefix)
             continue # check next one
         break
@@ -490,9 +491,10 @@ def _parse_sub(source, state, verbose, nested):
     # check if the branch can be replaced by a character set
     set = []
     for item in items:
-        if len(item) != 1:
+        item_data = item.data
+        if len(item_data) != 1:
             break
-        op, av = item[0]
+        op, av = item_data[0]
         if op is LITERAL:
             set.append((op, av))
         elif op is IN and av[0][0] is not NEGATE:
