@@ -1140,40 +1140,51 @@ class _Pickler:
         # _batch_appends path that goes through batched().
         if type(self) is _Pickler:
             n = len(obj)
-            if n > 0 and type(obj[0]) is int:
-                for item in obj[1:]:
-                    if type(item) is not int:
-                        break
+            if n > 0:
+                item_type = type(obj[0])
+                if item_type is int:
+                    save_atomic = self.save_long
+                elif item_type is bool:
+                    save_atomic = self.save_bool
+                elif item_type is str:
+                    save_atomic = self.save_str
+                elif item_type is bytes:
+                    save_atomic = self.save_bytes
                 else:
-                    save_long = self.save_long
-                    write = self.write
-                    batch_size = self._BATCHSIZE
-                    idx = 0
-                    while True:
-                        remaining = n - idx
-                        if remaining <= 0:
-                            return
-                        if remaining == 1:
-                            try:
-                                save_long(obj[idx])
-                            except BaseException as exc:
-                                exc.add_note(f'when serializing {_T(obj)} item {idx}')
-                                raise
-                            write(APPEND)
-                            return
-                        batch = remaining if remaining < batch_size else batch_size
-                        snapshot = obj[idx:idx + batch]
-                        write(MARK)
-                        i = idx
-                        for x in snapshot:
-                            try:
-                                save_long(x)
-                            except BaseException as exc:
-                                exc.add_note(f'when serializing {_T(obj)} item {i}')
-                                raise
-                            i += 1
-                        write(APPENDS)
-                        idx = i
+                    save_atomic = None
+                if save_atomic is not None:
+                    for item in obj[1:]:
+                        if type(item) is not item_type:
+                            break
+                    else:
+                        write = self.write
+                        batch_size = self._BATCHSIZE
+                        idx = 0
+                        while True:
+                            remaining = n - idx
+                            if remaining <= 0:
+                                return
+                            if remaining == 1:
+                                try:
+                                    save_atomic(obj[idx])
+                                except BaseException as exc:
+                                    exc.add_note(f'when serializing {_T(obj)} item {idx}')
+                                    raise
+                                write(APPEND)
+                                return
+                            batch = remaining if remaining < batch_size else batch_size
+                            snapshot = obj[idx:idx + batch]
+                            write(MARK)
+                            i = idx
+                            for x in snapshot:
+                                try:
+                                    save_atomic(x)
+                                except BaseException as exc:
+                                    exc.add_note(f'when serializing {_T(obj)} item {i}')
+                                    raise
+                                i += 1
+                            write(APPENDS)
+                            idx = i
         save = self.save
         write = self.write
         batch_size = self._BATCHSIZE
