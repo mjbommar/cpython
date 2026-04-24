@@ -40,14 +40,25 @@
             - attribute compile time by phase before any prototype branch
             - only open code experiments if a lower structural phase shows
               meaningful headroom
-        - Initial benchmark corpus:
-          - `benchmarks/bench_compile_phase_attribution.py`
-          - results:
-            - `benchmarks/results/runtime-phase-attribution.json`
-        - Guardrails:
-          - `guardrails/check_compile_phase_attribution_semantics.py`
-          - result:
-            - `compile phase attribution semantics: ok`
+- Initial benchmark corpus:
+  - `benchmarks/bench_compile_phase_attribution.py`
+  - results:
+    - `benchmarks/results/runtime-phase-attribution.json`
+  - source-proof harness:
+    - `benchmarks/bench_compile_ast_structural.py`
+    - helper module:
+      - `helpers.py`
+    - results:
+      - `benchmarks/results/source-baseline-e2.json`
+      - `benchmarks/results/source-candidate-e2.json`
+      - `benchmarks/results/runtime-phase-attribution-candidate-e2.json`
+- Guardrails:
+  - `guardrails/check_compile_phase_attribution_semantics.py`
+  - result:
+    - `compile phase attribution semantics: ok`
+  - `guardrails/check_compile_ast_structural_semantics.py`
+  - result:
+    - `compile ast structural semantics: ok`
 
         ## Candidate Ledger
 
@@ -130,33 +141,109 @@
           - `compute_code_flags()` and `_PyCodegen_AddReturnAtEnd()` are
             effectively noise (`<= 0.45%`)
 
-        Decision:
+Decision:
 
-        - Keep the family active, but explicitly stop considering setup /
-          preprocess micro-tweaks for this line of work.
-        - For this compile-family branch, the next promising target is the
+- Keep the family active, but explicitly stop considering setup /
+  preprocess micro-tweaks for this line of work.
+- For this compile-family branch, the next promising target is the
           lower `optimize_and_assemble_code_unit()` path, not another
           `_PyAST_Compile()` entry/setup change.
-        - The function/class/nested-heavy `compiler_codegen()` dominance is
-          real, but that likely belongs in a separate future codegen family if
-          we choose to chase it.
+- The function/class/nested-heavy `compiler_codegen()` dominance is
+  real, but that likely belongs in a separate future codegen family if
+  we choose to chase it.
 
-        ## Validation
+### E2
 
-        - Focused tests:
-        - Full suite:
-        - Ecosystem / third-party:
+Status: accepted and stacked.
 
-        ## Acceptance Decision
+Thesis:
 
-        - Decision:
-        - Accepted commit:
-        - Stacked winner commit:
+- Stay below `_PyAST_Compile()` setup and target the optasm-heavy path
+  directly: when `_PyCfg_ToInstructionSequence()` receives an empty
+  instruction sequence, pre-count instructions and labels, allocate once,
+  and fill the destination arrays directly instead of growing them through
+  `_PyInstructionSequence_UseLabel()` / `_PyInstructionSequence_Addop()`
+  in the inner loop.
 
-        ## Notes
+Result:
 
-        - Keep rejected ideas here too so the branch remains useful research.
-        - This family exists specifically to avoid reopening entry/setup
-          compiler tweaks that already failed.
-        - The measurement-only proof patch lives only on the clean experiment
-          worktree branch and has not been promoted anywhere.
+- Clean source patch on `exp-compile/ast-structural-mainline`:
+  - `Python/flowgraph.c:_PyCfg_ToInstructionSequence()`
+  - add an empty-sequence specialization that:
+    - counts labels and total instructions first
+    - allocates `seq->s_instrs` and `seq->s_labelmap` once
+    - fills instructions directly
+    - then applies the label map once at the end
+  - fallback path keeps the old generic growth logic untouched
+- Phase-attribution candidate check against `runtime-phase-attribution.json`:
+  - `A1_module_assign`: `+7.93%`
+  - `A2_module_many_assign`: `+7.72%`
+  - `A3_function_module`: `-10.45%`
+  - `A4_class_module`: `+5.34%`
+  - `A5_nested_functions`: `+9.37%`
+  - `A6_list_comprehension`: `+23.90%`
+  - geomean: about `+6.82%`
+- Clean same-worktree AST-only source proof:
+  - baseline artifact:
+    - `benchmarks/results/source-baseline-e2.json`
+  - candidate artifact:
+    - `benchmarks/results/source-candidate-e2.json`
+  - details:
+    - `C1_module_assign`: `+5.61%`
+    - `C2_module_many_assign`: `+2.44%`
+    - `C3_function_module`: `+4.73%`
+    - `C4_class_module`: `+5.63%`
+    - `C5_nested_functions`: `+2.19%`
+    - `C6_list_comprehension`: `+3.08%`
+  - geomean: about `+3.94%`
+- Guardrail:
+  - phase-attribution semantics: passed
+  - AST structural semantics: passed
+
+Decision:
+
+- Accepted on the clean branch and promoted to the stacked branch. The
+  attribution-only comparison had one concerning regression on
+  `A3_function_module`, but the same-worktree AST-only source proof came
+  back broadly positive and the candidate then cleared focused and full
+  validation on both the clean and stacked branches.
+
+## Validation
+
+- Guardrails:
+  - phase-attribution guardrail: passed
+  - clean source AST structural guardrail: passed
+  - stacked AST structural guardrail: passed
+- Focused tests:
+  - clean branch `exp-compile/ast-structural-mainline`:
+    - `test_compile test_ast`: passed
+    - `test_symtable test_dis`: passed
+  - stacked branch `exp-combined-winners-local`:
+    - `test_compile test_ast`: passed
+    - `test_symtable test_dis`: passed
+- Full suite:
+  - clean branch:
+    - `49,882` run
+    - `2,623` skipped
+    - `SUCCESS` in `4 min 20 sec`
+  - stacked branch:
+    - `49,892` run
+    - `2,620` skipped
+    - `SUCCESS` in `4 min 18 sec`
+- Ecosystem / third-party:
+  - not run
+
+## Acceptance Decision
+
+- Decision: accepted and stacked
+- Accepted commit: `2d319755662`
+- Stacked winner commit: `3978a15ff66`
+
+## Notes
+
+- Keep rejected ideas here too so the branch remains useful research.
+- This family exists specifically to avoid reopening entry/setup
+  compiler tweaks that already failed.
+- The measurement-only proof patch lives only on the clean experiment
+  worktree branch and has not been promoted anywhere.
+- Current phase: `stacked`

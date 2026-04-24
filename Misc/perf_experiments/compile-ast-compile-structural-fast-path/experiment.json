@@ -8,7 +8,7 @@
   "base_commit": "0cdb89807fbb8afb2df333f8bc98eaef5babe3a6",
   "branch": "exp-compile/ast-structural-mainline",
   "created_at": "2026-04-24T20:42:16+00:00",
-  "decision": "pending",
+  "decision": "accepted",
   "evidence": {
     "benchmarks": "done",
     "guardrails": "done",
@@ -21,13 +21,15 @@
   "hypothesis": "Control-flow lifting plus common-case split: the real remaining compile opportunity is likely below _PyAST_Compile() in compiler_mod() / optimize-and-assemble work, not another entry/setup tweak. First step is phase attribution to find a lower structural common path worth proving.",
   "notes": [
     "2026-04-24T20:42:21+00:00 Archetype: control-flow lifting plus common-case split. This family intentionally excludes the already-rejected lazy c_stack setup idea. The next gate is compile-phase attribution: separate new_compiler/compiler_mod/optimize-and-assemble style costs so the family targets a structural lower-layer win rather than another thin setup tweak.",
-    "2026-04-24T20:54:50+00:00 Phase attribution completed with the measurement-only compile.c probe. Across the focused corpus, setup/new_compiler is about 22-29% of total, preprocess only about 1.9-2.7%, and compiler_mod about 66-73%. The real split is compiler_codegen() for function/class/nested-heavy cases versus _PyCompile_OptimizeAndAssemble() for flat-module/list-comprehension cases. Inside optasm, code_flags/add_return are negligible and the meaningful headroom is in optimize_and_assemble_code_unit(), especially cfg-to-instruction lowering and assembly. Do not reopen setup/preprocess micro-tweaks in this family."
+    "2026-04-24T20:54:50+00:00 Phase attribution completed with the measurement-only compile.c probe. Across the focused corpus, setup/new_compiler is about 22-29% of total, preprocess only about 1.9-2.7%, and compiler_mod about 66-73%. The real split is compiler_codegen() for function/class/nested-heavy cases versus _PyCompile_OptimizeAndAssemble() for flat-module/list-comprehension cases. Inside optasm, code_flags/add_return are negligible and the meaningful headroom is in optimize_and_assemble_code_unit(), especially cfg-to-instruction lowering and assembly. Do not reopen setup/preprocess micro-tweaks in this family.",
+    "2026-04-24T21:36:49+00:00 E2 source proof survived: flowgraph.c instruction-sequence preallocation/direct-fill in _PyCfg_ToInstructionSequence() measured about +3.94% geomean on the clean same-worktree AST-only harness after a broader attribution-only comparison of about +6.82% with one A3 regression. Advance to focused validation.",
+    "2026-04-24T21:48:10+00:00 E2 accepted and stacked. Clean branch exp-compile/ast-structural-mainline passed test_compile/test_ast, test_symtable/test_dis, and full suite 49,882 run 2,623 skipped SUCCESS in 4 min 20 sec. Stacked branch exp-combined-winners-local passed the AST structural guardrail, the same focused tests, and full suite 49,892 run 2,620 skipped SUCCESS in 4 min 18 sec."
   ],
-  "phase": "benchmarks",
+  "phase": "stacked",
   "promotion": {
-    "accepted_commit": null,
-    "stacked_commit": null,
-    "stacked_validation": "pending"
+    "accepted_commit": "2d319755662b4e990f3e61cb2527dfd61b9e6971",
+    "stacked_commit": "3978a15ff66991d641ec5f9b6a0f72bc789d4944",
+    "stacked_validation": "done"
   },
   "schema_version": 1,
   "slug": "compile-ast-compile-structural-fast-path",
@@ -44,7 +46,7 @@
   "title": "compile ast structural fast path",
   "validation": {
     "ecosystem": "pending",
-    "focused_tests": "pending",
-    "full_suite": "pending"
+    "focused_tests": "done",
+    "full_suite": "done"
   }
 }
