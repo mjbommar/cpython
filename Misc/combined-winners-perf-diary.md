@@ -1587,3 +1587,51 @@ What we learned:
   public `byte2op` name; `test_pickletools` caught that immediately, which is a
   good reminder that tiny module-level helper changes still need contract
   validation, not just perf numbers
+
+## 2026-04-24 update: glob string scandir selector specialization
+
+Accepted and cherry-picked commit:
+
+- `2a873925d43` / `4537fd42930`
+  `glob: specialize string scandir selectors`
+
+Clean-mainline focused result:
+
+- `bench_glob_scandir_shape.py` two-pass same-worktree source proof:
+  - focused-harness geomean: about `+2.27%`
+  - `G1_glob_recursive_all`: `+1.99%`
+  - `G2_glob_recursive_py`: `+1.25%`
+  - `G3_pathlib_rglob_all`: `+3.75%`
+  - `G4_pathlib_glob_recursive_all`: `+4.67%`
+  - `G5_pathlib_glob_recursive_py`: `+4.19%`
+  - `G6_glob_wildcard_all`: `+0.90%`
+  - `G7_glob_wildcard_py`: `+2.15%`
+  - `G8_pathlib_glob_wildcard_all`: `-0.59%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_glob_scandir_shape_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_glob`: passed
+- clean-mainline focused tests:
+  `test_pathlib`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `SUCCESS` in `4 min 20 sec`
+- stacked focused tests:
+  `test_glob`: passed
+- stacked focused tests:
+  `test_pathlib`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `SUCCESS` in `4 min 20 sec`
+
+What we learned:
+
+- the rejected recursive-selector family was pointing at a real subsystem,
+  but the actual remaining leverage was lower in the string-path data shape:
+  per-entry tuple churn and unconditional `entry.path` traffic
+- string-specific selector overrides were the right review boundary; changing
+  `_GlobberBase` would have broadened the risk surface for a smaller win
+- this winner composed on top of an existing stacked glob improvement
+  (`a0a9f825350`, tuple-list `scandir()`), so the stacked merge needed to keep
+  both layers rather than treating them as alternatives
