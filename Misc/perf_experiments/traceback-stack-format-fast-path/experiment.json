@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/traceback-stack-format-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/traceback-stack-format-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/traceback-stack-format-fast-path/guardrails",
+    "root": "Misc/perf_experiments/traceback-stack-format-fast-path"
+  },
+  "base_commit": "2b93536ee010528803a7ddf8f9a2149130a26855",
+  "branch": "exp-traceback/stack-format-mainline",
+  "created_at": "2026-04-24T15:11:41+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "traceback",
+  "hypothesis": "Archetype: common-case split plus control-flow lifting. After the frame-summary winner, StackSummary.format() and TracebackException.format() still contribute real cumulative cost. The likely leverage is a no-repetition fast path that avoids recursive-frame bookkeeping on the common case where adjacent frames are not duplicates, while preserving the existing compression behavior once repetition is seen.",
+  "notes": [
+    "2026-04-24T15:18:11+00:00 2026-04-24 Usage scan: after the earlier frame-summary win, stacked discovery still showed StackSummary.format about 1.825s and TracebackException.format about 2.005s cumulative, so this follow-up family scoped only the remaining traceback orchestrator layers.",
+    "2026-04-24T15:18:11+00:00 2026-04-24 E1 TracebackException.format common-case split measured about 1.000202x geomean. It was effectively flat and regressed the chained-exception case, so it is rejected.",
+    "2026-04-24T15:18:11+00:00 2026-04-24 E2 StackSummary.format no-repeat fast path measured about 0.977518x geomean and regressed every focused traceback case, so the family is closed rejected."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "traceback-stack-format-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/traceback.py:763 StackSummary.format",
+    "Lib/traceback.py:1577 TracebackException.format"
+  ],
+  "title": "traceback stack format fast path",
+  "validation": {
+    "ecosystem": "skipped",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
+  }
+}
