@@ -1035,3 +1035,55 @@ What we learned:
   semantics surface
 - alias and dotted plain-import superclass resolution are already unresolved in
   baseline pyclbr. Keeping those unchanged made this a safe, reviewable winner
+
+## 2026-04-24 update: profiling sample loop fast path
+
+Accepted and cherry-picked commit:
+
+- `be63ca12685` / `dd562c8ee32`
+  `profiling: split the hot sampling loop`
+
+Clean-mainline focused result:
+
+- `bench_sample_profiler_loop.py` source proof:
+  - `P1_default`: `+84.60%`
+  - `P2_running_attr`: `+8.68%`
+  - `P3_async_running`: `+2.37%`
+  - `P4_async_all`: `+4.01%`
+  - `P5_blocking`: `+9.25%`
+  - `P6_realtime`: `+8.42%`
+  - focused-harness geomean: about `+16.74%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_sample_profiler_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_profiling`: passed
+- clean-mainline focused tests:
+  `test_perf_profiler test_perfmaps`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,624` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 20 sec`
+- stacked guardrail:
+  `check_sample_profiler_semantics.py`: `ok`
+- stacked focused tests:
+  `test_profiling`: passed
+- stacked focused tests:
+  `test_perf_profiler test_perfmaps`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 16 sec`
+
+What we learned:
+
+- this family was a good example of why the funnel now insists on naming the
+  archetype early. The win was real because `SampleProfiler.sample()` is itself
+  the hot Python loop, not a thin wrapper around a dominant C call
+- the durable shape was a narrow common-case split for the non-blocking,
+  non-live, non-async path plus hoisted locals for the fallback path. That kept
+  the semantics surface small while removing repeated attribute tests and method
+  lookups from the default sampling loop
+- the very large default-path move held up through source proof, focused
+  profiling tests, and the stacked full suite, so this was not another
+  contextlib-style micro illusion
