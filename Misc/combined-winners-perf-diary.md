@@ -1087,3 +1087,66 @@ What we learned:
 - the very large default-path move held up through source proof, focused
   profiling tests, and the stacked full suite, so this was not another
   contextlib-style micro illusion
+
+## 2026-04-24 update: inspect signature common-case fast path
+
+Accepted and cherry-picked commit:
+
+- `82a3fb5a426` / `15d79d7a772`
+  `inspect: fast-path common signature cases`
+
+Clean-mainline focused result:
+
+- `bench_inspect_signature.py` source proof:
+  - focused-harness geomean: about `+14.83%`
+  - `S1_signature_simple`: `+26.09%`
+  - `S2_from_callable_simple`: `+25.16%`
+  - `S3_signature_builtin_len`: `+6.08%`
+  - `S4_from_callable_builtin_len`: `+5.35%`
+  - `S6_signature_wrapped_no_unwrap`: `+11.94%`
+  - `S8_signature_bound_method`: `+17.02%`
+  - `S9_signature_partialmethod`: `+7.51%`
+  - `S10_signature_carrier`: `+105.35%`
+  - `S11_mixed_stdlib`: `+5.85%`
+  - regressions remained on `S5_signature_wrapped` (`-13.29%`) and
+    `S7_signature_partial` (`-2.23%`), but they were bounded and outweighed by
+    the broader common-path gains
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_inspect_signature_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_inspect`: `SUCCESS` in `2.4 sec`
+- clean-mainline focused tests:
+  `test_functools test_operator test_types`: `SUCCESS` in `2.4 sec`
+- clean-mainline focused tests:
+  `test_dataclasses test_unittest test_warnings`: `SUCCESS` in `5.9 sec`
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 18 sec`
+- stacked guardrail:
+  `check_inspect_signature_semantics.py`: `ok`
+- stacked focused tests:
+  `test_inspect`: `SUCCESS` in `2.2 sec`
+- stacked focused tests:
+  `test_functools test_operator test_types`: `SUCCESS` in `2.1 sec`
+- stacked focused tests:
+  `test_dataclasses test_unittest test_warnings`: `SUCCESS` in `5.6 sec`
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 17 sec`
+
+What we learned:
+
+- the real leverage was inside `inspect._signature_from_callable()`, not in the
+  public `inspect.signature()` wrapper. This was a good fit for the
+  `common-case split` plus `control-flow lifting` archetypes rather than the
+  thin-wrapper-over-C anti-pattern
+- the durable win came from two very small moves: split plain-function and
+  builtin traffic into direct fast paths, and stop paying eager
+  `functools.partial` recursion-helper setup when the slow recursive branches
+  are not used
+- the first source-level patch shape was too mixed even though the monkeypatch
+  prototype looked strong. Requiring a rebuilt source proof before acceptance
+  prevented us from promoting the wrong shape
