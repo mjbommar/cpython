@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/compile-lazy-compiler-stack-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/compile-lazy-compiler-stack-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/compile-lazy-compiler-stack-fast-path/guardrails",
+    "root": "Misc/perf_experiments/compile-lazy-compiler-stack-fast-path"
+  },
+  "base_commit": "c6ef4d3e1091032c5347f1adbd94fe9bc4b0b6db",
+  "branch": "exp-compile/lazy-stack-mainline",
+  "created_at": "2026-04-24T19:37:42+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "compile",
+  "hypothesis": "Archetype: common-case split plus lazy allocation. _PyAST_Compile() currently allocates c_stack as an empty list for every compile even though many AST compiles never enter nested scopes. Lazily allocating c_stack on first nested scope push may remove one guaranteed allocation from the hot compile setup path without changing qualname or nested-scope semantics.",
+  "notes": [
+    "2026-04-24T19:42:13+00:00 Source-proof rejection: lazy c_stack allocation in compiler_setup/_PyCompile_EnterScope measured 1.007731x geomean (+0.77%) on the focused AST compile harness after a clean same-worktree rebuild; too weak to promote beyond benchmarks."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "skipped"
+  },
+  "schema_version": 1,
+  "slug": "compile-lazy-compiler-stack-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Python/compile.c:112 compiler_setup",
+    "Python/compile.c:595 _PyCompile_EnterScope",
+    "Python/compile.c:733 _PyCompile_ExitScope"
+  ],
+  "title": "compile lazy compiler stack fast path",
+  "validation": {
+    "ecosystem": "skipped",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
+  }
+}
