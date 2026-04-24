@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pegen-file-main-module-static-string-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pegen-file-main-module-static-string-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pegen-file-main-module-static-string-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pegen-file-main-module-static-string-fast-path"
+  },
+  "base_commit": "faedd2dedab033a10ebded599005301eb30ba45c",
+  "branch": "exp-pegen/file-main-module-mainline",
+  "created_at": "2026-04-24T19:32:49+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pegen",
+  "hypothesis": "Archetype: precomputed immutable state. _PyPegen_run_parser_from_file_pointer() allocates a fresh PyUnicode '__main__' on every file parse even though the value is static and already available as a global identifier object. Reusing the immortal static '__main__' string with Py_NewRef() may shave file-source parse setup cost without changing warning or error semantics.",
+  "notes": [
+    "2026-04-24T19:35:10+00:00 2026-04-24 Usage scan completed: _PyPegen_run_parser_from_file_pointer() allocates a fresh '__main__' string for tok->module even though a static global identifier object already exists as &_Py_ID(__main__). The candidate was a one-line immutable-state reuse with identical ownership semantics via Py_NewRef().",
+    "2026-04-24T19:35:10+00:00 2026-04-24 Rejected after clean same-worktree source proof. Guardrail passed, but replacing PyUnicode_FromString(\"__main__\") with Py_NewRef(&_Py_ID(__main__)) measured 0.988020x geomean (-1.20%) on the file-source harness: F1 -6.00%, F2 -0.67%, F3 +0.05%, F4 +1.01%, F5 -0.22%."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "pegen-file-main-module-static-string-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Parser/pegen.c:988 _PyPegen_run_parser_from_file_pointer",
+    "Parser/pegen.c:1011 tok->module = PyUnicode_FromString(\"__main__\")"
+  ],
+  "title": "pegen file main module static string fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
