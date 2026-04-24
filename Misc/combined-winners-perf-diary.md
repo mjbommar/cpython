@@ -1318,3 +1318,59 @@ What we learned:
   choice: the `StackSummary.format()` split regressed on its own, and the
   combined runtime prototype only barely exceeded the smaller frame-level
   patch
+
+## 2026-04-24 update: gettext locale expansion cache
+
+Accepted and cherry-picked commit:
+
+- `0832cc79cbc` / `0497f2871cf`
+  `gettext: cache expanded locale variants`
+
+Clean-mainline focused result:
+
+- `bench_gettext_translation_find.py` source proof:
+  - focused-harness geomean: about `+76.74%`
+  - `G1_expand_lang`: `+2056.96%`
+  - `G2_find_missing_explicit`: `+27.97%`
+  - `G3_find_missing_default_env`: `+27.56%`
+  - `G4_dgettext_missing`: `+26.12%`
+  - `G5_gettext_missing`: `+27.46%`
+  - `G6_argparse_ctor`: `+21.17%`
+  - `G7_argparse_help`: `+15.74%`
+  - `G8_argparse_error`: `+19.94%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_gettext_translation_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_gettext`: passed
+- clean-mainline focused tests:
+  `test_argparse test_optparse`: passed
+- clean-mainline focused tests:
+  `test_tools.test_i18n`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 20 sec`
+- stacked guardrail:
+  `check_gettext_translation_semantics.py`: `ok`
+- stacked focused tests:
+  `test_gettext`: passed
+- stacked focused tests:
+  `test_argparse test_optparse`: passed
+- stacked focused tests:
+  `test_tools.test_i18n`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 17 sec`
+
+What we learned:
+
+- the broad `gettext` profile signal was real, but it was mostly indirect
+  traffic from `argparse` repeatedly hitting the no-translation path
+- caching the pure `_expand_lang(loc)` expansion was enough to move both the
+  direct `gettext` miss cases and real `argparse` constructor/help/error paths
+  without touching higher-risk filesystem negative caching
+- returning a copy from the cache keeps the historical mutable-list contract,
+  which made this a safe small semantics-preserving win rather than a behavior
+  change disguised as a perf patch
