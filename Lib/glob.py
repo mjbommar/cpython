@@ -541,12 +541,112 @@ class _StringGlobber(_GlobberBase):
     concat_path = operator.add
 
     @staticmethod
-    def scandir(path):
+    def _scandir_entries(path):
         # We must close the scandir() object before proceeding to
         # avoid exhausting file descriptors when globbing deep trees.
         with os.scandir(path) as scandir_it:
-            return [(entry, entry.name, entry.path) for entry in scandir_it]
+            return list(scandir_it)
+
+    @staticmethod
+    def scandir(path):
+        entries = _StringGlobber._scandir_entries(path)
+        return [(entry, entry.name, entry.path) for entry in entries]
 
     @staticmethod
     def stringify_path(path):
         return path  # Already a string.
+
+    def wildcard_selector(self, part, parts):
+        """String-specific selector that iterates raw DirEntry objects."""
+
+        match = None if part == '*' else self.compile(part)
+        dir_only = bool(parts)
+        if dir_only:
+            select_next = self.selector(parts)
+
+        def select_wildcard(path, exists=False):
+            try:
+                entries = self._scandir_entries(path)
+            except OSError:
+                return
+
+            if match is None:
+                for entry in entries:
+                    if dir_only:
+                        try:
+                            if not entry.is_dir():
+                                continue
+                        except OSError:
+                            continue
+                        yield from select_next(
+                            self.concat_path(entry.path, self.sep), exists=True)
+                    else:
+                        yield entry.path
+                return
+
+            for entry in entries:
+                if not match(entry.name):
+                    continue
+                if dir_only:
+                    try:
+                        if not entry.is_dir():
+                            continue
+                    except OSError:
+                        continue
+                    yield from select_next(
+                        self.concat_path(entry.path, self.sep), exists=True)
+                else:
+                    yield entry.path
+
+        return select_wildcard
+
+    def recursive_selector(self, part, parts):
+        """String-specific recursive selector that iterates raw DirEntry objects."""
+
+        while parts and parts[-1] == '**':
+            parts.pop()
+
+        follow_symlinks = self.recursive is not _no_recurse_symlinks
+        if follow_symlinks:
+            while parts and parts[-1] not in _special_parts:
+                part += self.sep + parts.pop()
+
+        match = None if part == '**' else self.compile(part)
+        dir_only = bool(parts)
+        select_next = self.selector(parts)
+
+        def select_recursive(path, exists=False):
+            path_str = self.stringify_path(path)
+            match_pos = len(path_str)
+            if match is None or match(path_str, match_pos):
+                yield from select_next(path, exists)
+            stack = [path]
+            while stack:
+                path = stack.pop()
+                try:
+                    entries = self._scandir_entries(path)
+                except OSError:
+                    continue
+                for entry in entries:
+                    is_dir = False
+                    try:
+                        if entry.is_dir(follow_symlinks=follow_symlinks):
+                            is_dir = True
+                    except OSError:
+                        pass
+
+                    if not is_dir and dir_only:
+                        continue
+
+                    entry_path = entry.path
+                    if dir_only:
+                        entry_path_dir = self.concat_path(entry_path, self.sep)
+                    if match is None or match(entry_path, match_pos):
+                        if dir_only:
+                            yield from select_next(entry_path_dir, exists=True)
+                        else:
+                            yield entry_path
+                    if is_dir:
+                        stack.append(entry_path)
+
+        return select_recursive
