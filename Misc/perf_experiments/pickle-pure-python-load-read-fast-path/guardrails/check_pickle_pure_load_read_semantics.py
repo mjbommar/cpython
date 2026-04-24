@@ -20,6 +20,7 @@ OBJECTS = [
     {"a": 1, "b": [1, 2, 3], "c": ("x", "y")},
     [f"name-{i}" for i in range(200)],
     bytearray(b"x" * 4096),
+    bytearray(b"y" * (2 * 1024 * 1024)),
 ]
 
 PAYLOADS = [pickle._dumps(obj, protocol=5) for obj in OBJECTS]
@@ -46,17 +47,23 @@ def main() -> None:
         "truncated": capture(lambda: pickle._loads(PAYLOADS[0][:-1])),
     }
 
-    install_candidate()
-    try:
-        candidate = {
-            "loads": [capture(lambda payload=payload: pickle._loads(payload)) for payload in PAYLOADS],
-            "stream": capture(load_stream),
-            "truncated": capture(lambda: pickle._loads(PAYLOADS[0][:-1])),
-        }
-    finally:
-        restore_original()
+    for variant in (
+        "small_read_fast_path",
+        "chunk_join",
+        "chunk_bytearray",
+        "chunk_join_large_only",
+    ):
+        install_candidate(variant)
+        try:
+            candidate = {
+                "loads": [capture(lambda payload=payload: pickle._loads(payload)) for payload in PAYLOADS],
+                "stream": capture(load_stream),
+                "truncated": capture(lambda: pickle._loads(PAYLOADS[0][:-1])),
+            }
+        finally:
+            restore_original()
 
-    assert baseline == candidate, (baseline, candidate)
+        assert baseline == candidate, (variant, baseline, candidate)
     print("pickle pure load/read guardrails: ok")
 
 

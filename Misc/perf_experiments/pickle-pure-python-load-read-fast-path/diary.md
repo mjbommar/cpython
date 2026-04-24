@@ -89,6 +89,81 @@ Decision:
 
 Rejected as a source candidate. The mixed result is too weak for a clean branch.
 
+### E2
+
+Status: rejected.
+
+Thesis:
+
+Replace `_chunked_file_read()`'s repeated `b += chunk` growth with a chunk list
+plus one `b''.join(chunks)` at the end.
+
+Result:
+
+- Runtime proof only: about `-0.34%` geomean.
+- Details:
+  - `P1_load_small_list`: `-2.05%`
+  - `P2_load_nested`: `-0.07%`
+  - `P3_load_strings`: `-1.10%`
+  - `P4_load_stream_multi`: `-0.27%`
+  - `P5_load_large_bytes`: `+0.14%`
+  - `P6_load_huge_bytes`: `+1.48%`
+  - `P7_chunked_read_2mb`: `-4.77%`
+  - `P8_chunked_read_8mb`: `+4.11%`
+
+Decision:
+
+Rejected. It only helped the largest multi-chunk case and regressed the more
+common two-chunk loads.
+
+### E3
+
+Status: rejected.
+
+Thesis:
+
+Replace `_chunked_file_read()` growth with a `bytearray` accumulator and one
+final `bytes(buf)` conversion.
+
+Result:
+
+- Runtime proof only: about `-10.68%` geomean.
+- Details:
+  - `P5_load_large_bytes`: `-7.22%`
+  - `P7_chunked_read_2mb`: `-48.27%`
+  - `P8_chunked_read_8mb`: `-15.19%`
+
+Decision:
+
+Rejected immediately. This was materially worse across the chunked-read cases.
+
+### E4
+
+Status: rejected.
+
+Thesis:
+
+Use the original `_chunked_file_read()` up to 2 MiB and switch to the
+`b''.join(chunks)` strategy only for larger multi-chunk reads.
+
+Result:
+
+- Runtime proof only: about `-0.08%` geomean.
+- Details:
+  - `P1_load_small_list`: `-2.30%`
+  - `P2_load_nested`: `-1.16%`
+  - `P3_load_strings`: `-4.92%`
+  - `P4_load_stream_multi`: `-2.83%`
+  - `P5_load_large_bytes`: `-1.39%`
+  - `P6_load_huge_bytes`: `+1.62%`
+  - `P7_chunked_read_2mb`: `+3.55%`
+  - `P8_chunked_read_8mb`: `+7.34%`
+
+Decision:
+
+Rejected. The large-read wins were real, but they did not outweigh the
+regressions on the ordinary load-heavy cases.
+
 ## Validation
 
 - Guardrails:
@@ -102,14 +177,14 @@ Rejected as a source candidate. The mixed result is too weak for a clean branch.
 
 ## Acceptance Decision
 
-- Decision: pending
+- Decision: rejected
 - Accepted commit:
 - Stacked winner commit:
 
 ## Notes
 
-- Current phase: `benchmarks`
-- Next gate: decide whether there is a stronger load-side shape worth testing
-  in the same family, likely around `_chunked_file_read()` allocation strategy
-  or a more representative multi-unpickle stream workload. Do not open a clean
-  source branch for `E1`.
+- Current phase: `rejected`
+- No candidate in this family cleared the source-branch gate.
+- If this family is ever reopened, the next shape should likely target
+  opcode-specific decode helpers or a larger architectural load path rather
+  than more `_chunked_file_read()` micro-surgery.

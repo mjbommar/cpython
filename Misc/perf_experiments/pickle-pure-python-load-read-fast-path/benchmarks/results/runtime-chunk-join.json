@@ -1,0 +1,131 @@
+{
+  "P1_load_small_list": {
+    "best_ns": 42005.4,
+    "label": "load_small_list",
+    "loops": 1200,
+    "mean_ns": 43057.1,
+    "repeat": 7,
+    "samples_ns": [
+      44091.3,
+      46388.0,
+      42005.4,
+      42035.5,
+      42125.1,
+      42033.6,
+      42721.1
+    ]
+  },
+  "P2_load_nested": {
+    "best_ns": 548258.3,
+    "label": "load_nested",
+    "loops": 1200,
+    "mean_ns": 552393.6,
+    "repeat": 7,
+    "samples_ns": [
+      550737.1,
+      557640.2,
+      552268.0,
+      548258.3,
+      554566.9,
+      552515.8,
+      550768.6
+    ]
+  },
+  "P3_load_strings": {
+    "best_ns": 907701.0,
+    "label": "load_strings",
+    "loops": 1200,
+    "mean_ns": 914342.9,
+    "repeat": 7,
+    "samples_ns": [
+      921575.1,
+      914255.5,
+      917488.1,
+      910710.1,
+      907701.0,
+      914532.5,
+      914138.0
+    ]
+  },
+  "P4_load_stream_multi": {
+    "best_ns": 1352163.5,
+    "label": "load_stream_multi",
+    "loops": 300,
+    "mean_ns": 1371926.0,
+    "repeat": 7,
+    "samples_ns": [
+      1377138.6,
+      1354447.7,
+      1364813.6,
+      1374296.0,
+      1358487.3,
+      1422135.2,
+      1352163.5
+    ]
+  },
+  "P5_load_large_bytes": {
+    "best_ns": 36304.0,
+    "label": "load_large_bytes",
+    "loops": 250,
+    "mean_ns": 37829.3,
+    "repeat": 7,
+    "samples_ns": [
+      37958.6,
+      36928.7,
+      36304.0,
+      39214.1,
+      37013.3,
+      36538.6,
+      40847.9
+    ]
+  },
+  "P6_load_huge_bytes": {
+    "best_ns": 3148175.2,
+    "label": "load_huge_bytes",
+    "loops": 60,
+    "mean_ns": 3195748.3,
+    "repeat": 7,
+    "samples_ns": [
+      3169896.7,
+      3157358.3,
+      3332815.3,
+      3181844.8,
+      3223557.5,
+      3156589.9,
+      3148175.2
+    ]
+  },
+  "P7_chunked_read_2mb": {
+    "best_ns": 156840.4,
+    "label": "chunked_read_2mb",
+    "loops": 60,
+    "mean_ns": 180921.9,
+    "repeat": 7,
+    "samples_ns": [
+      196971.2,
+      175290.7,
+      167868.1,
+      156840.4,
+      157382.2,
+      184468.8,
+      227631.6
+    ]
+  },
+  "P8_chunked_read_8mb": {
+    "best_ns": 10609854.9,
+    "label": "chunked_read_8mb",
+    "loops": 20,
+    "mean_ns": 10853357.3,
+    "repeat": 7,
+    "samples_ns": [
+      10851398.6,
+      10617167.0,
+      10860385.9,
+      10609854.9,
+      11066063.5,
+      11194885.9,
+      10773745.1
+    ]
+  },
+  "variant": "chunk_join"
+}

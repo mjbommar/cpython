@@ -8,7 +8,7 @@
   "base_commit": "5a37cb8a24363a730302031721baeb264aff1a49",
   "branch": "exp-pickle/load-read-mainline",
   "created_at": "2026-04-24T14:28:40+00:00",
-  "decision": "pending",
+  "decision": "rejected",
   "evidence": {
     "benchmarks": "done",
     "guardrails": "done",
@@ -19,9 +19,10 @@
   "hypothesis": "Archetype: common-case split plus allocator/accumulator care. Fresh stacked discovery shows pure-Python pickle load/read still hot after the old save-side winner. The smallest safe first shape is to fast-path unframed small reads in _Unframer.read(), because most opcode reads are tiny and currently still pay the _chunked_file_read helper.",
   "notes": [
     "2026-04-24T14:31:57+00:00 Stacked discovery shows remaining pure-Python pickle load/read cluster: load about 9.656s cumulative, read about 4.001s, _chunked_file_read about 1.660s.",
-    "2026-04-24T14:31:57+00:00 E1 runtime small-read fast path only reached about 1.001781x geomean and regressed the common small/nested/string payloads, so it is rejected as a source candidate."
+    "2026-04-24T14:31:57+00:00 E1 runtime small-read fast path only reached about 1.001781x geomean and regressed the common small/nested/string payloads, so it is rejected as a source candidate.",
+    "2026-04-24T15:09:35+00:00 2026-04-24 E2 chunk-list join measured about 0.996554x geomean, E3 bytearray about 0.893164x, and E4 large-only join about 0.999226x. No load-side candidate cleared the clean source-branch gate, so the family is closed rejected."
   ],
-  "phase": "benchmarks",
+  "phase": "rejected",
   "promotion": {
     "accepted_commit": null,
     "stacked_commit": null,
@@ -42,8 +43,8 @@
   ],
   "title": "pickle pure-Python load/read fast path",
   "validation": {
-    "ecosystem": "pending",
-    "focused_tests": "pending",
-    "full_suite": "pending"
+    "ecosystem": "skipped",
+    "focused_tests": "skipped",
+    "full_suite": "skipped"
   }
 }
