@@ -1259,3 +1259,62 @@ What we learned:
   but operate on `item.data` directly instead of paying repeated
   `SubPattern.__getitem__`, `__len__`, and `__delitem__` overhead in the hot
   rewrite path
+
+## 2026-04-24 update: traceback non-color frame formatting fast path
+
+Accepted and cherry-picked commit:
+
+- `67cf6742853` / `6eea811f501`
+  `traceback: fast-path non-color frame formatting`
+
+Clean-mainline focused result:
+
+- `bench_traceback_format.py` source proof:
+  - focused-harness geomean: about `+4.35%`
+  - `T1_frame_simple`: `+4.77%`
+  - `T2_frame_locals`: `+7.76%`
+  - `T3_frame_caret`: `+2.77%`
+  - `T4_stack_simple`: `+5.11%`
+  - `T5_stack_recursive`: `+4.07%`
+  - `T6_te_simple`: `+4.23%`
+  - `T7_te_caret`: `+2.97%`
+  - `T8_te_locals`: `+5.36%`
+  - `T9_format_exception_simple`: `+3.51%`
+  - `T10_format_exception_caret`: `+3.03%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_traceback_format_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_traceback`: passed
+- clean-mainline focused tests:
+  `test_exceptions test_warnings`: passed
+- clean-mainline focused tests:
+  `test_logging test_pdb`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 20 sec`
+- stacked guardrail:
+  `check_traceback_format_semantics.py`: `ok`
+- stacked focused tests:
+  `test_traceback`: passed
+- stacked focused tests:
+  `test_exceptions test_warnings`: passed
+- stacked focused tests:
+  `test_logging test_pdb`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 17 sec`
+
+What we learned:
+
+- the durable traceback win was in the common non-color frame-formatting
+  path, not in broader `StackSummary.format()` loop surgery
+- the runtime prototype understated the final effect; once the source change
+  was isolated cleanly, the focused harness improved from about `+2.64%` to
+  about `+4.35%` geomean
+- keeping the patch scoped to `format_frame_summary()` was the right review
+  choice: the `StackSummary.format()` split regressed on its own, and the
+  combined runtime prototype only barely exceeded the smaller frame-level
+  patch
