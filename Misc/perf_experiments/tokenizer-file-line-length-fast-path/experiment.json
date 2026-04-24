@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/tokenizer-file-line-length-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/tokenizer-file-line-length-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/tokenizer-file-line-length-fast-path/guardrails",
+    "root": "Misc/perf_experiments/tokenizer-file-line-length-fast-path"
+  },
+  "base_commit": "a9895a588d4aea081e8f2903b0c59ee08d9cf5a7",
+  "branch": "exp-tokenizer/file-line-length-mainline",
+  "created_at": "2026-04-24T19:21:19+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "tokenizer",
+  "hypothesis": "Archetype: control-flow lifting plus common-case data reuse. The raw file tokenizer path already knows exact line bounds via tok->inp, but tok_underflow_file() rescans the same bytes with strlen() for coding-cookie checks and UTF-8 or codec validation. Reusing pointer-difference lengths may remove redundant per-line scans on source-file compilation without changing tokenizer semantics.",
+  "notes": [
+    "2026-04-24T19:27:14+00:00 2026-04-24 Usage scan completed: the real file-source work sits in tok_underflow_file(), not the tiny _PyTokenizer_FromFile() wrapper, and the candidate was a local reuse of tok->inp-derived line lengths in place of raw-file strlen() rescans.",
+    "2026-04-24T19:27:14+00:00 2026-04-24 Rejected after clean same-worktree source proof. Guardrail passed, but the pointer-length tokenizer patch measured 0.994991x geomean (-0.50%) on the file-source harness: F1 -0.40%, F2 -1.88%, F3 -0.33%, F4 -0.97%, F5 +1.09%."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "tokenizer-file-line-length-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Parser/tokenizer/file_tokenizer.c:tok_underflow_file",
+    "Parser/tokenizer/file_tokenizer.c:_PyTokenizer_FromFile"
+  ],
+  "title": "tokenizer file line length fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

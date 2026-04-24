@@ -1,0 +1,122 @@
+{
+  "cases": {
+    "F1_short_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-6eeqp_nt/f1_short_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 10789275,
+      "mean_ns": 9878346.42857143,
+      "median_ns": 9764960,
+      "min_ns": 9542437,
+      "samples_ns": [
+        9652514,
+        9762379,
+        9764960,
+        9542437,
+        9777822,
+        10789275,
+        9859038
+      ],
+      "warmups": 2
+    },
+    "F2_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-6eeqp_nt/f2_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 15968475,
+      "mean_ns": 15580959.857142856,
+      "median_ns": 15593958,
+      "min_ns": 15132612,
+      "samples_ns": [
+        15968475,
+        15643487,
+        15593958,
+        15861899,
+        15132612,
+        15531005,
+        15335283
+      ],
+      "warmups": 2
+    },
+    "F3_utf8_cookie_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-6eeqp_nt/f3_utf8_cookie_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 15172189,
+      "mean_ns": 14579579.142857144,
+      "median_ns": 14592129,
+      "min_ns": 14113764,
+      "samples_ns": [
+        14113764,
+        14518558,
+        14592129,
+        15172189,
+        14233156,
+        14685179,
+        14742079
+      ],
+      "warmups": 2
+    },
+    "F4_latin1_cookie_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-6eeqp_nt/f4_latin1_cookie_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 18257555,
+      "mean_ns": 16693274.42857143,
+      "median_ns": 16010841,
+      "min_ns": 15553576,
+      "samples_ns": [
+        17233761,
+        18190736,
+        18257555,
+        15985327,
+        15621125,
+        16010841,
+        15553576
+      ],
+      "warmups": 2
+    },
+    "F5_mixed_module": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-6eeqp_nt/f5_mixed_module.py"
+      ],
+      "loops": 7,
+      "max_ns": 29665173,
+      "mean_ns": 29203998.85714286,
+      "median_ns": 29245607,
+      "min_ns": 28759167,
+      "samples_ns": [
+        29665173,
+        29245607,
+        29052223,
+        28759167,
+        29431446,
+        28925107,
+        29349269
+      ],
+      "warmups": 2
+    }
+  },
+  "loops": 7,
+  "python": "/home/mjbommar/projects/personal/cpython/python",
+  "warmups": 2
+}

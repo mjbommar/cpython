@@ -1,0 +1,122 @@
+{
+  "cases": {
+    "F1_short_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-du25qkdh/f1_short_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 10028212,
+      "mean_ns": 9862888.857142856,
+      "median_ns": 9831433,
+      "min_ns": 9666309,
+      "samples_ns": [
+        9999123,
+        9762852,
+        9943011,
+        10028212,
+        9831433,
+        9809282,
+        9666309
+      ],
+      "warmups": 2
+    },
+    "F2_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-du25qkdh/f2_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 15987154,
+      "mean_ns": 15584415.714285715,
+      "median_ns": 15619722,
+      "min_ns": 14961321,
+      "samples_ns": [
+        15638027,
+        15468280,
+        15619722,
+        14961321,
+        15919879,
+        15496527,
+        15987154
+      ],
+      "warmups": 2
+    },
+    "F3_utf8_cookie_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-du25qkdh/f3_utf8_cookie_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 14794732,
+      "mean_ns": 14502277.857142856,
+      "median_ns": 14493158,
+      "min_ns": 14162354,
+      "samples_ns": [
+        14489109,
+        14162354,
+        14794732,
+        14493158,
+        14616128,
+        14417390,
+        14543074
+      ],
+      "warmups": 2
+    },
+    "F4_latin1_cookie_long_comments": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-du25qkdh/f4_latin1_cookie_long_comments.py"
+      ],
+      "loops": 7,
+      "max_ns": 19159425,
+      "mean_ns": 18089497.14285714,
+      "median_ns": 17949842,
+      "min_ns": 17685340,
+      "samples_ns": [
+        18075161,
+        18075835,
+        17738923,
+        19159425,
+        17949842,
+        17941954,
+        17685340
+      ],
+      "warmups": 2
+    },
+    "F5_mixed_module": {
+      "command": [
+        "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+        "-S",
+        "-B",
+        "/tmp/tokenizer-file-lines-du25qkdh/f5_mixed_module.py"
+      ],
+      "loops": 7,
+      "max_ns": 29597464,
+      "mean_ns": 29280429.57142857,
+      "median_ns": 29227543,
+      "min_ns": 28878431,
+      "samples_ns": [
+        29597464,
+        29222994,
+        29486326,
+        29382663,
+        29227543,
+        29167586,
+        28878431
+      ],
+      "warmups": 2
+    }
+  },
+  "loops": 7,
+  "python": "/home/mjbommar/projects/personal/cpython-tokenizer-file-line-length-mainline/python",
+  "warmups": 2
+}
