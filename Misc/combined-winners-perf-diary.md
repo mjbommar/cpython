@@ -1483,3 +1483,55 @@ What we learned:
 - preserving the existing per-batch snapshot behavior kept the current
   concurrent-mutation tolerance while still capturing most of the win from
   direct `save_long()` dispatch
+
+## 2026-04-24 update: pickle exact-int tuple fast path
+
+Accepted and cherry-picked commit:
+
+- `a521002acec` / `383516c4dfe`
+  `pickle: specialize exact-int tuple saves`
+
+Clean-mainline focused result:
+
+- `bench_pickle_pure_tuple.py` reduced same-worktree source proof:
+  - focused-harness geomean: about `+19.44%`
+  - `T1_tuple_of_ints_10k_dump`: `+42.52%`
+  - `T2_tuple_of_strs_1k_dump`: `+1.40%`
+  - `T3_nested_tuple_dump`: `+21.43%`
+  - `T4_mixed_scalar_tuple_dump`: `-0.64%`
+  - `T5_small_int_tuple_dump`: `+71.64%`
+  - `T6_int_pair_tuple_dump`: `+17.87%`
+  - `T7_tuple_of_dicts_dump`: `-1.68%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_pickle_pure_tuple_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- clean-mainline focused tests:
+  `test_copy test_copyreg test_shelve`: passed
+- clean-mainline full suite:
+  `49,892` tests, `2,623` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 21 sec`
+- stacked guardrail:
+  `check_pickle_pure_tuple_semantics.py`: `ok`
+- stacked focused tests:
+  `test_pickle test_picklebuffer test_pickletools`: passed
+- stacked focused tests:
+  `test_copy test_copyreg test_shelve`: passed
+- stacked full suite:
+  `49,892` tests, `2,621` skipped, `476` tests OK,
+  `SUCCESS` in `4 min 19 sec`
+
+What we learned:
+
+- the older rejected atomic-tuple direction failed the byte-stability bar, so
+  the right next move was a narrower specialization that leaves memoization and
+  opcode shape unchanged
+- exact `_Pickler` plus homogeneous exact-`int` tuples is the right safety
+  boundary because it bypasses generic `save()` dispatch without suppressing
+  subclass hooks like `persistent_id`
+- this tuple win composes cleanly with the earlier exact-int list batch win,
+  which suggests the remaining pure-Python pickle save-side leverage is still
+  in exact-type container fast paths rather than broad dispatcher rewrites
