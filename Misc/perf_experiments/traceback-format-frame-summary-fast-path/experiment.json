@@ -8,7 +8,7 @@
   "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
   "branch": "exp-traceback/frame-summary-mainline",
   "created_at": "2026-04-24T12:38:37+00:00",
-  "decision": "pending",
+  "decision": "accepted",
   "evidence": {
     "benchmarks": "done",
     "guardrails": "done",
@@ -21,13 +21,17 @@
   "hypothesis": "Archetype: common-case split plus control-flow lifting. Fresh stacked discovery still shows traceback formatting as a real pure-Python cluster: StackSummary.format(), StackSummary.format_frame_summary(), and traceback.format(). Most formatted frames are on the common no-colorize, no-locals path, and many miss the full caret-anchor machinery. Splitting that common path away from the heavy caret/color/locals logic may reduce traceback formatting overhead without changing rendered output.",
   "notes": [
     "2026-04-24T12:39:01+00:00 2026-04-24 Fresh stacked discovery shows traceback.py as a real pure-Python cluster: traceback.format() about 2.00s cumulative, StackSummary.format() about 1.83s, format_frame_summary() about 1.79s on the curated broad stdlib slice. Chosen over argparse because argparse traffic here is likely one-shot CLI/test-local, and over gettext because gettext looks closer to a cached wrapper chain around translation/find.",
-    "2026-04-24T12:47:54+00:00 2026-04-24 Defined focused traceback benchmark corpus and guardrail. Baseline artifact: benchmarks/results/runtime-baseline.json. Common-path baseline shapes: frame simple about 57.4 us, frame caret about 85.6 us, stack simple about 126.0 us, TracebackException.format simple about 141.7 us, format_exception caret about 224.9 us."
+    "2026-04-24T12:47:54+00:00 2026-04-24 Defined focused traceback benchmark corpus and guardrail. Baseline artifact: benchmarks/results/runtime-baseline.json. Common-path baseline shapes: frame simple about 57.4 us, frame caret about 85.6 us, stack simple about 126.0 us, TracebackException.format simple about 141.7 us, format_exception caret about 224.9 us.",
+    "2026-04-24T13:31:12+00:00 2026-04-24 Runtime proof: frame_no_color +2.64% geomean, stack_no_color -1.02%, combined +2.73%; carried the smallest positive shape forward.",
+    "2026-04-24T13:31:12+00:00 2026-04-24 Clean source proof on serialized A/B run: source-baseline-a vs source-candidate-a +4.35% geomean with all 10 focused cases positive.",
+    "2026-04-24T13:31:12+00:00 2026-04-24 Clean validation passed: focused tests test_traceback; test_exceptions test_warnings; test_logging test_pdb, then full suite SUCCESS in 4 min 20 sec (49,882 run, 2,623 skipped).",
+    "2026-04-24T13:37:04+00:00 2026-04-24 Stacked validation passed: guardrail ok; focused tests test_traceback, test_exceptions test_warnings, test_logging test_pdb all passed; full suite SUCCESS in 4 min 17 sec (49,892 run, 2,620 skipped)."
   ],
-  "phase": "benchmarks",
+  "phase": "stacked",
   "promotion": {
-    "accepted_commit": null,
-    "stacked_commit": null,
-    "stacked_validation": "pending"
+    "accepted_commit": "67cf6742853",
+    "stacked_commit": "6eea811f501",
+    "stacked_validation": "done"
   },
   "schema_version": 1,
   "slug": "traceback-format-frame-summary-fast-path",
@@ -45,7 +49,7 @@
   "title": "traceback format frame summary fast path",
   "validation": {
     "ecosystem": "pending",
-    "focused_tests": "pending",
-    "full_suite": "pending"
+    "focused_tests": "done",
+    "full_suite": "done"
   }
 }

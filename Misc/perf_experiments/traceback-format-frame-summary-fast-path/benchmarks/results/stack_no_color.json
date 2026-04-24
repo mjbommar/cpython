@@ -1,0 +1,163 @@
+{
+  "T10_format_exception_caret": {
+    "best_ns": 224314.2,
+    "label": "traceback.format_exception caret",
+    "loops": 4000,
+    "mean_ns": 225589.2,
+    "repeat": 7,
+    "samples_ns": [
+      226088.6,
+      224822.1,
+      225160.7,
+      226039.6,
+      224430.5,
+      228269.1,
+      224314.2
+    ]
+  },
+  "T1_frame_simple": {
+    "best_ns": 57621.1,
+    "label": "frame simple",
+    "loops": 20000,
+    "mean_ns": 57940.1,
+    "repeat": 7,
+    "samples_ns": [
+      57621.1,
+      57928.3,
+      57949.4,
+      57844.0,
+      57665.8,
+      58742.4,
+      57829.6
+    ]
+  },
+  "T2_frame_locals": {
+    "best_ns": 61205.2,
+    "label": "frame with locals",
+    "loops": 20000,
+    "mean_ns": 61813.9,
+    "repeat": 7,
+    "samples_ns": [
+      62261.0,
+      63373.3,
+      61751.6,
+      61348.2,
+      61329.3,
+      61428.8,
+      61205.2
+    ]
+  },
+  "T3_frame_caret": {
+    "best_ns": 84662.9,
+    "label": "frame with caret data",
+    "loops": 20000,
+    "mean_ns": 85074.4,
+    "repeat": 7,
+    "samples_ns": [
+      84918.7,
+      84824.3,
+      84976.1,
+      85331.1,
+      84662.9,
+      85256.0,
+      85551.6
+    ]
+  },
+  "T4_stack_simple": {
+    "best_ns": 125481.8,
+    "label": "stack format simple",
+    "loops": 8000,
+    "mean_ns": 126298.6,
+    "repeat": 7,
+    "samples_ns": [
+      126182.6,
+      126471.9,
+      125995.1,
+      126373.4,
+      127450.0,
+      126135.6,
+      125481.8
+    ]
+  },
+  "T5_stack_recursive": {
+    "best_ns": 628268.2,
+    "label": "stack format recursive",
+    "loops": 8000,
+    "mean_ns": 629519.7,
+    "repeat": 7,
+    "samples_ns": [
+      628268.2,
+      630066.8,
+      629143.8,
+      629986.7,
+      629257.3,
+      629188.0,
+      630727.4
+    ]
+  },
+  "T6_te_simple": {
+    "best_ns": 142511.8,
+    "label": "TracebackException.format simple",
+    "loops": 6000,
+    "mean_ns": 142861.3,
+    "repeat": 7,
+    "samples_ns": [
+      142620.0,
+      142738.2,
+      142605.0,
+      143877.6,
+      142539.1,
+      142511.8,
+      143137.5
+    ]
+  },
+  "T7_te_caret": {
+    "best_ns": 169432.1,
+    "label": "TracebackException.format caret",
+    "loops": 6000,
+    "mean_ns": 170383.8,
+    "repeat": 7,
+    "samples_ns": [
+      170299.8,
+      171807.8,
+      171837.6,
+      169432.1,
+      169907.6,
+      169487.8,
+      169914.0
+    ]
+  },
+  "T8_te_locals": {
+    "best_ns": 149347.5,
+    "label": "TracebackException.format locals",
+    "loops": 6000,
+    "mean_ns": 150004.3,
+    "repeat": 7,
+    "samples_ns": [
+      150822.9,
+      149347.5,
+      149748.9,
+      150149.1,
+      150074.8,
+      150116.9,
+      149770.0
+    ]
+  },
+  "T9_format_exception_simple": {
+    "best_ns": 194767.3,
+    "label": "traceback.format_exception simple",
+    "loops": 4000,
+    "mean_ns": 195232.1,
+    "repeat": 7,
+    "samples_ns": [
+      194911.2,
+      195433.4,
+      195340.5,
+      194767.3,
+      194942.0,
+      195292.1,
+      195938.2
+    ]
+  },
+  "variant": "stack_no_color"
+}

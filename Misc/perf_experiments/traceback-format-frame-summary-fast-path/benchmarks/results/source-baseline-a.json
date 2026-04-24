@@ -1,0 +1,163 @@
+{
+  "T10_format_exception_caret": {
+    "best_ns": 225566.8,
+    "label": "traceback.format_exception caret",
+    "loops": 4000,
+    "mean_ns": 226930.8,
+    "repeat": 7,
+    "samples_ns": [
+      230068.8,
+      226315.1,
+      227788.8,
+      225566.8,
+      226605.2,
+      225948.4,
+      226222.7
+    ]
+  },
+  "T1_frame_simple": {
+    "best_ns": 57611.0,
+    "label": "frame simple",
+    "loops": 20000,
+    "mean_ns": 57954.2,
+    "repeat": 7,
+    "samples_ns": [
+      58374.2,
+      57811.5,
+      58305.0,
+      57611.0,
+      57866.7,
+      57794.6,
+      57916.7
+    ]
+  },
+  "T2_frame_locals": {
+    "best_ns": 61568.3,
+    "label": "frame with locals",
+    "loops": 20000,
+    "mean_ns": 61963.0,
+    "repeat": 7,
+    "samples_ns": [
+      62104.6,
+      61568.3,
+      62221.5,
+      61824.1,
+      62214.6,
+      61877.6,
+      61930.2
+    ]
+  },
+  "T3_frame_caret": {
+    "best_ns": 85511.8,
+    "label": "frame with caret data",
+    "loops": 20000,
+    "mean_ns": 85842.4,
+    "repeat": 7,
+    "samples_ns": [
+      85939.8,
+      85817.9,
+      86455.1,
+      85617.7,
+      85511.8,
+      85772.3,
+      85782.4
+    ]
+  },
+  "T4_stack_simple": {
+    "best_ns": 127483.7,
+    "label": "stack format simple",
+    "loops": 8000,
+    "mean_ns": 128374.1,
+    "repeat": 7,
+    "samples_ns": [
+      127717.6,
+      127483.7,
+      128166.2,
+      128369.1,
+      128635.3,
+      129296.7,
+      128950.3
+    ]
+  },
+  "T5_stack_recursive": {
+    "best_ns": 632882.4,
+    "label": "stack format recursive",
+    "loops": 8000,
+    "mean_ns": 636990.2,
+    "repeat": 7,
+    "samples_ns": [
+      635185.8,
+      636562.4,
+      640914.6,
+      640747.7,
+      639116.5,
+      632882.4,
+      633522.1
+    ]
+  },
+  "T6_te_simple": {
+    "best_ns": 142271.9,
+    "label": "TracebackException.format simple",
+    "loops": 6000,
+    "mean_ns": 143529.1,
+    "repeat": 7,
+    "samples_ns": [
+      142271.9,
+      144721.2,
+      143946.9,
+      144928.0,
+      143199.6,
+      143080.7,
+      142555.5
+    ]
+  },
+  "T7_te_caret": {
+    "best_ns": 170327.5,
+    "label": "TracebackException.format caret",
+    "loops": 6000,
+    "mean_ns": 170827.7,
+    "repeat": 7,
+    "samples_ns": [
+      170723.9,
+      170992.8,
+      171740.1,
+      170610.1,
+      170839.9,
+      170327.5,
+      170559.8
+    ]
+  },
+  "T8_te_locals": {
+    "best_ns": 149928.4,
+    "label": "TracebackException.format locals",
+    "loops": 6000,
+    "mean_ns": 150669.4,
+    "repeat": 7,
+    "samples_ns": [
+      150964.8,
+      149946.8,
+      150836.4,
+      149928.4,
+      151523.8,
+      150560.3,
+      150925.4
+    ]
+  },
+  "T9_format_exception_simple": {
+    "best_ns": 194544.4,
+    "label": "traceback.format_exception simple",
+    "loops": 4000,
+    "mean_ns": 196372.9,
+    "repeat": 7,
+    "samples_ns": [
+      196794.1,
+      195553.1,
+      196753.6,
+      196161.2,
+      196269.1,
+      198535.2,
+      194544.4
+    ]
+  },
+  "variant": "runtime"
+}
