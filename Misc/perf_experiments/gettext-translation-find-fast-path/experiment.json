@@ -1,0 +1,51 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/gettext-translation-find-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/gettext-translation-find-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/gettext-translation-find-fast-path/guardrails",
+    "root": "Misc/perf_experiments/gettext-translation-find-fast-path"
+  },
+  "base_commit": "5bd5d7b13d6b7e5111aac911148e7894a84b8b1a",
+  "branch": "exp-gettext/translation-find-mainline",
+  "created_at": "2026-04-24T13:43:45+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "gettext",
+  "hypothesis": "Archetype: precomputed snapshot plus common-case split. Broad stacked discovery shows Lib/gettext.py:translation/find/_expand_lang contributing about 2.28s cumulative, almost entirely via argparse repeatedly calling gettext.gettext() on the no-translation path. A safe first shape is caching the pure _expand_lang(loc) expansion and then measuring whether that moves direct gettext missing-file calls and argparse help/error formatting enough to justify a source patch.",
+  "notes": [
+    "2026-04-24T14:00:11+00:00 Broad stacked discovery attributed repeated no-translation gettext traffic mostly to argparse construction/help/error paths.",
+    "2026-04-24T14:00:11+00:00 Runtime cached _expand_lang proof: about 1.728855x geomean; clean source proof: about 1.767381x geomean.",
+    "2026-04-24T14:00:11+00:00 Clean validation passed: test_gettext, test_argparse test_optparse, test_tools.test_i18n, and full suite 49,882 run / 2,623 skipped in 4 min 20 sec.",
+    "2026-04-24T14:05:58+00:00 Stacked validation passed: guardrail, test_gettext, test_argparse test_optparse, test_tools.test_i18n, and full suite 49,892 run / 2,620 skipped in 4 min 17 sec."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "0832cc79cbc",
+    "stacked_commit": "0497f2871cf",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "gettext-translation-find-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/gettext.py:232 _expand_lang",
+    "Lib/gettext.py:489 find",
+    "Lib/gettext.py:529 translation"
+  ],
+  "title": "gettext translation/find fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

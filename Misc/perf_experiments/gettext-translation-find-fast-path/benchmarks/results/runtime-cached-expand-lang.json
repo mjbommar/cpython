@@ -1,0 +1,131 @@
+{
+  "G1_expand_lang": {
+    "best_ns": 173.2,
+    "label": "expand_lang",
+    "loops": 20000,
+    "mean_ns": 182.4,
+    "repeat": 7,
+    "samples_ns": [
+      179.0,
+      175.1,
+      173.2,
+      188.9,
+      177.1,
+      187.8,
+      195.7
+    ]
+  },
+  "G2_find_missing_explicit": {
+    "best_ns": 18318.5,
+    "label": "find_missing_explicit",
+    "loops": 20000,
+    "mean_ns": 18725.8,
+    "repeat": 7,
+    "samples_ns": [
+      18613.7,
+      18318.5,
+      19134.5,
+      18335.3,
+      18939.8,
+      18855.2,
+      18883.8
+    ]
+  },
+  "G3_find_missing_default_env": {
+    "best_ns": 37961.1,
+    "label": "find_missing_default_env",
+    "loops": 20000,
+    "mean_ns": 38635.4,
+    "repeat": 7,
+    "samples_ns": [
+      38935.8,
+      38866.8,
+      37961.1,
+      38512.1,
+      38756.6,
+      38917.2,
+      38498.3
+    ]
+  },
+  "G4_dgettext_missing": {
+    "best_ns": 39774.7,
+    "label": "dgettext_missing",
+    "loops": 20000,
+    "mean_ns": 40250.6,
+    "repeat": 7,
+    "samples_ns": [
+      39822.4,
+      40185.5,
+      39859.3,
+      40869.4,
+      41112.8,
+      39774.7,
+      40130.1
+    ]
+  },
+  "G5_gettext_missing": {
+    "best_ns": 39648.1,
+    "label": "gettext_missing",
+    "loops": 20000,
+    "mean_ns": 40365.8,
+    "repeat": 7,
+    "samples_ns": [
+      39648.1,
+      40616.6,
+      39911.0,
+      39671.8,
+      40560.7,
+      41585.3,
+      40567.0
+    ]
+  },
+  "G6_argparse_ctor": {
+    "best_ns": 218266.8,
+    "label": "argparse_ctor",
+    "loops": 3000,
+    "mean_ns": 222218.1,
+    "repeat": 7,
+    "samples_ns": [
+      224323.4,
+      220031.0,
+      227142.7,
+      222804.5,
+      218266.8,
+      221877.8,
+      221080.1
+    ]
+  },
+  "G7_argparse_help": {
+    "best_ns": 562094.8,
+    "label": "argparse_help",
+    "loops": 3000,
+    "mean_ns": 567579.7,
+    "repeat": 7,
+    "samples_ns": [
+      563134.0,
+      568746.1,
+      569537.8,
+      562094.8,
+      571793.1,
+      569559.1,
+      568193.0
+    ]
+  },
+  "G8_argparse_error": {
+    "best_ns": 522465.2,
+    "label": "argparse_error",
+    "loops": 3000,
+    "mean_ns": 525843.7,
+    "repeat": 7,
+    "samples_ns": [
+      523218.3,
+      526621.3,
+      525995.0,
+      526140.9,
+      522465.2,
+      530983.2,
+      525482.2
+    ]
+  },
+  "variant": "cached_expand_lang"
+}
