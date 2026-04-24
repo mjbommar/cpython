@@ -1,0 +1,115 @@
+{
+  "G1_genops_small_list": {
+    "best_ns": 41146.4,
+    "label": "genops_small_list",
+    "loops": 4000,
+    "mean_ns": 42267.9,
+    "repeat": 7,
+    "samples_ns": [
+      42030.1,
+      41183.4,
+      41146.4,
+      41238.6,
+      43948.3,
+      42277.0,
+      44051.2
+    ]
+  },
+  "G2_genops_int_tuple": {
+    "best_ns": 100158.7,
+    "label": "genops_int_tuple",
+    "loops": 1400,
+    "mean_ns": 101210.6,
+    "repeat": 7,
+    "samples_ns": [
+      101454.6,
+      100633.8,
+      100332.6,
+      104951.1,
+      100525.1,
+      100158.7,
+      100418.0
+    ]
+  },
+  "G3_genops_nested_dict": {
+    "best_ns": 516290.6,
+    "label": "genops_nested_dict",
+    "loops": 1400,
+    "mean_ns": 521779.3,
+    "repeat": 7,
+    "samples_ns": [
+      519646.2,
+      520862.7,
+      523401.5,
+      523407.1,
+      524190.9,
+      516290.6,
+      524656.2
+    ]
+  },
+  "G4_genops_end_frame_heavy": {
+    "best_ns": 219448.9,
+    "label": "genops_end_frame_heavy",
+    "loops": 200,
+    "mean_ns": 222455.7,
+    "repeat": 7,
+    "samples_ns": [
+      223852.9,
+      224629.2,
+      219538.6,
+      225777.9,
+      220731.1,
+      219448.9,
+      223211.3
+    ]
+  },
+  "G5_genops_no_tell_proto2": {
+    "best_ns": 238950.1,
+    "label": "genops_no_tell_proto2",
+    "loops": 1400,
+    "mean_ns": 245168.7,
+    "repeat": 7,
+    "samples_ns": [
+      243512.6,
+      239808.1,
+      238950.1,
+      247084.3,
+      251113.4,
+      247711.7,
+      248000.6
+    ]
+  },
+  "G6_optimize_frame_heavy": {
+    "best_ns": 465567.0,
+    "label": "optimize_frame_heavy",
+    "loops": 100,
+    "mean_ns": 479188.6,
+    "repeat": 7,
+    "samples_ns": [
+      489536.7,
+      468486.2,
+      497182.1,
+      475005.0,
+      490258.1,
+      468285.5,
+      465567.0
+    ]
+  },
+  "G7_dis_nested_dict": {
+    "best_ns": 3499073.3,
+    "label": "dis_nested_dict",
+    "loops": 100,
+    "mean_ns": 3551914.4,
+    "repeat": 7,
+    "samples_ns": [
+      3566383.4,
+      3575064.3,
+      3544765.2,
+      3581324.3,
+      3514978.8,
+      3499073.3,
+      3581811.2
+    ]
+  },
+  "variant": "baseline"
+}

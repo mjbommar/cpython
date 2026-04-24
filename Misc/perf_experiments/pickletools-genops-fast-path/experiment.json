@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickletools-genops-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickletools-genops-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickletools-genops-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickletools-genops-fast-path"
+  },
+  "base_commit": "9fab602d28a89f6f40d2315f4ad7e2c7a3144110",
+  "branch": "exp-pickletools/genops-mainline",
+  "created_at": "2026-04-24T17:07:02+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickletools",
+  "hypothesis": "Archetype: representation shift plus loop-invariant hoisting. pickletools._genops() still spends real stacked-profile time decoding one-byte opcodes and doing text-key dict lookup on every step; a byte-indexed opcode table plus localized hot-loop bindings may reduce per-op overhead without changing generator semantics.",
+  "notes": [
+    "2026-04-24T17:10:21+00:00 2026-04-24 Usage scan: stacked discovery profile /tmp/stacked-discovery-2026-04-24.pstats shows Lib/pickletools.py:_genops at about 1.657s cumulative over 387470 calls. Runtime proof on the stacked baseline: byte-indexed opcode lookup plus split tell/no-tell loops measured 1.152053x geomean (+15.21%) on the focused harness; G1 +19.99%, G2 +20.37%, G3 +13.59%, G4 +17.98%, G5 +21.45%, G6 +8.75%, G7 +5.35%.",
+    "2026-04-24T17:19:53+00:00 2026-04-24 Clean source proof: byte-indexed opcode lookup plus split tell/no-tell loops in Lib/pickletools.py:_genops measured 1.094843x geomean (+9.48%) on the focused same-worktree source A/B; G1 +14.77%, G2 +13.53%, G3 +7.88%, G4 +10.57%, G5 +16.30%, G6 +4.12%, G7 +0.21%. Guardrail passed; focused tests test_pickletools and test_pickle/test_picklebuffer passed; full suite passed in 4 min 22 sec (49,892 run, 2,623 skipped).",
+    "2026-04-24T17:24:47+00:00 2026-04-24 Stacked validation: cherry-picked f8738c1dcd8 as e9be1a19d06 into cpython-combined-winners; guardrail passed; focused tests test_pickletools and test_pickle/test_picklebuffer passed; full suite passed in 4 min 18 sec (49,892 run, 2,620 skipped)."
+  ],
+  "phase": "stacked",
+  "promotion": {
+    "accepted_commit": "f8738c1dcd8",
+    "stacked_commit": "e9be1a19d06",
+    "stacked_validation": "done"
+  },
+  "schema_version": 1,
+  "slug": "pickletools-genops-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickletools.py:2268 _genops"
+  ],
+  "title": "pickletools genops fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

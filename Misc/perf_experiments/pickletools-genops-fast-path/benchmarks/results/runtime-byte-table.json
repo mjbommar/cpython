@@ -1,0 +1,115 @@
+{
+  "G1_genops_small_list": {
+    "best_ns": 34398.2,
+    "label": "genops_small_list",
+    "loops": 4000,
+    "mean_ns": 34927.5,
+    "repeat": 7,
+    "samples_ns": [
+      34770.2,
+      36110.9,
+      34988.2,
+      34567.5,
+      34398.2,
+      34478.8,
+      35178.9
+    ]
+  },
+  "G2_genops_int_tuple": {
+    "best_ns": 82876.1,
+    "label": "genops_int_tuple",
+    "loops": 1400,
+    "mean_ns": 85120.1,
+    "repeat": 7,
+    "samples_ns": [
+      84032.8,
+      87785.6,
+      89594.8,
+      83194.1,
+      84080.2,
+      82876.1,
+      84276.9
+    ]
+  },
+  "G3_genops_nested_dict": {
+    "best_ns": 459819.8,
+    "label": "genops_nested_dict",
+    "loops": 1400,
+    "mean_ns": 464524.8,
+    "repeat": 7,
+    "samples_ns": [
+      463537.5,
+      461047.4,
+      470710.0,
+      462003.9,
+      459819.8,
+      464921.4,
+      469633.4
+    ]
+  },
+  "G4_genops_end_frame_heavy": {
+    "best_ns": 190348.3,
+    "label": "genops_end_frame_heavy",
+    "loops": 200,
+    "mean_ns": 194346.9,
+    "repeat": 7,
+    "samples_ns": [
+      191774.6,
+      200800.4,
+      191392.8,
+      193086.9,
+      201748.0,
+      190348.3,
+      191277.1
+    ]
+  },
+  "G5_genops_no_tell_proto2": {
+    "best_ns": 198695.9,
+    "label": "genops_no_tell_proto2",
+    "loops": 1400,
+    "mean_ns": 200854.6,
+    "repeat": 7,
+    "samples_ns": [
+      200079.0,
+      198695.9,
+      203533.8,
+      200554.8,
+      199359.5,
+      203347.3,
+      200411.5
+    ]
+  },
+  "G6_optimize_frame_heavy": {
+    "best_ns": 443024.6,
+    "label": "optimize_frame_heavy",
+    "loops": 100,
+    "mean_ns": 446542.1,
+    "repeat": 7,
+    "samples_ns": [
+      449718.8,
+      443024.6,
+      445658.0,
+      446733.2,
+      445740.0,
+      445398.2,
+      449521.9
+    ]
+  },
+  "G7_dis_nested_dict": {
+    "best_ns": 3502220.1,
+    "label": "dis_nested_dict",
+    "loops": 100,
+    "mean_ns": 3541493.4,
+    "repeat": 7,
+    "samples_ns": [
+      3502220.1,
+      3572676.5,
+      3511880.0,
+      3587765.3,
+      3521052.1,
+      3502687.8,
+      3592172.1
+    ]
+  },
+  "variant": "byte_table"
+}
