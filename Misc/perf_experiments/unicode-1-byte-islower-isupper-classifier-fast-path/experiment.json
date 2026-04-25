@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/unicode-1-byte-islower-isupper-classifier-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/unicode-1-byte-islower-isupper-classifier-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/unicode-1-byte-islower-isupper-classifier-fast-path/guardrails",
+    "root": "Misc/perf_experiments/unicode-1-byte-islower-isupper-classifier-fast-path"
+  },
+  "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
+  "branch": "exp-unicode/islower-isupper-1byte-mainline",
+  "created_at": "2026-04-25T12:28:35+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "unicode",
+  "hypothesis": "Long 1-byte str.islower()/str.isupper() calls repeatedly enter generic Unicode ctype helpers; a single-pass 1-byte bitset classifier should reduce total runtime in string-heavy workloads while preserving wider-Unicode semantics.",
+  "notes": [
+    "2026-04-25T12:35:41+00:00 Usage scan found stdlib call sites in socket/signal/pickle/clinic plus collections wrappers; focused A/B harness shows 2.79x geomean speedup across classifier regimes and 1.37x stdlib-name-filter speedup. Guardrails and test_str/test_string/test_unicodedata passed. pyperformance fast smoke ran json_dumps/json_loads/regex_compile; django_template is blocked by pinned Django importing removed distutils on 3.15.",
+    "2026-04-25T12:42:13+00:00 Full suite passed on proof branch: ./python -m test -j4, 476 tests OK, 49,882 run, 2,596 skipped, 5m31s.",
+    "2026-04-25T12:42:32+00:00 Accepted source commit: db57b3a52a6 Optimize 1-byte str islower and isupper."
+  ],
+  "phase": "accepted",
+  "promotion": {
+    "accepted_commit": "db57b3a52a6",
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "unicode-1-byte-islower-isupper-classifier-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Objects/unicodeobject.c:11731 unicode_islower_impl",
+    "Objects/unicodeobject.c:11775 unicode_isupper_impl"
+  ],
+  "title": "Unicode 1-byte islower/isupper classifier fast path",
+  "validation": {
+    "ecosystem": "done",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}
