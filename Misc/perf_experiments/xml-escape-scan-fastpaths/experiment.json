@@ -24,13 +24,14 @@
   "notes": [
     "2026-04-25T10:01:24+00:00 E3 exact-str QName guard plus redundant Element.items list-copy avoidance: same-worktree focused A/B geomean -9.56%; tostring clean -18.53%, tostring escaped -18.06%. pyperformance fast xml_etree: generate 1.05x faster, process 1.12x faster; parse/iterparse not significant. Focused XML tests passed.",
     "2026-04-25T10:04:19+00:00 E4 final safety revision uses type(obj) exact-type checks instead of obj.__class__; focused A/B vs saved same-worktree baseline geomean -9.50%, tostring clean -17.34%, tostring escaped -17.73%. pyperformance fast xml_etree compare: parse 1.05x, iterparse 1.07x, generate 1.12x, process 1.15x, geomean 1.10x. Focused XML tests passed.",
-    "2026-04-25T10:06:36+00:00 Accepted branch commit: b375012a1fe Optimize ElementTree XML serialization fast paths."
+    "2026-04-25T10:06:36+00:00 Accepted branch commit: b375012a1fe Optimize ElementTree XML serialization fast paths.",
+    "2026-04-25T10:12:08+00:00 Stacked winner source commit: 3675289bacd; stacked diary commit: 96b88ca1817. Pushed to origin/exp-combined/winners-stack."
   ],
   "phase": "accepted",
   "promotion": {
     "accepted_commit": "b375012a1fe",
-    "stacked_commit": null,
-    "stacked_validation": "pending"
+    "stacked_commit": "3675289bacd",
+    "stacked_validation": "done"
   },
   "schema_version": 1,
   "slug": "xml-escape-scan-fastpaths",
