@@ -82,7 +82,7 @@ Decision:
 ## Acceptance Decision
 
 - Decision: branch-local accept; ready for stacked validation.
-- Accepted commit:
+- Accepted commit: `fe3611434a9`
 - Stacked winner commit:
 
 ## Notes

@@ -22,11 +22,12 @@
   "hypothesis": "Archetype: prepared-search/input-shape snapshot plus exact-type gate, following the StringZilla fast-rejection-before-exact-handling pattern. Exact str XML text and attribute fragments can be scanned in C for escapable characters and returned unchanged when clean; only dirty strings allocate and build replacements. Non-str extension behavior remains on the Python slow path.",
   "notes": [
     "2026-04-25T12:03:56+00:00 E2 C escape helper with 1-byte memchr fast rejection: serialized same-worktree focused A/B geomean -27.06%; tostring clean -8.78%, tostring escaped -8.19%. pyperformance fast xml_etree: generate 1.03x faster, process 1.04x faster; parse/iterparse not significant. Focused XML tests passed.",
-    "2026-04-25T12:11:33+00:00 Full suite passed on proof branch: 476 tests OK, 49,882 run, 2,596 skipped, 5 min 31 sec."
+    "2026-04-25T12:11:33+00:00 Full suite passed on proof branch: 476 tests OK, 49,882 run, 2,596 skipped, 5 min 31 sec.",
+    "2026-04-25T12:12:17+00:00 Accepted branch commit: fe3611434a9 xml: add C helpers for ElementTree escaping."
   ],
   "phase": "accepted",
   "promotion": {
-    "accepted_commit": null,
+    "accepted_commit": "fe3611434a9",
     "stacked_commit": null,
     "stacked_validation": "pending"
   },
