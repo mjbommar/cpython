@@ -2097,13 +2097,35 @@ try:
     # (see tests)
     _Element_Py = Element
 
+    _escape_cdata_py = _escape_cdata
+    _escape_attrib_py = _escape_attrib
+    _escape_attrib_html_py = _escape_attrib_html
+
     # Element, SubElement, ParseError, TreeBuilder, XMLParser, _set_factories
     from _elementtree import *
     from _elementtree import _set_factories
+    from _elementtree import _escape_cdata as _escape_cdata_c
+    from _elementtree import _escape_attrib as _escape_attrib_c
+    from _elementtree import _escape_attrib_html as _escape_attrib_html_c
 except ImportError:
     pass
 else:
     _set_factories(Comment, ProcessingInstruction)
+
+    def _escape_cdata(text):
+        if type(text) is str:
+            return _escape_cdata_c(text)
+        return _escape_cdata_py(text)
+
+    def _escape_attrib(text):
+        if type(text) is str:
+            return _escape_attrib_c(text)
+        return _escape_attrib_py(text)
+
+    def _escape_attrib_html(text):
+        if type(text) is str:
+            return _escape_attrib_html_c(text)
+        return _escape_attrib_html_py(text)
 
 
 # --------------------------------------------------------------------

@@ -1,0 +1,49 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/xml-c-escape-helpers/benchmarks",
+    "diary": "Misc/perf_experiments/xml-c-escape-helpers/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/xml-c-escape-helpers/guardrails",
+    "root": "Misc/perf_experiments/xml-c-escape-helpers"
+  },
+  "base_commit": "9fd8c170f49c086ff331f276e52d6dd8914a12e7",
+  "branch": "exp-xml/c-escape-helpers-mainline",
+  "created_at": "2026-04-25T11:53:35+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [
+      "Misc/perf_experiments/xml-c-escape-helpers/benchmarks/results/baseline-profile.txt",
+      "Misc/perf_experiments/xml-c-escape-helpers/benchmarks/results/e2-profile.txt"
+    ],
+    "usage_scan": "done"
+  },
+  "family": "xml",
+  "hypothesis": "Archetype: prepared-search/input-shape snapshot plus exact-type gate, following the StringZilla fast-rejection-before-exact-handling pattern. Exact str XML text and attribute fragments can be scanned in C for escapable characters and returned unchanged when clean; only dirty strings allocate and build replacements. Non-str extension behavior remains on the Python slow path.",
+  "notes": [
+    "2026-04-25T12:03:56+00:00 E2 C escape helper with 1-byte memchr fast rejection: serialized same-worktree focused A/B geomean -27.06%; tostring clean -8.78%, tostring escaped -8.19%. pyperformance fast xml_etree: generate 1.03x faster, process 1.04x faster; parse/iterparse not significant. Focused XML tests passed.",
+    "2026-04-25T12:11:33+00:00 Full suite passed on proof branch: 476 tests OK, 49,882 run, 2,596 skipped, 5 min 31 sec."
+  ],
+  "phase": "accepted",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "xml-c-escape-helpers",
+  "success_criteria": [
+    "Improve XML serialization total runtime on focused ElementTree benchmarks and pyperformance xml_etree without changing ElementTree escaping semantics."
+  ],
+  "targets": [
+    "Lib/xml/etree/ElementTree.py:_escape_cdata",
+    "Lib/xml/etree/ElementTree.py:_escape_attrib",
+    "Modules/_elementtree.c module helpers"
+  ],
+  "title": "XML C escape helpers",
+  "validation": {
+    "ecosystem": "done",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}

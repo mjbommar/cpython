@@ -1,0 +1,130 @@
+{
+  "E1_escape_cdata_clean_short": {
+    "best_ns": 104.4,
+    "label": "E1_escape_cdata_clean_short",
+    "loops": 100000,
+    "mean_ns": 107.5,
+    "repeat": 7,
+    "samples_ns": [
+      105.6,
+      107.1,
+      109.9,
+      105.0,
+      115.0,
+      105.9,
+      104.4
+    ]
+  },
+  "E2_escape_cdata_clean_long": {
+    "best_ns": 149.0,
+    "label": "E2_escape_cdata_clean_long",
+    "loops": 15000,
+    "mean_ns": 152.4,
+    "repeat": 7,
+    "samples_ns": [
+      149.8,
+      149.4,
+      153.1,
+      153.4,
+      149.1,
+      149.0,
+      163.3
+    ]
+  },
+  "E3_escape_cdata_dirty": {
+    "best_ns": 280.4,
+    "label": "E3_escape_cdata_dirty",
+    "loops": 60000,
+    "mean_ns": 303.1,
+    "repeat": 7,
+    "samples_ns": [
+      280.4,
+      300.6,
+      281.1,
+      312.4,
+      315.1,
+      325.5,
+      306.8
+    ]
+  },
+  "E4_escape_attrib_clean_short": {
+    "best_ns": 113.6,
+    "label": "E4_escape_attrib_clean_short",
+    "loops": 80000,
+    "mean_ns": 117.8,
+    "repeat": 7,
+    "samples_ns": [
+      123.3,
+      118.6,
+      118.9,
+      116.0,
+      119.2,
+      113.6,
+      114.7
+    ]
+  },
+  "E5_escape_attrib_clean_long": {
+    "best_ns": 234.6,
+    "label": "E5_escape_attrib_clean_long",
+    "loops": 10000,
+    "mean_ns": 239.1,
+    "repeat": 7,
+    "samples_ns": [
+      234.9,
+      234.9,
+      256.2,
+      234.6,
+      234.8,
+      238.3,
+      239.8
+    ]
+  },
+  "E6_escape_attrib_dirty": {
+    "best_ns": 486.6,
+    "label": "E6_escape_attrib_dirty",
+    "loops": 40000,
+    "mean_ns": 509.3,
+    "repeat": 7,
+    "samples_ns": [
+      537.3,
+      514.3,
+      496.5,
+      492.5,
+      507.7,
+      530.1,
+      486.6
+    ]
+  },
+  "E7_tostring_clean_tree": {
+    "best_ns": 485120.4,
+    "label": "E7_tostring_clean_tree",
+    "loops": 1250,
+    "mean_ns": 494035.0,
+    "repeat": 7,
+    "samples_ns": [
+      499488.3,
+      501365.1,
+      498642.5,
+      487456.6,
+      491210.2,
+      485120.4,
+      494961.9
+    ]
+  },
+  "E8_tostring_escape_tree": {
+    "best_ns": 569823.0,
+    "label": "E8_tostring_escape_tree",
+    "loops": 1000,
+    "mean_ns": 577837.6,
+    "repeat": 7,
+    "samples_ns": [
+      578892.8,
+      569823.0,
+      587876.9,
+      575825.6,
+      579468.4,
+      579330.9,
+      573645.5
+    ]
+  }
+}

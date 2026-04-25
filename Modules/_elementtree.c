@@ -4419,8 +4419,210 @@ static PyType_Spec xmlparser_spec = {
 /* ==================================================================== */
 /* python module interface */
 
+typedef enum {
+    XML_ESCAPE_CDATA,
+    XML_ESCAPE_ATTRIB,
+    XML_ESCAPE_ATTRIB_HTML
+} XmlEscapeMode;
+
+static int
+xml_escape_replacement(Py_UCS4 ch, XmlEscapeMode mode, const char **replacement,
+                       Py_ssize_t *replacement_len)
+{
+    switch (ch) {
+    case '&':
+        *replacement = "&amp;";
+        *replacement_len = 5;
+        return 1;
+    case '<':
+        if (mode == XML_ESCAPE_ATTRIB_HTML) {
+            return 0;
+        }
+        *replacement = "&lt;";
+        *replacement_len = 4;
+        return 1;
+    case '>':
+        *replacement = "&gt;";
+        *replacement_len = 4;
+        return 1;
+    case '"':
+        if (mode == XML_ESCAPE_CDATA) {
+            return 0;
+        }
+        *replacement = "&quot;";
+        *replacement_len = 6;
+        return 1;
+    case '\r':
+        if (mode != XML_ESCAPE_ATTRIB) {
+            return 0;
+        }
+        *replacement = "&#13;";
+        *replacement_len = 5;
+        return 1;
+    case '\n':
+        if (mode != XML_ESCAPE_ATTRIB) {
+            return 0;
+        }
+        *replacement = "&#10;";
+        *replacement_len = 5;
+        return 1;
+    case '\t':
+        if (mode != XML_ESCAPE_ATTRIB) {
+            return 0;
+        }
+        *replacement = "&#09;";
+        *replacement_len = 5;
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+static Py_ssize_t
+xml_escape_find_ucs1(const unsigned char *data, Py_ssize_t length, int ch)
+{
+    const void *ptr = memchr(data, ch, (size_t)length);
+    if (ptr == NULL) {
+        return -1;
+    }
+    return (const unsigned char *)ptr - data;
+}
+
+static Py_ssize_t
+xml_escape_min_found(Py_ssize_t current, Py_ssize_t candidate)
+{
+    if (candidate < 0) {
+        return current;
+    }
+    if (current < 0 || candidate < current) {
+        return candidate;
+    }
+    return current;
+}
+
+static Py_ssize_t
+xml_escape_find_first_ucs1(const unsigned char *data, Py_ssize_t length,
+                           XmlEscapeMode mode)
+{
+    Py_ssize_t first = -1;
+    first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '&'));
+    if (mode != XML_ESCAPE_ATTRIB_HTML) {
+        first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '<'));
+    }
+    first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '>'));
+    if (mode != XML_ESCAPE_CDATA) {
+        first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '"'));
+    }
+    if (mode == XML_ESCAPE_ATTRIB) {
+        first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '\r'));
+        first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '\n'));
+        first = xml_escape_min_found(first, xml_escape_find_ucs1(data, length, '\t'));
+    }
+    return first;
+}
+
+static PyObject *
+xml_escape_text(PyObject *text, XmlEscapeMode mode)
+{
+    const int kind = PyUnicode_KIND(text);
+    const void *data = PyUnicode_DATA(text);
+    const Py_ssize_t length = PyUnicode_GET_LENGTH(text);
+    Py_ssize_t first = -1;
+
+    if (kind == PyUnicode_1BYTE_KIND) {
+        first = xml_escape_find_first_ucs1((const unsigned char *)data, length, mode);
+    }
+    else {
+        for (Py_ssize_t i = 0; i < length; i++) {
+            const char *replacement;
+            Py_ssize_t replacement_len;
+            Py_UCS4 ch = PyUnicode_READ(kind, data, i);
+            if (xml_escape_replacement(ch, mode, &replacement, &replacement_len)) {
+                first = i;
+                break;
+            }
+        }
+    }
+
+    if (first < 0) {
+        return Py_NewRef(text);
+    }
+
+    PyUnicodeWriter *writer = PyUnicodeWriter_Create(length);
+    if (writer == NULL) {
+        return NULL;
+    }
+
+    Py_ssize_t start = 0;
+    for (Py_ssize_t i = first; i < length; i++) {
+        const char *replacement;
+        Py_ssize_t replacement_len;
+        Py_UCS4 ch = PyUnicode_READ(kind, data, i);
+        if (!xml_escape_replacement(ch, mode, &replacement, &replacement_len)) {
+            continue;
+        }
+        if (start < i &&
+            PyUnicodeWriter_WriteSubstring(writer, text, start, i) < 0)
+        {
+            goto error;
+        }
+        if (PyUnicodeWriter_WriteASCII(writer, replacement, replacement_len) < 0) {
+            goto error;
+        }
+        start = i + 1;
+    }
+
+    if (start < length &&
+        PyUnicodeWriter_WriteSubstring(writer, text, start, length) < 0)
+    {
+        goto error;
+    }
+
+    return PyUnicodeWriter_Finish(writer);
+
+error:
+    PyUnicodeWriter_Discard(writer);
+    return NULL;
+}
+
+static PyObject *
+elementtree_escape_cdata(PyObject *Py_UNUSED(module), PyObject *text)
+{
+    if (!PyUnicode_Check(text)) {
+        PyErr_Format(PyExc_TypeError, "expected str, not %.200s",
+                     Py_TYPE(text)->tp_name);
+        return NULL;
+    }
+    return xml_escape_text(text, XML_ESCAPE_CDATA);
+}
+
+static PyObject *
+elementtree_escape_attrib(PyObject *Py_UNUSED(module), PyObject *text)
+{
+    if (!PyUnicode_Check(text)) {
+        PyErr_Format(PyExc_TypeError, "expected str, not %.200s",
+                     Py_TYPE(text)->tp_name);
+        return NULL;
+    }
+    return xml_escape_text(text, XML_ESCAPE_ATTRIB);
+}
+
+static PyObject *
+elementtree_escape_attrib_html(PyObject *Py_UNUSED(module), PyObject *text)
+{
+    if (!PyUnicode_Check(text)) {
+        PyErr_Format(PyExc_TypeError, "expected str, not %.200s",
+                     Py_TYPE(text)->tp_name);
+        return NULL;
+    }
+    return xml_escape_text(text, XML_ESCAPE_ATTRIB_HTML);
+}
+
 static PyMethodDef _functions[] = {
     {"SubElement", _PyCFunction_CAST(subelement), METH_VARARGS | METH_KEYWORDS},
+    {"_escape_cdata", elementtree_escape_cdata, METH_O},
+    {"_escape_attrib", elementtree_escape_attrib, METH_O},
+    {"_escape_attrib_html", elementtree_escape_attrib_html, METH_O},
     _ELEMENTTREE__SET_FACTORIES_METHODDEF
     {NULL, NULL}
 };
