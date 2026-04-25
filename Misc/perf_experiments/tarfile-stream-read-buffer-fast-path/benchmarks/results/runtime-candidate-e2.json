@@ -1,0 +1,147 @@
+{
+  "T1_gz_stream_member_small_reads": {
+    "best_ns": 173345.6,
+    "label": "gz_stream_member_small_reads",
+    "loops": 180,
+    "mean_ns": 175276.9,
+    "repeat": 7,
+    "samples_ns": [
+      178350.0,
+      176545.1,
+      173614.0,
+      173703.7,
+      175716.7,
+      173345.6,
+      175663.2
+    ]
+  },
+  "T2_bz2_stream_member_small_reads": {
+    "best_ns": 501393.8,
+    "label": "bz2_stream_member_small_reads",
+    "loops": 180,
+    "mean_ns": 512752.6,
+    "repeat": 7,
+    "samples_ns": [
+      509129.0,
+      536621.1,
+      507560.0,
+      510367.9,
+      517786.8,
+      501393.8,
+      506409.8
+    ]
+  },
+  "T3_xz_stream_member_small_reads": {
+    "best_ns": 202191.1,
+    "label": "xz_stream_member_small_reads",
+    "loops": 180,
+    "mean_ns": 209630.3,
+    "repeat": 7,
+    "samples_ns": [
+      202191.1,
+      209886.5,
+      203241.6,
+      203365.5,
+      211709.5,
+      220137.3,
+      216880.4
+    ]
+  },
+  "T4_gz_stream_member_large_reads": {
+    "best_ns": 151548.8,
+    "label": "gz_stream_member_large_reads",
+    "loops": 180,
+    "mean_ns": 154820.7,
+    "repeat": 7,
+    "samples_ns": [
+      159899.4,
+      152994.2,
+      153227.8,
+      152159.0,
+      151548.8,
+      155202.3,
+      158713.6
+    ]
+  },
+  "T5_bz2_stream_member_large_reads": {
+    "best_ns": 480901.3,
+    "label": "bz2_stream_member_large_reads",
+    "loops": 180,
+    "mean_ns": 489236.7,
+    "repeat": 7,
+    "samples_ns": [
+      516051.6,
+      491556.5,
+      480901.3,
+      485552.8,
+      484888.7,
+      483922.6,
+      481783.3
+    ]
+  },
+  "T6_xz_stream_member_large_reads": {
+    "best_ns": 178770.2,
+    "label": "xz_stream_member_large_reads",
+    "loops": 180,
+    "mean_ns": 180030.5,
+    "repeat": 7,
+    "samples_ns": [
+      180906.7,
+      179464.5,
+      178770.2,
+      179505.4,
+      182583.0,
+      178920.4,
+      180063.0
+    ]
+  },
+  "T7_gz_stream_headers_only": {
+    "best_ns": 119723.3,
+    "label": "gz_stream_headers_only",
+    "loops": 360,
+    "mean_ns": 122975.3,
+    "repeat": 7,
+    "samples_ns": [
+      121381.6,
+      119723.3,
+      120422.9,
+      128571.6,
+      129228.9,
+      120996.3,
+      120502.6
+    ]
+  },
+  "T8_bz2_direct_small_reads": {
+    "best_ns": 525451.4,
+    "label": "bz2_direct_small_reads",
+    "loops": 360,
+    "mean_ns": 532391.2,
+    "repeat": 7,
+    "samples_ns": [
+      533800.1,
+      525451.4,
+      536814.7,
+      529627.8,
+      545517.1,
+      527908.8,
+      527618.4
+    ]
+  },
+  "T9_xz_direct_small_reads": {
+    "best_ns": 230848.9,
+    "label": "xz_direct_small_reads",
+    "loops": 360,
+    "mean_ns": 239773.7,
+    "repeat": 7,
+    "samples_ns": [
+      230848.9,
+      241124.6,
+      236305.1,
+      238461.9,
+      236762.6,
+      235902.1,
+      259010.7
+    ]
+  },
+  "variant": "common_case_split_direct"
+}

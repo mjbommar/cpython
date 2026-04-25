@@ -1,0 +1,131 @@
+{
+  "C1_bz2_raw_chunked": {
+    "best_ns": 2330690.1,
+    "label": "bz2_raw_chunked",
+    "loops": 250,
+    "mean_ns": 2347207.4,
+    "repeat": 7,
+    "samples_ns": [
+      2347455.9,
+      2361247.9,
+      2330690.1,
+      2353856.5,
+      2335681.3,
+      2337106.7,
+      2364413.7
+    ]
+  },
+  "C2_lzma_raw_chunked": {
+    "best_ns": 158344.0,
+    "label": "lzma_raw_chunked",
+    "loops": 250,
+    "mean_ns": 159796.6,
+    "repeat": 7,
+    "samples_ns": [
+      160724.4,
+      161964.9,
+      158344.0,
+      158996.0,
+      158441.3,
+      160382.6,
+      159723.1
+    ]
+  },
+  "C3_bz2_raw_multistream": {
+    "best_ns": 1270627.3,
+    "label": "bz2_raw_multistream",
+    "loops": 250,
+    "mean_ns": 1288744.8,
+    "repeat": 7,
+    "samples_ns": [
+      1311711.8,
+      1270627.3,
+      1279195.2,
+      1295320.6,
+      1286052.2,
+      1274975.1,
+      1303331.2
+    ]
+  },
+  "C4_lzma_raw_multistream": {
+    "best_ns": 186563.6,
+    "label": "lzma_raw_multistream",
+    "loops": 250,
+    "mean_ns": 189624.5,
+    "repeat": 7,
+    "samples_ns": [
+      194916.7,
+      190735.5,
+      188412.8,
+      186563.6,
+      188976.9,
+      187263.8,
+      190502.0
+    ]
+  },
+  "C5_bz2_file_chunked": {
+    "best_ns": 2380289.9,
+    "label": "bz2_file_chunked",
+    "loops": 180,
+    "mean_ns": 2411937.2,
+    "repeat": 7,
+    "samples_ns": [
+      2380289.9,
+      2423389.8,
+      2400590.1,
+      2423454.2,
+      2385699.9,
+      2421347.4,
+      2448789.1
+    ]
+  },
+  "C6_lzma_file_chunked": {
+    "best_ns": 181848.0,
+    "label": "lzma_file_chunked",
+    "loops": 180,
+    "mean_ns": 184306.6,
+    "repeat": 7,
+    "samples_ns": [
+      184618.5,
+      186113.9,
+      181848.0,
+      186083.1,
+      185758.1,
+      183741.9,
+      181983.0
+    ]
+  },
+  "C7_bz2_file_readall": {
+    "best_ns": 2347720.9,
+    "label": "bz2_file_readall",
+    "loops": 120,
+    "mean_ns": 2381019.7,
+    "repeat": 7,
+    "samples_ns": [
+      2393386.3,
+      2382910.3,
+      2370353.7,
+      2378582.2,
+      2437230.3,
+      2356954.2,
+      2347720.9
+    ]
+  },
+  "C8_lzma_file_readall": {
+    "best_ns": 139581.5,
+    "label": "lzma_file_readall",
+    "loops": 120,
+    "mean_ns": 143162.8,
+    "repeat": 7,
+    "samples_ns": [
+      142988.7,
+      143791.8,
+      145491.0,
+      142706.1,
+      139581.5,
+      145457.2,
+      142123.0
+    ]
+  },
+  "variant": "baseline"
+}

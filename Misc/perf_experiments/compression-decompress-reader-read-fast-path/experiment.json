@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/compression-decompress-reader-read-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/compression-decompress-reader-read-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/compression-decompress-reader-read-fast-path/guardrails",
+    "root": "Misc/perf_experiments/compression-decompress-reader-read-fast-path"
+  },
+  "base_commit": "3263942ffef9ebb47facd3fe370443b06daa02bb",
+  "branch": "exp-compression/decompress-reader-mainline",
+  "created_at": "2026-04-25T00:38:28+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "compression",
+  "hypothesis": "Common-case split plus allocator/accumulator refactor: bz2 and lzma stream reads still pay Python loop/list churn in compression._common._streams.DecompressReader.read() even when one refill/decompress step yields output immediately.",
+  "notes": [
+    "2026-04-25T00:42:49+00:00 Archetype common-case split plus allocator/accumulator refactor. Usage scan confirmed real bz2/lzma callers through compression._common._streams.DecompressReader.read(), but E1 common-case split runtime proof regressed badly: about -13.31% geomean on the focused raw/file benchmark. Reject before any clean source branch."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "compression-decompress-reader-read-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/compression/_common/_streams.py:63 DecompressReader.read"
+  ],
+  "title": "compression decompress reader read fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

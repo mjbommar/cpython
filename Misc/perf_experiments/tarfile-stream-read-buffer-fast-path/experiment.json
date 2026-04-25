@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/tarfile-stream-read-buffer-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/tarfile-stream-read-buffer-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/tarfile-stream-read-buffer-fast-path/guardrails",
+    "root": "Misc/perf_experiments/tarfile-stream-read-buffer-fast-path"
+  },
+  "base_commit": "3263942ffef9ebb47facd3fe370443b06daa02bb",
+  "branch": "exp-tarfile/stream-read-mainline",
+  "created_at": "2026-04-25T00:45:28+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "tarfile",
+  "hypothesis": "Common-case split plus allocator/accumulator refactor: tarfile stream reads still pay list-and-join churn in _Stream._read() even when dbuf already satisfies the request or a single decompress step yields enough output.",
+  "notes": [
+    "2026-04-25T00:55:39+00:00 Archetype common-case split plus allocator/accumulator refactor. Guardrail passed. E1 runtime proof was about +2.76% geomean, but clean source proof collapsed to about +1.41%; E2 refinement was weaker at about +1.87% runtime geomean. Reject before focused or full validation."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "tarfile-stream-read-buffer-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/tarfile.py:538 _Stream._read"
+  ],
+  "title": "tarfile stream read buffer fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
