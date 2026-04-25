@@ -1736,3 +1736,50 @@ What we learned:
   loop without widening the compiler surface
 - the measurement-only compile phase probe stayed off the stacked branch; only
   the real flowgraph winner was promoted
+
+## 2026-04-24 update: os.makedirs common-case split
+
+Accepted and cherry-picked commit:
+
+- `7c59b8539f2` / `521c5363fb8`
+  `os: optimize makedirs common case`
+
+Clean-mainline focused result:
+
+- `bench_os_makedirs.py` clean source proof:
+  - focused-harness geomean: about `+23.17%`
+  - `M1_leaf_default`: `+30.89%`
+  - `M2_leaf_exist_ok_missing`: `+30.02%`
+  - `M3_nested_default`: `-7.94%`
+  - `M4_bytes_leaf_default`: `+39.72%`
+  - `M5_existing_dir_exist_ok`: `+29.53%`
+
+Validation:
+
+- clean-mainline guardrail:
+  `check_os_makedirs_semantics.py`: `ok`
+- clean-mainline focused tests:
+  `test_os test_pathlib test_shutil test_tarfile test_zipfile test_py_compile`:
+  passed
+- clean-mainline full suite:
+  `49,882` tests, `2,620` skipped, `SUCCESS` in `4 min 15 sec`
+- stacked guardrail:
+  `check_os_makedirs_semantics.py`: `ok`
+- stacked focused tests:
+  `test_os test_pathlib test_shutil test_tarfile test_zipfile test_py_compile`:
+  passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `SUCCESS` in `4 min 14 sec`
+
+What we learned:
+
+- `os.makedirs()` still had real Python-layer headroom in the simple
+  existing-parent leaf-create path; a direct `mkdir()` first split was enough
+  to recover it without widening the patch beyond one function
+- the nested recursive-create path does regress modestly, so this is not a
+  universal algorithmic improvement; it wins because the broad caller mix is
+  dominated by the simple leaf case and the regression stayed small through
+  source proof
+- for this family, the direct `mkdir` vs `makedirs` headroom check was
+  essential pre-flight work: it avoided the usual thin-wrapper trap and showed
+  the wrapper overhead was still large enough to matter
