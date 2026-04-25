@@ -232,6 +232,22 @@ def makedirs(name, mode=0o777, exist_ok=False):
     head, tail = path.split(name)
     if not tail:
         head, tail = path.split(head)
+    if head and tail:
+        cdir = curdir
+        if isinstance(tail, bytes):
+            cdir = bytes(curdir, 'ASCII')
+        if tail != cdir:
+            try:
+                mkdir(name, mode)
+                return
+            except FileNotFoundError:
+                pass
+            except NotADirectoryError:
+                pass
+            except OSError:
+                if exist_ok and path.isdir(name):
+                    return
+                raise
     if head and tail and not path.exists(head):
         try:
             makedirs(head, exist_ok=exist_ok)
