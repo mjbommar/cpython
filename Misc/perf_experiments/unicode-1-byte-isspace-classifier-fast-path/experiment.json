@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/unicode-1-byte-isspace-classifier-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/unicode-1-byte-isspace-classifier-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/unicode-1-byte-isspace-classifier-fast-path/guardrails",
+    "root": "Misc/perf_experiments/unicode-1-byte-isspace-classifier-fast-path"
+  },
+  "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
+  "branch": "exp-unicode/isspace-1byte-mainline",
+  "created_at": "2026-04-25T14:24:33+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "unicode",
+  "hypothesis": "Long 1-byte str.isspace() calls repeatedly enter generic Unicode whitespace checks; a single-pass 1-byte whitespace bitset should reduce parser/text workload runtime while preserving full Unicode semantics.",
+  "notes": [
+    "2026-04-25T14:53:22+00:00 Rejected: non-ASCII one-byte bitset improves synthetic Latin-1 isspace by about 1.6x, but ASCII/BMP and realistic stdlib-shaped workloads are flat; no total-runtime evidence for stacked promotion."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "unicode-1-byte-isspace-classifier-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Objects/unicodeobject.c:11874 unicode_isspace_impl"
+  ],
+  "title": "Unicode 1-byte isspace classifier fast path",
+  "validation": {
+    "ecosystem": "skipped",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
