@@ -1,0 +1,131 @@
+{
+  "T1_detect_ascii_docstring": {
+    "best_ns": 2209.4,
+    "label": "detect_ascii_docstring",
+    "loops": 12000,
+    "mean_ns": 2244.3,
+    "repeat": 7,
+    "samples_ns": [
+      2298.5,
+      2236.5,
+      2284.7,
+      2237.4,
+      2209.4,
+      2223.0,
+      2220.7
+    ]
+  },
+  "T2_detect_utf8_docstring": {
+    "best_ns": 2223.6,
+    "label": "detect_utf8_docstring",
+    "loops": 12000,
+    "mean_ns": 2359.4,
+    "repeat": 7,
+    "samples_ns": [
+      2259.6,
+      2275.4,
+      2223.6,
+      2269.9,
+      2315.9,
+      2540.4,
+      2630.8
+    ]
+  },
+  "T3_detect_comment_cookie": {
+    "best_ns": 3551.6,
+    "label": "detect_comment_cookie",
+    "loops": 12000,
+    "mean_ns": 3667.2,
+    "repeat": 7,
+    "samples_ns": [
+      3761.8,
+      3638.5,
+      3587.7,
+      3551.6,
+      3603.8,
+      3572.6,
+      3954.2
+    ]
+  },
+  "T4_detect_shebang_cookie": {
+    "best_ns": 4537.4,
+    "label": "detect_shebang_cookie",
+    "loops": 12000,
+    "mean_ns": 4617.4,
+    "repeat": 7,
+    "samples_ns": [
+      4696.0,
+      4568.2,
+      4537.4,
+      4554.4,
+      4562.7,
+      4672.7,
+      4730.3
+    ]
+  },
+  "T5_detect_bom_default": {
+    "best_ns": 3171.7,
+    "label": "detect_bom_default",
+    "loops": 12000,
+    "mean_ns": 3317.4,
+    "repeat": 7,
+    "samples_ns": [
+      3474.1,
+      3424.2,
+      3214.2,
+      3571.4,
+      3177.8,
+      3188.4,
+      3171.7
+    ]
+  },
+  "T6_open_default": {
+    "best_ns": 16630.2,
+    "label": "open_default",
+    "loops": 2500,
+    "mean_ns": 16860.2,
+    "repeat": 7,
+    "samples_ns": [
+      16630.2,
+      16885.5,
+      16721.1,
+      16816.7,
+      16889.6,
+      16978.4,
+      17099.7
+    ]
+  },
+  "T7_open_cookie": {
+    "best_ns": 18908.0,
+    "label": "open_cookie",
+    "loops": 2500,
+    "mean_ns": 19404.0,
+    "repeat": 7,
+    "samples_ns": [
+      21164.4,
+      19280.5,
+      19436.7,
+      18950.3,
+      18908.0,
+      18983.6,
+      19104.8
+    ]
+  },
+  "T8_decode_source_default": {
+    "best_ns": 6713.6,
+    "label": "decode_source_default",
+    "loops": 12000,
+    "mean_ns": 6823.1,
+    "repeat": 7,
+    "samples_ns": [
+      7015.3,
+      6847.3,
+      6832.8,
+      6793.1,
+      6785.4,
+      6713.6,
+      6774.0
+    ]
+  },
+  "variant": "common_case_split"
+}

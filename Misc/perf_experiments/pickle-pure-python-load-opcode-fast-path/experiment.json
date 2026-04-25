@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/pickle-pure-python-load-opcode-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/pickle-pure-python-load-opcode-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/pickle-pure-python-load-opcode-fast-path/guardrails",
+    "root": "Misc/perf_experiments/pickle-pure-python-load-opcode-fast-path"
+  },
+  "base_commit": "faa7d29705c03f8ab5141a015128de52fe932f61",
+  "branch": "exp-pickle/load-opcodes-mainline",
+  "created_at": "2026-04-25T01:12:32+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "pending",
+    "guardrails": "pending",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "pickle",
+  "hypothesis": "Control-flow lifting plus common-case split: after the rejected read-helper family, the remaining pure-Python load signal is concentrated in tiny opcode helpers like load_binunicode, load_short_binunicode, load_binint1/2, and tuple arity opcodes, so the next plausible shape is reducing per-opcode helper and stack-mutation overhead rather than more file-read micro-surgery.",
+  "notes": [
+    "2026-04-25T01:13:17+00:00 Archetype control-flow lifting plus common-case split. Reopened pickle load work at the opcode-helper layer after the read-helper family failed. Usage scan confirms concentrated helper signal in load_binunicode/load_short_binunicode/load_binint1/load_binint2 plus tuple arity opcodes, with representative protocol 4/5 opcode census dominated by BININT1, SHORT_BINUNICODE, and TUPLE3."
+  ],
+  "phase": "usage-scan",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "pickle-pure-python-load-opcode-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/pickle.py:1325 load"
+  ],
+  "title": "pickle pure python load opcode fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}

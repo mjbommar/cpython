@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/tokenize-detect-encoding-common-case-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/tokenize-detect-encoding-common-case-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/tokenize-detect-encoding-common-case-fast-path/guardrails",
+    "root": "Misc/perf_experiments/tokenize-detect-encoding-common-case-fast-path"
+  },
+  "base_commit": "faa7d29705c03f8ab5141a015128de52fe932f61",
+  "branch": "exp-tokenize/detect-encoding-mainline",
+  "created_at": "2026-04-25T01:08:05+00:00",
+  "decision": "rejected",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "tokenize",
+  "hypothesis": "Common-case split: tokenize.detect_encoding() pays regex and blank-line checks even when the first line is already a non-comment, nonblank UTF-8 line with no BOM or coding cookie, which is the dominant stdlib shape.",
+  "notes": [
+    "2026-04-25T01:11:52+00:00 Archetype common-case split. Stdlib first-line scan showed 79.87% noncomment/nonblank first lines, but E1 runtime proof was still negative overall: about -4.01% geomean, and the tighter helper form improved only to about -2.38% geomean. Reject before any clean source branch."
+  ],
+  "phase": "rejected",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "tokenize-detect-encoding-common-case-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/tokenize.py:358 detect_encoding"
+  ],
+  "title": "tokenize detect encoding common case fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
