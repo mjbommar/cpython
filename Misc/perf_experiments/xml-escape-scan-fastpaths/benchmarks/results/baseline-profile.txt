@@ -1,0 +1,33 @@
+         9096001 function calls (8786001 primitive calls) in 3.250 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+312000/2000    1.461    0.000    2.320    0.001 ElementTree.py:860(_serialize_xml)
+  4672000    0.536    0.000    0.536    0.000 {built-in method builtins.isinstance}
+     2000    0.532    0.000    0.898    0.000 ElementTree.py:799(_namespaces)
+  2182000    0.279    0.000    0.279    0.000 {method 'write' of '_io.StringIO' objects}
+   936000    0.215    0.000    0.215    0.000 ElementTree.py:1034(_escape_attrib)
+   624000    0.127    0.000    0.127    0.000 {method 'items' of 'xml.etree.ElementTree.Element' objects}
+   314000    0.066    0.000    0.066    0.000 ElementTree.py:1018(_escape_cdata)
+     2000    0.007    0.000    3.239    0.002 ElementTree.py:687(write)
+     2000    0.005    0.000    3.248    0.002 ElementTree.py:1077(tostring)
+    14000    0.004    0.000    0.004    0.000 ElementTree.py:810(add_qname)
+     2000    0.003    0.000    0.003    0.000 contextlib.py:108(__init__)
+     4000    0.002    0.000    0.003    0.000 ElementTree.py:749(_get_writer)
+     4000    0.002    0.000    0.005    0.000 {built-in method builtins.next}
+     2000    0.002    0.000    0.002    0.000 {method 'getvalue' of '_io.StringIO' objects}
+     2000    0.002    0.000    0.005    0.000 contextlib.py:303(helper)
+     2000    0.002    0.000    3.249    0.002 bench_xml_escape.py:68(_serialize)
+     2000    0.002    0.000    0.003    0.000 contextlib.py:145(__exit__)
+     2000    0.001    0.000    0.005    0.000 contextlib.py:136(__enter__)
+     2000    0.001    0.000    0.002    0.000 ElementTree.py:529(__init__)
+     4000    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
+     4000    0.001    0.000    0.001    0.000 {method 'lower' of 'str' objects}
+     2000    0.001    0.000    0.001    0.000 ElementTree.py:118(iselement)
+     2000    0.001    0.000    0.001    0.000 {method 'iter' of 'xml.etree.ElementTree.Element' objects}
+     2000    0.000    0.000    0.000    0.000 {built-in method builtins.hasattr}
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+
+

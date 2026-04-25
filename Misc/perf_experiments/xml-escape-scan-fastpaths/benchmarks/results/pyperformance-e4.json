@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-04-25T10:03:54.502174+00:00",
+  "repo": {
+    "name": "pyperformance",
+    "url": "https://github.com/python/pyperformance.git",
+    "ref": "main",
+    "commit": "b5dfaee6d4da542dc58b2070e018d8449d60d7d9",
+    "checkout_dir": "/tmp/cpython-xml-pyperformance-e4/src/pyperformance"
+  },
+  "python": {
+    "requested": "./python",
+    "venv_python": "/tmp/cpython-xml-pyperformance-e4/venvs/pyperformance/bin/python",
+    "venv_dir": "/tmp/cpython-xml-pyperformance-e4/venvs/pyperformance"
+  },
+  "install": [
+    {
+      "argv": [
+        "python",
+        "-m",
+        "pip",
+        "install",
+        "-e",
+        "/tmp/cpython-xml-pyperformance-e4/src/pyperformance"
+      ],
+      "cwd": "/tmp/cpython-xml-pyperformance-e4/src/pyperformance",
+      "seconds": 3.1740111560211517,
+      "log": "/tmp/cpython-xml-pyperformance-e4/logs/pyperformance/20260425T100311Z/install-01.log"
+    }
+  ],
+  "commands": [
+    {
+      "label": "pyperformance",
+      "argv": [
+        "python",
+        "-m",
+        "pyperformance",
+        "run",
+        "--fast",
+        "-b",
+        "xml_etree",
+        "--output",
+        "/tmp/cpython-xml-pyperformance-e4/artifacts/pyperformance/pyperformance-results.json"
+      ],
+      "cwd": "/tmp/cpython-xml-pyperformance-e4/src/pyperformance",
+      "repeat": 1,
+      "runs": [
+        {
+          "argv": [
+            "python",
+            "-m",
+            "pyperformance",
+            "run",
+            "--fast",
+            "-b",
+            "xml_etree",
+            "--output",
+            "/tmp/cpython-xml-pyperformance-e4/artifacts/pyperformance/pyperformance-results.json"
+          ],
+          "cwd": "/tmp/cpython-xml-pyperformance-e4/src/pyperformance",
+          "seconds": 34.55670221702894,
+          "log": "/tmp/cpython-xml-pyperformance-e4/logs/pyperformance/20260425T100311Z/pyperformance-run01.log"
+        }
+      ],
+      "stats": {
+        "min_seconds": 34.55670221702894,
+        "max_seconds": 34.55670221702894,
+        "mean_seconds": 34.55670221702894,
+        "median_seconds": 34.55670221702894
+      }
+    }
+  ],
+  "extra": {
+    "raw_output": "/tmp/cpython-xml-pyperformance-e4/artifacts/pyperformance/pyperformance-results.json"
+  }
+}

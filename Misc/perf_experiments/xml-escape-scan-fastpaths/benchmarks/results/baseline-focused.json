@@ -1,0 +1,114 @@
+{
+  "E1_escape_cdata_clean_short": {
+    "best_ns": 137.9,
+    "label": "E1_escape_cdata_clean_short",
+    "loops": 80000,
+    "mean_ns": 139.9,
+    "repeat": 5,
+    "samples_ns": [
+      141.9,
+      139.4,
+      141.1,
+      137.9,
+      139.1
+    ]
+  },
+  "E2_escape_cdata_clean_long": {
+    "best_ns": 179.5,
+    "label": "E2_escape_cdata_clean_long",
+    "loops": 12000,
+    "mean_ns": 184.4,
+    "repeat": 5,
+    "samples_ns": [
+      189.7,
+      179.5,
+      181.7,
+      185.3,
+      185.7
+    ]
+  },
+  "E3_escape_cdata_dirty": {
+    "best_ns": 436.5,
+    "label": "E3_escape_cdata_dirty",
+    "loops": 48000,
+    "mean_ns": 445.2,
+    "repeat": 5,
+    "samples_ns": [
+      436.5,
+      441.3,
+      439.7,
+      454.5,
+      454.1
+    ]
+  },
+  "E4_escape_attrib_clean_short": {
+    "best_ns": 206.6,
+    "label": "E4_escape_attrib_clean_short",
+    "loops": 64000,
+    "mean_ns": 209.5,
+    "repeat": 5,
+    "samples_ns": [
+      210.4,
+      211.0,
+      212.6,
+      207.2,
+      206.6
+    ]
+  },
+  "E5_escape_attrib_clean_long": {
+    "best_ns": 335.3,
+    "label": "E5_escape_attrib_clean_long",
+    "loops": 8000,
+    "mean_ns": 349.0,
+    "repeat": 5,
+    "samples_ns": [
+      366.0,
+      351.1,
+      335.3,
+      353.3,
+      339.1
+    ]
+  },
+  "E6_escape_attrib_dirty": {
+    "best_ns": 1021.3,
+    "label": "E6_escape_attrib_dirty",
+    "loops": 32000,
+    "mean_ns": 1031.9,
+    "repeat": 5,
+    "samples_ns": [
+      1021.3,
+      1027.5,
+      1029.9,
+      1042.9,
+      1038.1
+    ]
+  },
+  "E7_tostring_clean_tree": {
+    "best_ns": 557427.9,
+    "label": "E7_tostring_clean_tree",
+    "loops": 1000,
+    "mean_ns": 562423.5,
+    "repeat": 5,
+    "samples_ns": [
+      561908.4,
+      561581.2,
+      565435.0,
+      565765.0,
+      557427.9
+    ]
+  },
+  "E8_tostring_escape_tree": {
+    "best_ns": 638813.8,
+    "label": "E8_tostring_escape_tree",
+    "loops": 800,
+    "mean_ns": 653993.1,
+    "repeat": 5,
+    "samples_ns": [
+      666029.6,
+      674983.5,
+      645972.9,
+      638813.8,
+      644165.6
+    ]
+  }
+}

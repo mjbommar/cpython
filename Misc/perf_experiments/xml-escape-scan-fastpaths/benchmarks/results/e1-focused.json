@@ -1,0 +1,114 @@
+{
+  "E1_escape_cdata_clean_short": {
+    "best_ns": 129.9,
+    "label": "E1_escape_cdata_clean_short",
+    "loops": 80000,
+    "mean_ns": 135.6,
+    "repeat": 5,
+    "samples_ns": [
+      131.0,
+      129.9,
+      137.9,
+      145.8,
+      133.4
+    ]
+  },
+  "E2_escape_cdata_clean_long": {
+    "best_ns": 174.4,
+    "label": "E2_escape_cdata_clean_long",
+    "loops": 12000,
+    "mean_ns": 190.1,
+    "repeat": 5,
+    "samples_ns": [
+      175.5,
+      174.4,
+      199.8,
+      210.0,
+      191.0
+    ]
+  },
+  "E3_escape_cdata_dirty": {
+    "best_ns": 420.2,
+    "label": "E3_escape_cdata_dirty",
+    "loops": 48000,
+    "mean_ns": 431.3,
+    "repeat": 5,
+    "samples_ns": [
+      427.2,
+      431.8,
+      420.2,
+      436.6,
+      440.6
+    ]
+  },
+  "E4_escape_attrib_clean_short": {
+    "best_ns": 205.1,
+    "label": "E4_escape_attrib_clean_short",
+    "loops": 64000,
+    "mean_ns": 214.7,
+    "repeat": 5,
+    "samples_ns": [
+      218.7,
+      229.3,
+      210.4,
+      210.2,
+      205.1
+    ]
+  },
+  "E5_escape_attrib_clean_long": {
+    "best_ns": 325.2,
+    "label": "E5_escape_attrib_clean_long",
+    "loops": 8000,
+    "mean_ns": 332.5,
+    "repeat": 5,
+    "samples_ns": [
+      325.2,
+      325.6,
+      340.3,
+      336.1,
+      335.2
+    ]
+  },
+  "E6_escape_attrib_dirty": {
+    "best_ns": 997.7,
+    "label": "E6_escape_attrib_dirty",
+    "loops": 32000,
+    "mean_ns": 1005.8,
+    "repeat": 5,
+    "samples_ns": [
+      1004.4,
+      1011.0,
+      997.7,
+      1007.3,
+      1008.4
+    ]
+  },
+  "E7_tostring_clean_tree": {
+    "best_ns": 445569.6,
+    "label": "E7_tostring_clean_tree",
+    "loops": 1000,
+    "mean_ns": 451473.4,
+    "repeat": 5,
+    "samples_ns": [
+      445569.6,
+      459896.3,
+      448225.7,
+      456636.8,
+      447038.4
+    ]
+  },
+  "E8_tostring_escape_tree": {
+    "best_ns": 530154.4,
+    "label": "E8_tostring_escape_tree",
+    "loops": 800,
+    "mean_ns": 535049.6,
+    "repeat": 5,
+    "samples_ns": [
+      532727.5,
+      539343.3,
+      532065.7,
+      540957.2,
+      530154.4
+    ]
+  }
+}
