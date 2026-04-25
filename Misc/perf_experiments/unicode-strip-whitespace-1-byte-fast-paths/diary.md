@@ -89,7 +89,8 @@
 
         - Decision: accepted.
         - Accepted commit: `16b568756f30e1dc71c800fa4381222692938e5c`
-        - Stacked winner commit:
+        - Stacked winner commit: `b828a76118f`
+        - Stacked validation: `./python -m test -j4` passed: `476 tests OK`, `49,892` run, `2,620` skipped, `5 min 33 sec`.
 
         ## Notes
 

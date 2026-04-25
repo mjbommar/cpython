@@ -20,13 +20,14 @@
   "family": "unicode",
   "hypothesis": "Whitespace strip/lstrip/rstrip spend measurable runtime in parser and email-style text workloads; tighter 1-byte trimming loops can reduce total runtime while preserving full Unicode whitespace semantics.",
   "notes": [
-    "2026-04-25T15:10:59+00:00 Accepted E3 only: explicit ASCII str.rstrip trailing-space run skip. Focused rstrip_space_padded improved about 1.29x; broad strip/lstrip variants were rejected due mixed non-target movement. Full suite passed."
+    "2026-04-25T15:10:59+00:00 Accepted E3 only: explicit ASCII str.rstrip trailing-space run skip. Focused rstrip_space_padded improved about 1.29x; broad strip/lstrip variants were rejected due mixed non-target movement. Full suite passed.",
+    "2026-04-25T15:18:58+00:00 Stacked winner validation passed on b828a76118f: ./python -m test -j4, 476 tests OK, 49,892 run, 2,620 skipped, 5 min 33 sec."
   ],
-  "phase": "accepted",
+  "phase": "stacked",
   "promotion": {
     "accepted_commit": "16b568756f30e1dc71c800fa4381222692938e5c",
-    "stacked_commit": null,
-    "stacked_validation": "pending"
+    "stacked_commit": "b828a76118f",
+    "stacked_validation": "done"
   },
   "schema_version": 1,
   "slug": "unicode-strip-whitespace-1-byte-fast-paths",
