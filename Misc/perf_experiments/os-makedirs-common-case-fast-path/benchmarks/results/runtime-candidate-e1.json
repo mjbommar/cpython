@@ -1,0 +1,83 @@
+{
+  "M1_leaf_default": {
+    "best_ns": 7016.5,
+    "label": "M1_leaf_default",
+    "loops": 1000,
+    "mean_ns": 7236.4,
+    "repeat": 7,
+    "samples_ns": [
+      7016.5,
+      7140.3,
+      7217.0,
+      7208.8,
+      7311.9,
+      7410.8,
+      7349.8
+    ]
+  },
+  "M2_leaf_exist_ok_missing": {
+    "best_ns": 7162.2,
+    "label": "M2_leaf_exist_ok_missing",
+    "loops": 1000,
+    "mean_ns": 7415.9,
+    "repeat": 7,
+    "samples_ns": [
+      7276.0,
+      7539.3,
+      7326.9,
+      7162.2,
+      7347.7,
+      7961.9,
+      7297.1
+    ]
+  },
+  "M3_nested_default": {
+    "best_ns": 130992.2,
+    "label": "M3_nested_default",
+    "loops": 350,
+    "mean_ns": 131609.7,
+    "repeat": 7,
+    "samples_ns": [
+      131672.6,
+      130992.2,
+      131792.2,
+      131699.9,
+      131897.0,
+      131577.1,
+      131636.8
+    ]
+  },
+  "M4_bytes_leaf_default": {
+    "best_ns": 7234.2,
+    "label": "M4_bytes_leaf_default",
+    "loops": 1000,
+    "mean_ns": 7370.3,
+    "repeat": 7,
+    "samples_ns": [
+      7288.5,
+      7234.2,
+      7327.0,
+      7399.4,
+      7397.2,
+      7521.9,
+      7423.7
+    ]
+  },
+  "M5_existing_dir_exist_ok": {
+    "best_ns": 5648.3,
+    "label": "M5_existing_dir_exist_ok",
+    "loops": 1800,
+    "mean_ns": 5790.4,
+    "repeat": 7,
+    "samples_ns": [
+      5778.4,
+      6253.9,
+      5838.4,
+      5648.3,
+      5683.7,
+      5658.2,
+      5671.4
+    ]
+  },
+  "variant": "mkdir_first"
+}

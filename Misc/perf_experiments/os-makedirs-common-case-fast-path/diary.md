@@ -44,13 +44,23 @@
             - `os.makedirs()` best: about `10098.9 ns`
             - ratio: about `0.59x`
         - Initial benchmark corpus:
+          - `benchmarks/bench_os_makedirs.py`
+          - cases:
+            - `M1_leaf_default`
+            - `M2_leaf_exist_ok_missing`
+            - `M3_nested_default`
+            - `M4_bytes_leaf_default`
+            - `M5_existing_dir_exist_ok`
         - Guardrails:
+          - `guardrails/check_os_makedirs_semantics.py`
+          - target result:
+            - `os makedirs semantics: ok`
 
         ## Candidate Ledger
 
         ### E1
 
-        Status: pending.
+        Status: accepted and stacked.
 
         Thesis:
 
@@ -61,23 +71,58 @@
 
         Result:
 
-        - pending
+        - guardrail passed:
+          - `os makedirs semantics: ok`
+        - focused runtime proof with the helper monkeypatch:
+          - `M1_leaf_default`: `+37.20%`
+          - `M2_leaf_exist_ok_missing`: `+37.31%`
+          - `M3_nested_default`: `-7.13%`
+          - `M4_bytes_leaf_default`: `+35.88%`
+          - `M5_existing_dir_exist_ok`: `+36.52%`
+          - geomean: about `+26.55%`
+          - artifacts:
+            - `benchmarks/results/runtime-baseline.json`
+            - `benchmarks/results/runtime-candidate-e1.json`
+        - clean source proof on `exp-os/makedirs-mainline`:
+          - `M1_leaf_default`: `+30.89%`
+          - `M2_leaf_exist_ok_missing`: `+30.02%`
+          - `M3_nested_default`: `-7.94%`
+          - `M4_bytes_leaf_default`: `+39.72%`
+          - `M5_existing_dir_exist_ok`: `+29.53%`
+          - geomean: about `+23.17%`
+          - artifacts:
+            - `benchmarks/results/source-baseline-a.json`
+            - `benchmarks/results/source-candidate-e1-a.json`
 
         Decision:
 
-        - pending
+        - accept
+        - the optimistic `mkdir()` first split materially speeds the real
+          dominant leaf-create cases, keeps bytes and `exist_ok=True` common
+          traffic fast, and the nested-chain regression is small enough to
+          survive source proof and full validation
 
         ## Validation
 
         - Focused tests:
+          - clean branch:
+            - `test_os test_pathlib test_shutil test_tarfile test_zipfile test_py_compile`
+            - `SUCCESS` in `19.6 sec`
+          - stacked branch:
+            - `test_os test_pathlib test_shutil test_tarfile test_zipfile test_py_compile`
+            - `SUCCESS` in `19.7 sec`
         - Full suite:
+          - clean branch:
+            - `49,882` run, `2,620` skipped, `SUCCESS` in `4 min 15 sec`
+          - stacked branch:
+            - `49,892` run, `2,620` skipped, `SUCCESS` in `4 min 14 sec`
         - Ecosystem / third-party:
 
         ## Acceptance Decision
 
-        - Decision:
-        - Accepted commit:
-        - Stacked winner commit:
+        - Decision: stacked
+        - Accepted commit: `7c59b8539f2`
+        - Stacked winner commit: `521c5363fb8`
 
         ## Notes
 
@@ -85,7 +130,8 @@
         - Archetype: `common-case split`
         - Anti-pattern check: this is not being opened as a thin wrapper guess;
           the direct `mkdir` vs `makedirs` headroom check was run first.
-        - Current phase: `usage-scan`
-        - Next gate: build a focused harness and guardrail around
-          existing-parent, missing-parent, trailing-slash, bytes-path, and
-          `exist_ok` cases before any source patch exists.
+        - Current phase: `stacked`
+        - Next gate: none
+        - Because `os` is frozen in this build, the clean source proof required
+          a real out-of-tree build and could not be faked with a `PYTHONPATH`
+          override against the main interpreter.
