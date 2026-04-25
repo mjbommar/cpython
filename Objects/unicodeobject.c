@@ -12472,6 +12472,11 @@ do_strip(PyObject *self, int striptype)
         j = len;
         if (striptype != LEFTSTRIP) {
             j--;
+            if (striptype == RIGHTSTRIP) {
+                while (j >= i && data[j] == ' ') {
+                    j--;
+                }
+            }
             while (j >= i) {
                 Py_UCS1 ch = data[j];
                 if (!_Py_ascii_whitespace[ch])
