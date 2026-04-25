@@ -837,7 +837,10 @@ def _namespaces(elem, default_namespace=None):
     # populate qname and namespaces table
     for elem in elem.iter():
         tag = elem.tag
-        if isinstance(tag, QName):
+        if type(tag) is str:
+            if tag not in qnames:
+                add_qname(tag)
+        elif isinstance(tag, QName):
             if tag.text not in qnames:
                 add_qname(tag.text)
         elif isinstance(tag, str):
@@ -846,15 +849,19 @@ def _namespaces(elem, default_namespace=None):
         elif tag is not None and tag is not Comment and tag is not PI:
             _raise_serialization_error(tag)
         for key, value in elem.items():
-            if isinstance(key, QName):
+            if type(key) is str:
+                pass
+            elif isinstance(key, QName):
                 key = key.text
             if key not in qnames:
                 add_qname(key)
-            if isinstance(value, QName) and value.text not in qnames:
-                add_qname(value.text)
+            if type(value) is not str:
+                if isinstance(value, QName) and value.text not in qnames:
+                    add_qname(value.text)
         text = elem.text
-        if isinstance(text, QName) and text.text not in qnames:
-            add_qname(text.text)
+        if type(text) is not str:
+            if isinstance(text, QName) and text.text not in qnames:
+                add_qname(text.text)
     return qnames, namespaces
 
 def _serialize_xml(write, elem, qnames, namespaces,
@@ -875,7 +882,9 @@ def _serialize_xml(write, elem, qnames, namespaces,
                                short_empty_elements=short_empty_elements)
         else:
             write("<" + tag)
-            items = list(elem.items())
+            items = elem.items()
+            if type(items) is not list:
+                items = list(items)
             if items or namespaces:
                 if namespaces:
                     for v, k in sorted(namespaces.items(),
@@ -887,9 +896,13 @@ def _serialize_xml(write, elem, qnames, namespaces,
                             _escape_attrib(v)
                             ))
                 for k, v in items:
-                    if isinstance(k, QName):
+                    if type(k) is str:
+                        pass
+                    elif isinstance(k, QName):
                         k = k.text
-                    if isinstance(v, QName):
+                    if type(v) is str:
+                        v = _escape_attrib(v)
+                    elif isinstance(v, QName):
                         v = qnames[v.text]
                     else:
                         v = _escape_attrib(v)
@@ -927,7 +940,9 @@ def _serialize_html(write, elem, qnames, namespaces, **kwargs):
                 _serialize_html(write, e, qnames, None)
         else:
             write("<" + tag)
-            items = list(elem.items())
+            items = elem.items()
+            if type(items) is not list:
+                items = list(items)
             if items or namespaces:
                 if namespaces:
                     for v, k in sorted(namespaces.items(),
@@ -939,9 +954,13 @@ def _serialize_html(write, elem, qnames, namespaces, **kwargs):
                             _escape_attrib(v)
                             ))
                 for k, v in items:
-                    if isinstance(k, QName):
+                    if type(k) is str:
+                        pass
+                    elif isinstance(k, QName):
                         k = k.text
-                    if isinstance(v, QName):
+                    if type(v) is str:
+                        v = _escape_attrib_html(v)
+                    elif isinstance(v, QName):
                         v = qnames[v.text]
                     else:
                         v = _escape_attrib_html(v)
