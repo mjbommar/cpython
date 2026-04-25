@@ -11739,6 +11739,44 @@ unicode_isascii_impl(PyObject *self)
     return PyBool_FromLong(PyUnicode_IS_ASCII(self));
 }
 
+static const uint64_t unicode_lowercase_1byte[4] = {
+    UINT64_C(0x0),
+    UINT64_C(0x7fffffe00000000),
+    UINT64_C(0x420040000000000),
+    UINT64_C(0xff7fffff80000000),
+};
+
+static const uint64_t unicode_uppercase_1byte[4] = {
+    UINT64_C(0x0),
+    UINT64_C(0x7fffffe),
+    UINT64_C(0x0),
+    UINT64_C(0x7f7fffff),
+};
+
+static inline int
+unicode_1byte_set_contains(const uint64_t set[4], Py_UCS1 ch)
+{
+    return (set[ch >> 6] & (UINT64_C(1) << (ch & 63))) != 0;
+}
+
+static int
+unicode_1byte_cased_predicate(const Py_UCS1 *chars, Py_ssize_t length,
+                              const uint64_t required[4],
+                              const uint64_t forbidden[4])
+{
+    int cased = 0;
+
+    for (Py_ssize_t i = 0; i < length; i++) {
+        Py_UCS1 ch = chars[i];
+
+        if (unicode_1byte_set_contains(forbidden, ch)) {
+            return 0;
+        }
+        cased |= unicode_1byte_set_contains(required, ch);
+    }
+    return cased;
+}
+
 /*[clinic input]
 @permit_long_docstring_body
 str.islower as unicode_islower
@@ -11761,6 +11799,23 @@ unicode_islower_impl(PyObject *self)
     length = PyUnicode_GET_LENGTH(self);
     kind = PyUnicode_KIND(self);
     data = PyUnicode_DATA(self);
+
+    if (kind == PyUnicode_1BYTE_KIND) {
+        const Py_UCS1 *chars = PyUnicode_1BYTE_DATA(self);
+
+        if (length == 1) {
+            return PyBool_FromLong(
+                unicode_1byte_set_contains(unicode_lowercase_1byte, chars[0]));
+        }
+        if (length == 0) {
+            Py_RETURN_FALSE;
+        }
+        /* No 1-byte Unicode code points have the titlecase (Lt) property. */
+        return PyBool_FromLong(
+            unicode_1byte_cased_predicate(chars, length,
+                                          unicode_lowercase_1byte,
+                                          unicode_uppercase_1byte));
+    }
 
     /* Shortcut for single character strings */
     if (length == 1)
@@ -11805,6 +11860,23 @@ unicode_isupper_impl(PyObject *self)
     length = PyUnicode_GET_LENGTH(self);
     kind = PyUnicode_KIND(self);
     data = PyUnicode_DATA(self);
+
+    if (kind == PyUnicode_1BYTE_KIND) {
+        const Py_UCS1 *chars = PyUnicode_1BYTE_DATA(self);
+
+        if (length == 1) {
+            return PyBool_FromLong(
+                unicode_1byte_set_contains(unicode_uppercase_1byte, chars[0]));
+        }
+        if (length == 0) {
+            Py_RETURN_FALSE;
+        }
+        /* No 1-byte Unicode code points have the titlecase (Lt) property. */
+        return PyBool_FromLong(
+            unicode_1byte_cased_predicate(chars, length,
+                                          unicode_uppercase_1byte,
+                                          unicode_lowercase_1byte));
+    }
 
     /* Shortcut for single character strings */
     if (length == 1)
