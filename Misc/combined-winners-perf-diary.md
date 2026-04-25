@@ -1822,3 +1822,44 @@ What we learned:
   non-list item views keep the old behavior
 - avoiding `list(elem.items())` is safe for the C accelerator's exact-list
   return while preserving snapshot semantics for non-list implementations
+
+## 2026-04-25 update: ElementTree C escape helpers
+
+Accepted and cherry-picked commit:
+
+- `fe3611434a9` / `3f1b7cbd693`
+  `xml: add C helpers for ElementTree escaping`
+
+Clean-mainline focused result:
+
+- `bench_xml_c_escape.py` final `memchr()` proof:
+  - focused-harness geomean: about `+27.06%`
+  - `tostring()` clean tree: `+8.78%`
+  - `tostring()` escaped tree: `+8.19%`
+- pyperformance fast `xml_etree` smoke:
+  - generate: `1.03x faster`
+  - process: `1.04x faster`
+  - parse/iterparse: not significant
+
+Validation:
+
+- clean-mainline focused tests:
+  `test_xml_etree test_xml_etree_c`: passed
+- clean-mainline full suite:
+  `49,882` tests, `2,596` skipped, `SUCCESS` in `5 min 31 sec`
+- stacked focused tests:
+  `test_xml_etree test_xml_etree_c`: passed
+- stacked full suite:
+  `49,892` tests, `2,620` skipped, `SUCCESS` in `5 min 37 sec`
+
+What we learned:
+
+- a generic C Unicode loop is the wrong scanner: it improved dirty strings but
+  badly regressed long clean strings because Python's existing substring search
+  is already optimized
+- the winning StringZilla-compatible shape is a cheap 1-byte fast rejection
+  layer using `memchr()` over the small XML byte set, then exact replacement
+  handling only after the first hit
+- the C helpers are exposed privately through `_elementtree`, while
+  `ElementTree.py` routes only exact `str` through them; subclasses and
+  non-string extension behavior stay on the existing Python helper path
