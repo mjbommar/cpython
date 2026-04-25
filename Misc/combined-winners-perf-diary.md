@@ -1783,3 +1783,42 @@ What we learned:
 - for this family, the direct `mkdir` vs `makedirs` headroom check was
   essential pre-flight work: it avoided the usual thin-wrapper trap and showed
   the wrapper overhead was still large enough to matter
+
+## 2026-04-25 update: ElementTree XML serializer type-shape split
+
+Accepted and cherry-picked commit:
+
+- `b375012a1fe` / `3675289bacd`
+  `xml: optimize ElementTree serialization fast paths`
+
+Clean-mainline focused result:
+
+- `bench_xml_escape.py` final `type(...) is ...` proof:
+  - focused-harness geomean: about `+9.50%`
+  - `tostring()` clean tree: `+17.34%`
+  - `tostring()` escaped tree: `+17.73%`
+- pyperformance fast `xml_etree` smoke:
+  - parse: `1.05x faster`
+  - iterparse: `1.07x faster`
+  - generate: `1.12x faster`
+  - process: `1.15x faster`
+  - geomean: `1.10x faster`
+
+Validation:
+
+- clean-mainline focused tests:
+  `test_xml_etree test_xml_etree_c`: passed
+- stacked focused tests:
+  `test_xml_etree test_xml_etree_c`: passed
+
+What we learned:
+
+- the first StringZilla-inspired escape-byte scan variants were not the right
+  Python-layer shape; repeated replace/membership checks were smaller than the
+  serializer's QName/type-dispatch overhead
+- the winning shape is still the StringZilla pattern of fast rejection before
+  exact handling, but applied to serializer object shapes: exact `str` and exact
+  list attribute snapshots stay on a short path, while QName, subclasses, and
+  non-list item views keep the old behavior
+- avoiding `list(elem.items())` is safe for the C accelerator's exact-list
+  return while preserving snapshot semantics for non-list implementations
