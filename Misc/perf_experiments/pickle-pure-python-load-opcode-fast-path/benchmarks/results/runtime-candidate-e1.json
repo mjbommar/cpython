@@ -1,0 +1,83 @@
+{
+  "P1_load_unicode_list": {
+    "best_ns": 1565534.1,
+    "label": "load_unicode_list",
+    "loops": 700,
+    "mean_ns": 1576054.5,
+    "repeat": 7,
+    "samples_ns": [
+      1569774.5,
+      1594614.7,
+      1592335.1,
+      1570744.8,
+      1565534.1,
+      1573051.0,
+      1566327.3
+    ]
+  },
+  "P2_load_small_int_list": {
+    "best_ns": 503633.3,
+    "label": "load_small_int_list",
+    "loops": 700,
+    "mean_ns": 509176.4,
+    "repeat": 7,
+    "samples_ns": [
+      506018.4,
+      516701.3,
+      506171.7,
+      503633.3,
+      513401.1,
+      504967.5,
+      513341.8
+    ]
+  },
+  "P3_load_tuple3_list": {
+    "best_ns": 1184156.1,
+    "label": "load_tuple3_list",
+    "loops": 700,
+    "mean_ns": 1192419.2,
+    "repeat": 7,
+    "samples_ns": [
+      1188964.3,
+      1197890.4,
+      1194978.3,
+      1192044.1,
+      1193520.9,
+      1195380.3,
+      1184156.1
+    ]
+  },
+  "P4_load_nested_mixed": {
+    "best_ns": 2729475.9,
+    "label": "load_nested_mixed",
+    "loops": 350,
+    "mean_ns": 2741117.7,
+    "repeat": 7,
+    "samples_ns": [
+      2746837.2,
+      2729475.9,
+      2742405.8,
+      2734846.3,
+      2733893.3,
+      2756482.2,
+      2743883.4
+    ]
+  },
+  "P5_load_stream_multi": {
+    "best_ns": 4568525.4,
+    "label": "load_stream_multi",
+    "loops": 120,
+    "mean_ns": 4611898.2,
+    "repeat": 7,
+    "samples_ns": [
+      4616756.7,
+      4620407.2,
+      4606898.9,
+      4589094.2,
+      4670324.3,
+      4568525.4,
+      4611280.7
+    ]
+  },
+  "variant": "inline_hot_opcodes"
+}

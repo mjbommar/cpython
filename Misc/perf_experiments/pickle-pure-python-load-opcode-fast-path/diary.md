@@ -61,32 +61,55 @@
             - nested dict/list payloads are dominated by `BININT1`, `BINGET`,
               `EMPTY_DICT`, `SETITEMS`, and `APPENDS`
         - Initial benchmark corpus:
-          - next gate: build a focused load harness that isolates:
-            - unicode-heavy payloads
-            - small-int-heavy payloads
-            - tuple-arity-heavy payloads
-            - mixed nested container payloads
+          - `benchmarks/bench_pickle_pure_load_opcodes.py`
+          - cases:
+            - `P1_load_unicode_list`
+            - `P2_load_small_int_list`
+            - `P3_load_tuple3_list`
+            - `P4_load_nested_mixed`
+            - `P5_load_stream_multi`
         - Guardrails:
-          - next gate: reuse the prior pickle load guardrail first, then widen
-            only if the prototype changes stack/memo semantics
+          - `guardrails/check_pickle_pure_load_opcode_semantics.py`
+          - target result:
+            - `pickle pure load opcode guardrails: ok`
 
         ## Candidate Ledger
 
         ### E1
 
-        Status: pending.
+        Status: rejected at runtime proof.
 
         Thesis:
 
-        -
+        - inline the dominant small load opcodes directly inside
+          `_Unpickler.load()` for protocol-4/5-heavy traffic:
+          `BININT1`, `BININT2`, `SHORT_BINUNICODE`, tuple arity opcodes,
+          `MEMOIZE`, `BINGET`, `MARK`, `APPENDS`, `SETITEMS`, and a few empty
+          container literals, while falling back to the normal dispatch table
+          for everything else
 
         Result:
 
-        -
+        - guardrail passed:
+          - `pickle pure load opcode guardrails: ok`
+        - focused runtime proof on the stacked interpreter was strongly
+          negative:
+          - `P1_load_unicode_list`: `-31.55%`
+          - `P2_load_small_int_list`: `+1.23%`
+          - `P3_load_tuple3_list`: `-18.17%`
+          - `P4_load_nested_mixed`: `-32.39%`
+          - `P5_load_stream_multi`: `-29.69%`
+          - geomean: about `-23.07%`
+        - artifacts:
+          - `benchmarks/results/runtime-baseline.json`
+          - `benchmarks/results/runtime-candidate-e1.json`
 
         Decision:
 
-        -
+        - reject the family before any clean source branch
+        - the Python-level mega-dispatch shape loses badly on unicode-heavy,
+          tuple-heavy, nested, and stream-multi traffic, so there is no reason
+          to spend a clean proof branch on it
 
         ## Validation
 
@@ -96,13 +119,16 @@
 
         ## Acceptance Decision
 
-        - Decision:
+        - Decision: rejected
         - Accepted commit:
         - Stacked winner commit:
 
         ## Notes
 
         - Keep rejected ideas here too so the branch remains useful research.
-        - Current phase: `usage-scan`
-        - Next gate: focused harness plus baseline artifacts before any
-          runtime monkeypatch candidate exists.
+        - Current phase: `rejected`
+        - Next gate: none
+        - The family matched the intended archetype on paper, but the
+          implementation crossed into the `manual Python-level control-flow
+          blowup` failure mode: too much inline interpreter work in one loop
+          overwhelmed any helper-call savings.

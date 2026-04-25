@@ -8,19 +8,20 @@
   "base_commit": "faa7d29705c03f8ab5141a015128de52fe932f61",
   "branch": "exp-pickle/load-opcodes-mainline",
   "created_at": "2026-04-25T01:12:32+00:00",
-  "decision": "pending",
+  "decision": "rejected",
   "evidence": {
-    "benchmarks": "pending",
-    "guardrails": "pending",
+    "benchmarks": "done",
+    "guardrails": "done",
     "profiles": [],
     "usage_scan": "done"
   },
   "family": "pickle",
   "hypothesis": "Control-flow lifting plus common-case split: after the rejected read-helper family, the remaining pure-Python load signal is concentrated in tiny opcode helpers like load_binunicode, load_short_binunicode, load_binint1/2, and tuple arity opcodes, so the next plausible shape is reducing per-opcode helper and stack-mutation overhead rather than more file-read micro-surgery.",
   "notes": [
-    "2026-04-25T01:13:17+00:00 Archetype control-flow lifting plus common-case split. Reopened pickle load work at the opcode-helper layer after the read-helper family failed. Usage scan confirms concentrated helper signal in load_binunicode/load_short_binunicode/load_binint1/load_binint2 plus tuple arity opcodes, with representative protocol 4/5 opcode census dominated by BININT1, SHORT_BINUNICODE, and TUPLE3."
+    "2026-04-25T01:13:17+00:00 Archetype control-flow lifting plus common-case split. Reopened pickle load work at the opcode-helper layer after the read-helper family failed. Usage scan confirms concentrated helper signal in load_binunicode/load_short_binunicode/load_binint1/load_binint2 plus tuple arity opcodes, with representative protocol 4/5 opcode census dominated by BININT1, SHORT_BINUNICODE, and TUPLE3.",
+    "2026-04-25T01:42:42+00:00 Guardrail passed, but runtime candidate E1 was strongly negative at about -23.07% geomean on the focused pickle load harness; rejected before any clean source branch."
   ],
-  "phase": "usage-scan",
+  "phase": "rejected",
   "promotion": {
     "accepted_commit": null,
     "stacked_commit": null,

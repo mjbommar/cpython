@@ -1,0 +1,83 @@
+{
+  "P1_load_unicode_list": {
+    "best_ns": 1058330.7,
+    "label": "load_unicode_list",
+    "loops": 700,
+    "mean_ns": 1078781.8,
+    "repeat": 7,
+    "samples_ns": [
+      1065934.5,
+      1077856.4,
+      1092310.5,
+      1071846.8,
+      1058330.7,
+      1104175.2,
+      1081018.3
+    ]
+  },
+  "P2_load_small_int_list": {
+    "best_ns": 510798.7,
+    "label": "load_small_int_list",
+    "loops": 700,
+    "mean_ns": 515420.8,
+    "repeat": 7,
+    "samples_ns": [
+      514447.6,
+      523507.1,
+      512713.8,
+      510798.7,
+      521939.6,
+      513426.7,
+      511112.4
+    ]
+  },
+  "P3_load_tuple3_list": {
+    "best_ns": 963722.2,
+    "label": "load_tuple3_list",
+    "loops": 700,
+    "mean_ns": 975773.6,
+    "repeat": 7,
+    "samples_ns": [
+      972191.2,
+      970185.4,
+      963722.2,
+      986650.6,
+      973718.2,
+      981762.3,
+      982185.5
+    ]
+  },
+  "P4_load_nested_mixed": {
+    "best_ns": 1841670.5,
+    "label": "load_nested_mixed",
+    "loops": 350,
+    "mean_ns": 1853218.7,
+    "repeat": 7,
+    "samples_ns": [
+      1856491.5,
+      1845816.4,
+      1855777.4,
+      1853208.4,
+      1841670.5,
+      1856656.1,
+      1862910.3
+    ]
+  },
+  "P5_load_stream_multi": {
+    "best_ns": 3195429.1,
+    "label": "load_stream_multi",
+    "loops": 120,
+    "mean_ns": 3242635.9,
+    "repeat": 7,
+    "samples_ns": [
+      3195429.1,
+      3313430.6,
+      3202537.5,
+      3225831.2,
+      3255148.0,
+      3237929.0,
+      3268146.0
+    ]
+  },
+  "variant": "baseline"
+}

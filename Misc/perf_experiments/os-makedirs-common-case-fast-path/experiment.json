@@ -1,0 +1,46 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/os-makedirs-common-case-fast-path/benchmarks",
+    "diary": "Misc/perf_experiments/os-makedirs-common-case-fast-path/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/os-makedirs-common-case-fast-path/guardrails",
+    "root": "Misc/perf_experiments/os-makedirs-common-case-fast-path"
+  },
+  "base_commit": "23a03177997723b721c02e53b58d3fd03ac42267",
+  "branch": "exp-os/makedirs-mainline",
+  "created_at": "2026-04-25T01:43:27+00:00",
+  "decision": "pending",
+  "evidence": {
+    "benchmarks": "pending",
+    "guardrails": "pending",
+    "profiles": [],
+    "usage_scan": "done"
+  },
+  "family": "os",
+  "hypothesis": "Common-case split: for the dominant leaf-create case where the parent already exists and the caller uses ordinary string paths with default mode, os.makedirs() likely spends reviewable Python time in split/exists/recursive setup before the final mkdir syscall, so an optimistic direct-mkdir-first shape may recover that overhead while preserving the current fallback semantics.",
+  "notes": [
+    "2026-04-25T01:43:56+00:00 Archetype common-case split. Usage scan found broad stdlib reach for os.makedirs(), and a direct headroom check on the simple existing-parent case showed os.makedirs() at only about 0.59x raw mkdir(), so the family is worth a focused benchmark and guardrail."
+  ],
+  "phase": "usage-scan",
+  "promotion": {
+    "accepted_commit": null,
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "os-makedirs-common-case-fast-path",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Lib/os.py:222 makedirs"
+  ],
+  "title": "os makedirs common case fast path",
+  "validation": {
+    "ecosystem": "pending",
+    "focused_tests": "pending",
+    "full_suite": "pending"
+  }
+}
