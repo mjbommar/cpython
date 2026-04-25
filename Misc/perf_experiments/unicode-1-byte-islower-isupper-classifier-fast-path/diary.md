@@ -108,12 +108,19 @@
             and `regex_compile`.
           - `django_template` blocked by benchmark dependency compatibility,
             not by this patch.
+        - Stacked validation:
+          - Source commit `2ac95e70c25` on `exp-combined-winners-local`.
+          - Stacked guardrails passed.
+          - `./python -m test test_str test_string test_unicodedata -j1`
+            passed.
+          - `./python -m test -j4` passed: `476` tests OK, `49,892` run,
+            `2,620` skipped, `5 min 32 sec`.
 
         ## Acceptance Decision
 
         - Decision: accepted for proof-branch commit and stacked promotion.
         - Accepted commit: `db57b3a52a6`
-        - Stacked winner commit:
+        - Stacked winner commit: `2ac95e70c25`
 
         ## Notes
 
