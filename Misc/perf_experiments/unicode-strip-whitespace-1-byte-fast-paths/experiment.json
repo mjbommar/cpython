@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "benchmark_dir": "Misc/perf_experiments/unicode-strip-whitespace-1-byte-fast-paths/benchmarks",
+    "diary": "Misc/perf_experiments/unicode-strip-whitespace-1-byte-fast-paths/diary.md",
+    "guardrail_dir": "Misc/perf_experiments/unicode-strip-whitespace-1-byte-fast-paths/guardrails",
+    "root": "Misc/perf_experiments/unicode-strip-whitespace-1-byte-fast-paths"
+  },
+  "base_commit": "ad7d3616c6cc21c5ec032a726e4c5e819628aa6e",
+  "branch": "exp-unicode/strip-whitespace-1byte-mainline",
+  "created_at": "2026-04-25T14:54:47+00:00",
+  "decision": "accepted",
+  "evidence": {
+    "benchmarks": "done",
+    "guardrails": "done",
+    "profiles": [
+      "/tmp/strip_candidate_test_email.prof"
+    ],
+    "usage_scan": "done"
+  },
+  "family": "unicode",
+  "hypothesis": "Whitespace strip/lstrip/rstrip spend measurable runtime in parser and email-style text workloads; tighter 1-byte trimming loops can reduce total runtime while preserving full Unicode whitespace semantics.",
+  "notes": [
+    "2026-04-25T15:10:59+00:00 Accepted E3 only: explicit ASCII str.rstrip trailing-space run skip. Focused rstrip_space_padded improved about 1.29x; broad strip/lstrip variants were rejected due mixed non-target movement. Full suite passed."
+  ],
+  "phase": "accepted",
+  "promotion": {
+    "accepted_commit": "16b568756f30e1dc71c800fa4381222692938e5c",
+    "stacked_commit": null,
+    "stacked_validation": "pending"
+  },
+  "schema_version": 1,
+  "slug": "unicode-strip-whitespace-1-byte-fast-paths",
+  "success_criteria": [
+    "Guardrails pass before any performance claim is trusted.",
+    "A focused harness shows a repeatable local win or a clear macro-workload reason to proceed.",
+    "Focused stdlib tests pass before promotion.",
+    "The full suite passes before the experiment is merged into the stacked winner branch."
+  ],
+  "targets": [
+    "Objects/unicodeobject.c:12359 do_strip"
+  ],
+  "title": "Unicode strip whitespace 1-byte fast paths",
+  "validation": {
+    "ecosystem": "skipped",
+    "focused_tests": "done",
+    "full_suite": "done"
+  }
+}
