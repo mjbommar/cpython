@@ -2,6 +2,7 @@
 
 #include "Python.h"
 #include "pycore_call.h"          // _PyObject_CallNoArgs()
+#include "pycore_object.h"        // _Py_SetImmortal()
 #include "pycore_runtime.h"       // _PyRuntime
 #include "pycore_unicodeobject.h" // _PyUnicode_AsUTF8String()
 
@@ -286,6 +287,17 @@ typedef struct {
     int fd;
 } PyStdPrinter_Object;
 
+static void
+stdprinter_dealloc(PyObject *self)
+{
+    /* This should never get called, but we also don't want to SEGV if
+     * we accidentally decref the stdprinter out of existence during
+     * interpreter teardown.  Instead, since stdprinter is an immortal
+     * singleton, re-set the reference count.
+     */
+    _Py_SetImmortal(self);
+}
+
 PyObject *
 PyFile_NewStdPrinter(int fd)
 {
@@ -300,6 +312,7 @@ PyFile_NewStdPrinter(int fd)
                         &PyStdPrinter_Type);
     if (self != NULL) {
         self->fd = fd;
+        _Py_SetImmortal((PyObject *)self);
     }
     return (PyObject*)self;
 }
@@ -434,7 +447,7 @@ PyTypeObject PyStdPrinter_Type = {
     sizeof(PyStdPrinter_Object),                /* tp_basicsize */
     0,                                          /* tp_itemsize */
     /* methods */
-    0,                                          /* tp_dealloc */
+    stdprinter_dealloc,                         /* tp_dealloc */
     0,                                          /* tp_vectorcall_offset */
     0,                                          /* tp_getattr */
     0,                                          /* tp_setattr */
